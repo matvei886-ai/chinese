@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Китайский этикет в быту</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #07242b;
+  background-image: radial-gradient(ellipse at top, #0d3a44 0%, #07242b 60%);
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+  color: #07242b;
+  position: relative;
+}
+
+body::before {
+  content: "和 礼 信 智 福 安 静 道";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  font-size: 80px;
+  color: rgba(255,255,255,0.035);
+  word-spacing: 40px;
+  line-height: 1.4;
+  pointer-events: none;
+  z-index: 0;
+  padding: 20px;
+  letter-spacing: 20px;
+}
+
+.wrapper { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; }
+
+/* Шапка */
+.header { text-align: center; margin-bottom: 30px; }
+.header-top {
+  font-size: 13px; letter-spacing: 4px; color: #5fd3c4;
+  margin-bottom: 6px; text-transform: uppercase;
+}
+.header h1 {
+  font-size: 23px; font-weight: 700; color: #fff;
+  margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); line-height: 1.3;
+}
+.header-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+.divider { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 0 auto; max-width: 260px; }
+.divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, #5fd3c4, transparent); }
+.divider-symbol { color: #5fd3c4; font-size: 18px; }
+
+/* Метка темы */
+.topic-label {
+  text-align: center;
+  color: #5fd3c4;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 36px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topic-label:first-of-type { margin-top: 0; }
+.topic-label::before, .topic-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(95,211,196,0.25);
+}
+
+/* Инфо-карточка (контент из поста/презентации) */
+.info-card {
+  background: linear-gradient(135deg, #0e4a52, #0a3940);
+  border-radius: 18px;
+  padding: 20px 20px 18px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(95,211,196,0.25);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  color: #e8fbf8;
+  position: relative;
+  overflow: hidden;
+}
+.info-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(95,211,196,0.12), transparent 70%);
+}
+.info-icon {
+  display: inline-flex;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(95,211,196,0.18);
+  color: #5fd3c4;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.info-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.info-text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #c9e9e4;
+}
+.info-text strong { color: #5fd3c4; }
+.info-list { margin-top: 8px; padding-left: 0; list-style: none; }
+.info-list li {
+  padding-left: 20px;
+  position: relative;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #c9e9e4;
+}
+.info-list li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: #5fd3c4;
+  font-size: 9px;
+  top: 5px;
+}
+.chinese-inline {
+  color: #5fd3c4;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Карточка-упражнение */
+.card {
+  background: #fdfffe;
+  border-radius: 18px;
+  margin-bottom: 22px;
+  overflow: hidden;
+  border: 1px solid #d2ece8;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: linear-gradient(to bottom, #1ba39a, #0c5c63);
+}
+
+.card-inner { padding: 18px 18px 18px 22px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; background: #0c5c63; color: #d9f7f2;
+  margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+.q-text { font-size: 14.5px; font-weight: 700; color: #07242b; margin-bottom: 14px; line-height: 1.55; }
+
+.chinese {
+  display: block; font-size: 28px; color: #0c5c63; font-weight: 700;
+  margin-bottom: 2px; letter-spacing: 3px;
+}
+.pinyin { display: block; font-size: 12px; color: #888; margin-bottom: 12px; font-style: italic; }
+
+/* Варианты */
+.options { display: flex; flex-direction: column; gap: 9px; }
+.options input[type=radio] { display: none; }
+
+.opt-label {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fff; border: 1.5px solid #d8e8e5; border-radius: 12px;
+  padding: 12px 14px; font-size: 13.5px; cursor: pointer; line-height: 1.4;
+  color: #1a2e2c; transition: all 0.15s; position: relative;
+}
+.opt-label::before { content: '○'; font-size: 16px; color: #1ba39a; flex-shrink: 0; margin-top: -1px; }
+.opt-label:active { background: #eefaf8; }
+
+input[type=radio]:checked + .opt-label {
+  border-color: #1ba39a; background: #eefaf8; color: #0c5c63; font-weight: 600;
+}
+input[type=radio]:checked + .opt-label::before { content: '●'; color: #1ba39a; }
+
+.correct-opt input[type=radio]:checked + .opt-label {
+  border-color: #5a8a1e; background: #e8f5d0; color: #2a5a00;
+}
+.correct-opt input[type=radio]:checked + .opt-label::before { content: '✓'; color: #5a8a1e; }
+
+.explain {
+  display: none; margin-top: 14px; padding: 13px 15px; border-radius: 10px;
+  font-size: 12.5px; line-height: 1.7;
+  background: linear-gradient(135deg, #e8f5d0, #d4edba);
+  color: #2a5a00; border-left: 3px solid #5a8a1e;
+}
+.correct-opt input[type=radio]:checked ~ .explain { display: block; }
+
+.footer {
+  text-align: center; margin-top: 32px; color: rgba(255,255,255,0.35);
+  font-size: 12px; letter-spacing: 2px;
+}
+.footer-symbol { font-size: 20px; margin-bottom: 6px; display: block; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-top">中国文化 · Китайская культура</div>
+    <h1>Китайский этикет в быту</h1>
+    <div class="header-sub">Краткая теория + проверь себя по каждой теме</div>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-symbol">✦</div>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 1: ЛИЦО -->
+  <div class="topic-label">面子 · Лицо и репутация</div>
+
+  <div class="info-card">
+    <span class="info-icon">面</span>
+    <p class="info-title">Насколько важно «лицо» (面子)?</p>
+    <p class="info-text"><strong>Лицо = репутация + уважение + статус.</strong> Это понятие важнее прямого общения. Публичная критика человека = потеря его лица и уважения к нему со стороны окружающих. Похвала при других, наоборот, повышает уважение.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Коллега ошибся на совещании. Как лучше указать ему на ошибку по китайским нормам?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"><span class="opt-label">Сразу сказать при всех: «Ты не прав»</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q1" value="b"><span class="opt-label">Поговорить лично, мягко и уважительным тоном</span></label>
+          <div class="explain">Публичная критика = потеря лица и сопротивление. Личный разговор с мягкой корректировкой решает проблему без унижения и сохраняет уважение.</div>
+        </div>
+        <label><input type="radio" name="q1" value="c"><span class="opt-label">Написать об ошибке в общий чат</span></label>
+        <label><input type="radio" name="q1" value="d"><span class="opt-label">Промолчать и ничего не говорить</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 2: ОБРАЩЕНИЯ -->
+  <div class="topic-label">称呼 · Как обращаться к людям</div>
+
+  <div class="info-card">
+    <span class="info-icon">称</span>
+    <p class="info-title">Почему нельзя называть людей по имени?</p>
+    <p class="info-text">В Китае важен статус и иерархия, поэтому используются титулы вместо имени:</p>
+    <ul class="info-list">
+      <li><span class="chinese-inline">老师</span> — учитель</li>
+      <li><span class="chinese-inline">王经理</span> — менеджер Ван</li>
+      <li><span class="chinese-inline">李姐</span> — сестра Ли</li>
+      <li><span class="chinese-inline">张总</span> — директор Чжан</li>
+    </ul>
+    <p class="info-text" style="margin-top:8px;">В китайском языке также нет нейтрального «ты» для уважительного обращения — есть вежливые формы (您好, 请问…).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Почему в Китае не принято называть человека просто по имени?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"><span class="opt-label">Имена слишком длинные</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q3" value="b"><span class="opt-label">В Китае важен статус и иерархия — используются титулы</span></label>
+          <div class="explain">В Китае важен статус и иерархия, поэтому используются титулы: 老师 (учитель), 王经理 (менеджер Ван), 张总 (директор Чжан) и т.д.</div>
+        </div>
+        <label><input type="radio" name="q3" value="c"><span class="opt-label">Имена держат в секрете</span></label>
+        <label><input type="radio" name="q3" value="d"><span class="opt-label">Это устаревшая традиция, которой никто не следует</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 3: ЧИСЛА -->
+  <div class="topic-label">数字 · Числа и приметы</div>
+
+  <div class="info-card">
+    <span class="info-icon">数</span>
+    <p class="info-title">Секреты чисел в Китае</p>
+    <p class="info-text"><strong>Счастливые:</strong> 6 («всё идёт гладко»), 8 («богатство»), 9 («надолго, на счастье»).</p>
+    <p class="info-text" style="margin-top:6px;"><strong>Нежелательные:</strong> 4 (созвучно слову «смерть»), 14 и 40 (та же ассоциация, усиленная).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Почему число 4 считается нежелательным в Китае?</p>
+      <div class="options">
+        <label><input type="radio" name="q6" value="a"><span class="opt-label">Это число неудачи по гороскопу</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q6" value="b"><span class="opt-label">Созвучно слову «смерть»</span></label>
+          <div class="explain">Число 4 (四, sì) созвучно слову «смерть» (死, sǐ), поэтому считается нежелательным. Похожая логика у чисел 14 и 40.</div>
+        </div>
+        <label><input type="radio" name="q6" value="c"><span class="opt-label">Оно ассоциируется с бедностью</span></label>
+        <label><input type="radio" name="q6" value="d"><span class="opt-label">Его сложно произнести</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 4: КРАСНЫЕ КОНВЕРТЫ -->
+  <div class="topic-label">红包 · Красные конверты</div>
+
+  <div class="info-card">
+    <span class="info-icon">红</span>
+    <p class="info-title">Красные конверты — это не только деньги</p>
+    <p class="info-text">Красный конверт <span class="chinese-inline">红包</span> — это знак внимания, отношений и этикета, а не просто сумма. Дарят на свадьбу, день рождения, новоселье, праздники.</p>
+    <p class="info-text" style="margin-top:8px;"><strong>Важно:</strong> конверт обычно не открывают сразу при дарителе — это считается более тактичным.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Вам подарили красный конверт. Как правильно поступить?</p>
+      <div class="options">
+        <label><input type="radio" name="q8" value="a"><span class="opt-label">Сразу открыть и пересчитать деньги при дарителе</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q8" value="b"><span class="opt-label">Не открывать сразу — это считается более тактичным</span></label>
+          <div class="explain">Красный конверт — это не просто сумма денег, а знак внимания и этикета. Обычно его не открывают сразу при дарителе.</div>
+        </div>
+        <label><input type="radio" name="q8" value="c"><span class="opt-label">Отказаться от конверта</span></label>
+        <label><input type="radio" name="q8" value="d"><span class="opt-label">Сразу вернуть деньги обратно</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 5: БАНКЕТ -->
+  <div class="topic-label">餐桌 · Этикет за столом</div>
+
+  <div class="info-card">
+    <span class="info-icon">餐</span>
+    <p class="info-title">Китайский банкет: главные правила</p>
+    <ul class="info-list">
+      <li><strong>Главное место</strong> — обычно напротив двери, его занимает старший, хозяин или важный гость</li>
+      <li><strong>Кто начинает первым</strong> — старшие или хозяин, потом остальные</li>
+      <li><strong>Кто платит</strong> — человек более высокого статуса, тот, кто пригласил, или хозяин встречи</li>
+      <li><strong>Если положили еду в тарелку</strong> — это знак заботы, лучше попробовать и поблагодарить</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Руководитель за столом положил вам еду на тарелку. Как реагировать?</p>
+      <div class="options">
+        <label><input type="radio" name="q10" value="a"><span class="opt-label">Это невежливо, нужно сразу отказаться</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q10" value="b"><span class="opt-label">Это знак заботы — лучше принять и поблагодарить</span></label>
+          <div class="explain">В китайской культуре такой жест часто означает внимание и расположение к вам. Лучше попробовать блюдо и поблагодарить.</div>
+        </div>
+        <label><input type="radio" name="q10" value="c"><span class="opt-label">Нужно сразу же положить еду в ответ</span></label>
+        <label><input type="radio" name="q10" value="d"><span class="opt-label">Это не имеет особого значения</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Начальник на ужине говорит: «Заказывайте что хотите». Как это лучше понимать?</p>
+      <div class="options">
+        <label><input type="radio" name="q11" value="a"><span class="opt-label">Буквально — можно заказывать самое дорогое блюдо</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q11" value="b"><span class="opt-label">Это вежливая фраза — лучше выбирать с чувством меры</span></label>
+          <div class="explain">Скрытый смысл: «Выбирайте, но с чувством меры». Важно не выбирать слишком дорогое или слишком странное блюдо.</div>
+        </div>
+        <label><input type="radio" name="q11" value="c"><span class="opt-label">Нужно вообще отказаться от заказа</span></label>
+        <label><input type="radio" name="q11" value="d"><span class="opt-label">Нужно спросить разрешения на каждое блюдо</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 6: ЧАЙ -->
+  <div class="topic-label">茶 · Чайный этикет</div>
+
+  <div class="info-card">
+    <span class="info-icon">茶</span>
+    <p class="info-title">Чайный этикет</p>
+    <ul class="info-list">
+      <li>Старшим чай предлагают первым</li>
+      <li>Сначала наливают чай другим, потом себе</li>
+      <li>Чашку принимают двумя руками</li>
+      <li>В знак благодарности легко стучат пальцами по столу</li>
+      <li>Не стоит держать чайник в руках слишком долго</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Что означает лёгкое постукивание пальцами по столу, когда вам наливают чай?</p>
+      <div class="options">
+        <label><input type="radio" name="q15" value="a"><span class="opt-label">Просьба налить ещё больше</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q15" value="b"><span class="opt-label">Это знак благодарности</span></label>
+          <div class="explain">Постукивание пальцами по столу — традиционный жест благодарности тому, кто наливает чай, без необходимости прерывать разговор.</div>
+        </div>
+        <label><input type="radio" name="q15" value="c"><span class="opt-label">Знак того, что чай слишком горячий</span></label>
+        <label><input type="radio" name="q15" value="d"><span class="opt-label">Просьба остановиться</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 7: ВЕЖЛИВЫЙ ОТКАЗ -->
+  <div class="topic-label">拒绝 · Вежливый отказ</div>
+
+  <div class="info-card">
+    <span class="info-icon">拒</span>
+    <p class="info-title">Перевод скрытых смыслов</p>
+    <p class="info-text">Многие вежливые фразы звучат мягко, но их настоящий смысл зависит от контекста:</p>
+    <ul class="info-list">
+      <li><strong>«Я подумаю»</strong> → скорее всего, отказ</li>
+      <li><strong>«Давай в другой раз»</strong> → неопределённый, вежливый отказ</li>
+      <li><strong>«Если будет возможность»</strong> → шанс невелик</li>
+      <li><strong>«Неплохо»</strong> → не хочет, но не говорит резко</li>
+    </ul>
+    <p class="info-text" style="margin-top:8px;">Главная цель отказа в Китае — сохранить вежливость и хорошие отношения, не говоря «нет» напрямую.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Что на самом деле часто означает фраза «Я подумаю» от китайского собеседника?</p>
+      <div class="options">
+        <label><input type="radio" name="q16" value="a"><span class="opt-label">Точно согласится позже</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q16" value="b"><span class="opt-label">Скорее всего, это отказ</span></label>
+          <div class="explain">«Я подумаю» в китайской культуре чаще всего означает вежливый отказ — собеседник не хочет говорить «нет» напрямую.</div>
+        </div>
+        <label><input type="radio" name="q16" value="c"><span class="opt-label">Нужно срочно напомнить о себе</span></label>
+        <label><input type="radio" name="q16" value="d"><span class="opt-label">Просьба прислать больше информации</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Какая главная разница между русской и китайской культурой отказа?</p>
+      <div class="options">
+        <label><input type="radio" name="q18" value="a"><span class="opt-label">В Китае отказывают грубее, чем в России</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q18" value="b"><span class="opt-label">В русской — часто прямо, в китайской — отказ звучит мягче</span></label>
+          <div class="explain">В русской культуре часто можно сказать прямо «нет». В китайской отказ звучит мягче: «в последнее время я немного занят» — цель сохранить вежливость и хорошие отношения.</div>
+        </div>
+        <label><input type="radio" name="q18" value="c"><span class="opt-label">В Китае вообще никогда не отказывают</span></label>
+        <label><input type="radio" name="q18" value="d"><span class="opt-label">Разницы нет, культуры одинаковые</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 8: WECHAT -->
+  <div class="topic-label">微信 · Этикет в WeChat</div>
+
+  <div class="info-card">
+    <span class="info-icon">微</span>
+    <p class="info-title">Этикет в WeChat: важные детали</p>
+    <p class="info-text"><strong>Лучше избегать:</strong> «Ты здесь?», только знак «?», только эмодзи, только «угу»/«мм», слишком длинные голосовые.</p>
+    <p class="info-text" style="margin-top:6px;"><strong>Лучше так:</strong> сначала поздороваться → коротко объяснить цель → писать ясно → отвечать вовремя → уважать чужое время.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Какое сообщение в WeChat лучше всего соответствует китайскому деловому этикету?</p>
+      <div class="options">
+        <label><input type="radio" name="q19" value="a"><span class="opt-label">«Ты здесь?»</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q19" value="b"><span class="opt-label">Сначала поздороваться, затем коротко объяснить цель</span></label>
+          <div class="explain">Лучше всего: сначала поздороваться, потом перейти к делу, коротко объяснить цель сообщения и писать ясно.</div>
+        </div>
+        <label><input type="radio" name="q19" value="c"><span class="opt-label">Только эмодзи без текста</span></label>
+        <label><input type="radio" name="q19" value="d"><span class="opt-label">Длинное голосовое сообщение без предупреждения</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 9: ПОДАРКИ-ТАБУ -->
+  <div class="topic-label">礼物 · Подарки-табу</div>
+
+  <div class="info-card">
+    <span class="info-icon">礼</span>
+    <p class="info-title">Подарки-табу: что лучше не дарить</p>
+    <ul class="info-list">
+      <li><strong>Часы</strong> — созвучно с «проводами в последний путь»</li>
+      <li><strong>Груша</strong> — созвучна слову «расставание»</li>
+      <li><strong>Зонт</strong> — намёк на разлуку</li>
+      <li><strong>Белые цветы</strong> — ассоциация с трауром</li>
+      <li><strong>Нож</strong> — символ разрыва отношений</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Почему часы — неудачный подарок в Китае?</p>
+      <div class="options">
+        <label><input type="radio" name="q20" value="a"><span class="opt-label">Они слишком дорогие</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q20" value="b"><span class="opt-label">Созвучны с «проводами в последний путь»</span></label>
+          <div class="explain">Часы (钟, zhōng) созвучны со словом «проводы в последний путь» (送终, sòngzhōng) — поэтому считаются неудачным подарком.</div>
+        </div>
+        <label><input type="radio" name="q20" value="c"><span class="opt-label">Они быстро ломаются</span></label>
+        <label><input type="radio" name="q20" value="d"><span class="opt-label">Это слишком практичный подарок</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 10: ИНОСТРАНЦЫ -->
+  <div class="topic-label">外国人 · Иностранцы в Китае</div>
+
+  <div class="info-card">
+    <span class="info-icon">外</span>
+    <p class="info-title">Иностранцы в глазах китайцев</p>
+    <p class="info-text"><strong>Нравится:</strong> интерес к языку и культуре, уважение к старшим, дружелюбие, вежливость к общественным правилам.</p>
+    <p class="info-text" style="margin-top:6px;"><strong>Не нравится:</strong> публичные объятия и поцелуи, игнорирование культуры, неуважение к старшим, слишком личные вопросы при знакомстве, грубость.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Что обычно НЕ нравится китайцам в поведении иностранцев?</p>
+      <div class="options">
+        <label><input type="radio" name="q22" value="a"><span class="opt-label">Интерес к китайскому языку</span></label>
+        <label><input type="radio" name="q22" value="b"><span class="opt-label">Уважение к старшим</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q22" value="c"><span class="opt-label">Публичные объятия и слишком личные вопросы при знакомстве</span></label>
+          <div class="explain">Китайцам обычно не нравятся: публичные объятия и поцелуи, игнорирование культуры, неуважение к старшим, слишком личные вопросы при первом знакомстве, грубость.</div>
+        </div>
+        <label><input type="radio" name="q22" value="d"><span class="opt-label">Доброжелательность и искренность</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ТЕМА 11: ЛОВУШКИ -->
+  <div class="topic-label">陷阱 · Типичные ловушки</div>
+
+  <div class="info-card">
+    <span class="info-icon">陷</span>
+    <p class="info-title">В какие ловушки чаще всего попадают русские в Китае?</p>
+    <ul class="info-list">
+      <li>Слишком прямое обращение по имени без учёта статуса</li>
+      <li>Публичная критика человека</li>
+      <li>Настаивание на полном раздельном счёте</li>
+      <li>Восприятие вежливых фраз буквально</li>
+      <li>Слишком личные вопросы при первой встрече</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Упражнение</span>
+      <p class="q-text">Какая ошибка чаще всего встречается у русских в Китае?</p>
+      <div class="options">
+        <label><input type="radio" name="q23" value="a"><span class="opt-label">Слишком частые комплименты</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q23" value="b"><span class="opt-label">Настаивание на раздельном счёте — общение кажется холодным</span></label>
+          <div class="explain">Одна из типичных ошибок — настаивать на полном раздельном счёте, из-за чего общение может показаться слишком холодным для китайской культуры отношений.</div>
+        </div>
+        <label><input type="radio" name="q23" value="c"><span class="opt-label">Слишком долгое молчание</span></label>
+        <label><input type="radio" name="q23" value="d"><span class="opt-label">Слишком формальная одежда</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ИТОГ -->
+  <div class="topic-label">三个关键词 · Три ключа к пониманию</div>
+
+  <div class="info-card">
+    <span class="info-icon">关</span>
+    <p class="info-title">Итог: три ключа к пониманию китайцев</p>
+    <ul class="info-list">
+      <li><span class="chinese-inline">面子</span> — не ставить человека в неловкое положение</li>
+      <li><span class="chinese-inline">关系</span> — ценить человеческие связи и отношения</li>
+      <li><span class="chinese-inline">客气</span> — многие слова нельзя понимать буквально</li>
+    </ul>
+    <p class="info-text" style="margin-top:8px;">Знание языка помогает понять, <em>что</em> сказали. Понимание культуры помогает понять, <em>что хотели выразить</em> на самом деле.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <span class="badge">Итоговое упражнение</span>
+      <p class="q-text">Какие три понятия — ключ к пониманию китайцев?</p>
+      <div class="options">
+        <label><input type="radio" name="q25" value="a"><span class="opt-label">Деньги, статус, власть</span></label>
+        <div class="correct-opt">
+          <label><input type="radio" name="q25" value="b"><span class="opt-label">面子 (лицо) + 关系 (связи) + 客气 (вежливость)</span></label>
+          <div class="explain">Три ключа: 面子 (лицо) — не ставить человека в неловкое положение; 关系 (связи) — ценить отношения; 客气 (вежливость) — слова нельзя понимать слишком буквально.</div>
+        </div>
+        <label><input type="radio" name="q25" value="c"><span class="opt-label">Скорость, эффективность, результат</span></label>
+        <label><input type="radio" name="q25" value="d"><span class="opt-label">Возраст, образование, профессия</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-symbol">龙</span>
+    中国文化 · Китайская культура
+  </div>
+
+</div>
+</body>
+</html>
