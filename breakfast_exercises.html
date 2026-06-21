@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Глава 5. Завтрак 早饭</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+    background: #f0f6e8;
+    color: #1a2a0a;
+    padding: 12px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+
+  header {
+    background: linear-gradient(135deg, #264a0c 0%, #3a7a18 100%);
+    color: #f0f8e8;
+    padding: 20px 16px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+  header h1 { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
+  header p  { font-size: 0.85rem; opacity: 0.9; }
+  header .tip { margin-top: 10px; font-size: 0.78rem; background: rgba(240,248,232,0.18); padding: 8px 12px; border-radius: 8px; }
+
+  section { background: white; padding: 16px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  h2 { color: #264a0c; font-size: 1.05rem; margin-bottom: 4px; line-height: 1.3; display: flex; align-items: center; gap: 8px; }
+  .nb { background: #3a7a18; color: white; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+  .instruction { color: #4a6a2a; font-size: 0.82rem; margin-bottom: 14px; font-style: italic; }
+
+  /* Vocab groups */
+  .vgroup { margin-bottom: 12px; }
+  .vgroup-title { font-size: 0.8rem; font-weight: 700; color: white; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; display: inline-block; }
+  .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 7px; }
+  .vc { background: #f2f8ec; padding: 9px 10px; border-radius: 8px; border-left: 3px solid #5a9a28; }
+  .vc .han { font-size: 1rem; font-weight: bold; color: #264a0c; }
+  .vc .py  { font-size: 0.75rem; color: #3a7a18; font-style: italic; margin-top: 2px; }
+  .vc .ru  { font-size: 0.78rem; color: #3a5a1a; margin-top: 2px; }
+
+  /* Questions */
+  .q { background: #f2f8ec; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid #3a7a18; }
+  .q-text { font-weight: 600; font-size: 1rem; margin-bottom: 4px; line-height: 1.4; }
+  .q-text .big { font-size: 1.3rem; }
+  .q-hint { font-size: 0.8rem; color: #4a6a2a; font-style: italic; margin-bottom: 10px; }
+
+  .opt-input { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+  .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .opt-grid.one { grid-template-columns: 1fr; }
+  .opt {
+    display: flex; align-items: center; justify-content: center;
+    background: white; border: 1.5px solid #c0d8a0;
+    padding: 9px 10px; border-radius: 6px;
+    font-size: 0.93rem; text-align: center;
+    min-height: 44px; cursor: pointer;
+    user-select: none; -webkit-user-select: none; line-height: 1.3;
+  }
+  .opt:active { background: #e8f4d8; }
+  .opt-input.ok:checked + .opt { background: #d0f0c0; border-color: #3a9020; color: #145808; font-weight: 600; }
+  .opt-input.ok:checked + .opt::after { content: " ✓"; }
+  .opt-input.no:checked + .opt { background: #fad0cc; border-color: #c03020; color: #7a1010; }
+  .opt-input.no:checked + .opt::after { content: " ✗"; }
+
+  .hint-box { display: none; margin-top: 8px; padding: 8px 12px; background: #d0f0c0; color: #145808; border-radius: 6px; font-size: 0.84rem; font-weight: 600; }
+  .q:has(.opt-input.ok:checked) .hint-box { display: block; }
+
+  .tf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; max-width: 280px; }
+
+  /* Fill-in */
+  .fib { background: #f2f8ec; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 1rem; line-height: 2; border-left: 3px solid #3a7a18; }
+  .fib input[type=text] { border: none; border-bottom: 2px dashed #3a7a18; background: transparent; font-size: 1rem; font-family: inherit; padding: 2px 6px; width: 110px; text-align: center; color: #1a2a0a; outline: none; }
+  .fib input[type=text]:focus { border-bottom-style: solid; }
+  .fib .ru { display: block; font-size: 0.78rem; color: #4a6a2a; font-style: italic; margin-top: 4px; }
+
+  details.ans { margin-top: 8px; border-radius: 6px; border: 1px solid #b8d890; overflow: hidden; }
+  details.ans summary { cursor: pointer; padding: 9px 14px; font-size: 0.84rem; font-weight: 600; color: #3a7a18; list-style: none; user-select: none; background: white; }
+  details.ans summary::before { content: "👁 Показать ответ"; }
+  details.ans[open] summary::before { content: "🙈 Скрыть ответ"; }
+  details.ans summary::-webkit-details-marker { display: none; }
+  details.ans .body { padding: 10px 14px; font-size: 0.92rem; color: #145808; background: #f0fae8; border-top: 1px solid #b8d890; line-height: 1.6; }
+  details.ans .body .h  { font-size: 1.1rem; font-weight: bold; color: #264a0c; }
+  details.ans .body .p  { font-style: italic; color: #3a7a18; }
+  details.ans .body .note { display: block; font-size: 0.78rem; color: #4a6a2a; margin-top: 3px; }
+
+  footer { text-align: center; padding: 16px; color: #4a6a2a; font-size: 0.82rem; }
+  @media (min-width: 600px) { body { padding: 24px; } section { padding: 22px; } header h1 { font-size: 1.5rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🥢 Глава 5. Завтрак 早饭</h1>
+  <p>Упражнения по лексике — китайский завтрак, английский завтрак, напитки</p>
+  <div class="tip">💡 Нажмите на вариант — зелёным ✓ правильно, красным ✗ ошибка. В заданиях 5 и 6 — нажмите «Показать ответ».</div>
+</header>
+
+<!-- VOCAB -->
+<section>
+  <h2><span class="nb">📖</span> Словарь</h2>
+  <p class="instruction">Повторите слова перед выполнением упражнений.</p>
+
+  <div class="vgroup">
+    <div class="vgroup-title" style="background:#3a7a18">🌅 Завтрак и привычки</div>
+    <div class="vocab-grid">
+      <div class="vc"><div class="han">早饭</div><div class="py">zǎofàn</div><div class="ru">завтрак</div></div>
+      <div class="vc"><div class="han">早餐</div><div class="py">zǎocān</div><div class="ru">завтрак (офиц.)</div></div>
+      <div class="vc"><div class="han">不吃早饭不行</div><div class="py">bù chī zǎofàn bù xíng</div><div class="ru">без завтрака никак нельзя</div></div>
+      <div class="vc"><div class="han">对胃不好</div><div class="py">duì wèi bù hǎo</div><div class="ru">вредно для желудка</div></div>
+      <div class="vc"><div class="han">没时间吃早饭</div><div class="py">méi shíjiān chī zǎofàn</div><div class="ru">нет времени завтракать</div></div>
+      <div class="vc"><div class="han">低血糖</div><div class="py">dī xuètáng</div><div class="ru">низкий сахар в крови</div></div>
+      <div class="vc"><div class="han">一日三餐</div><div class="py">yī rì sāncān</div><div class="ru">три приёма пищи в день</div></div>
+      <div class="vc"><div class="han">按时吃</div><div class="py">àn shí chī</div><div class="ru">есть вовремя</div></div>
+    </div>
+  </div>
+
+  <div class="vgroup">
+    <div class="vgroup-title" style="background:#c87820">🥢 Китайский завтрак</div>
+    <div class="vocab-grid">
+      <div class="vc" style="border-color:#c87820"><div class="han">中式早餐</div><div class="py">zhōngshì zǎocān</div><div class="ru">китайский завтрак</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">油条</div><div class="py">yóutiáo</div><div class="ru">жареные палочки (хворост)</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">稀饭</div><div class="py">xīfàn</div><div class="ru">рисовая каша (жидкая)</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">喝粥</div><div class="py">hē zhōu</div><div class="ru">есть/пить кашу</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">豆浆</div><div class="py">dòujiāng</div><div class="ru">соевое молоко</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">包子</div><div class="py">bāozi</div><div class="ru">паровые булочки</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">面条</div><div class="py">miàntiáo</div><div class="ru">лапша</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">暖胃</div><div class="py">nuǎnwèi</div><div class="ru">согревает желудок</div></div>
+      <div class="vc" style="border-color:#c87820"><div class="han">合胃口</div><div class="py">hé wèikǒu</div><div class="ru">по вкусу / нравится</div></div>
+    </div>
+  </div>
+
+  <div class="vgroup">
+    <div class="vgroup-title" style="background:#1a4a8a">🥓 Английский завтрак</div>
+    <div class="vocab-grid">
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">英式早餐</div><div class="py">yīngshì zǎocān</div><div class="ru">английский завтрак</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">正宗英式早餐</div><div class="py">zhèngzōng yīngshì</div><div class="ru">настоящий английский завтрак</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">煎蛋 / 煎鸡蛋</div><div class="py">jiāndàn</div><div class="ru">жареное яйцо</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">培根</div><div class="py">péigēn</div><div class="ru">бекон</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">猪肉香肠</div><div class="py">zhūròu xiāngcháng</div><div class="ru">свиная сосиска</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">烤番茄</div><div class="py">kǎo fānqié</div><div class="ru">запечённый помидор</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">煎蘑菇</div><div class="py">jiān mógu</div><div class="ru">жареные грибы</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">吐司</div><div class="py">tǔsī</div><div class="ru">тост</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">黑布丁</div><div class="py">hēi bùding</div><div class="ru">чёрный пудинг</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">薯饼</div><div class="py">shǔbǐng</div><div class="ru">картофельная лепёшка</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">烤面包</div><div class="py">kǎo miànbāo</div><div class="ru">поджаренный хлеб</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">黄油</div><div class="py">huángyóu</div><div class="ru">сливочное масло</div></div>
+      <div class="vc" style="border-color:#1a4a8a"><div class="han">焦一点的烤面包</div><div class="py">jiāo yīdiǎn de kǎo miànbāo</div><div class="ru">слегка подгоревший тост</div></div>
+    </div>
+  </div>
+
+  <div class="vgroup">
+    <div class="vgroup-title" style="background:#5a3888">☕ Напитки</div>
+    <div class="vocab-grid">
+      <div class="vc" style="border-color:#5a3888"><div class="han">豆浆</div><div class="py">dòujiāng</div><div class="ru">соевое молоко</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">橙汁</div><div class="py">chéngzhī</div><div class="ru">апельсиновый сок</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">鲜榨橙汁</div><div class="py">xiānzhà chéngzhī</div><div class="ru">свежевыжатый сок</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">英式红茶</div><div class="py">yīngshì hóngchá</div><div class="ru">английский чёрный чай</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">黑咖啡</div><div class="py">hēi kāfēi</div><div class="ru">чёрный кофе</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">拿铁</div><div class="py">nátiě</div><div class="ru">латте</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">卡布 (卡布奇诺)</div><div class="py">kǎbù</div><div class="ru">капучино</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">浓缩咖啡</div><div class="py">nóngsuō kāfēi</div><div class="ru">эспрессо</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">很上头</div><div class="py">hěn shàngtóu</div><div class="ru">бьёт в голову</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">清爽</div><div class="py">qīngshuǎng</div><div class="ru">освежающий</div></div>
+      <div class="vc" style="border-color:#5a3888"><div class="han">全身舒服极了</div><div class="py">quánshēn shūfu jí le</div><div class="ru">всё тело ощущает комфорт</div></div>
+    </div>
+  </div>
+
+  <div class="vgroup">
+    <div class="vgroup-title" style="background:#2a7a50">🥗 Яйца и виды завтрака</div>
+    <div class="vocab-grid">
+      <div class="vc" style="border-color:#2a7a50"><div class="han">鸡蛋</div><div class="py">jīdàn</div><div class="ru">яйцо</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">水煮蛋</div><div class="py">shuǐzhǔdàn</div><div class="ru">варёное яйцо</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">鸡蛋很有营养</div><div class="py">jīdàn hěn yǒu yíngyǎng</div><div class="ru">яйца очень питательны</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">边缘脆脆的</div><div class="py">biānyuán cuìcuì de</div><div class="ru">с хрустящими краями</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">快手早餐</div><div class="py">kuàishǒu zǎocān</div><div class="ru">быстрый завтрак</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">减脂早餐</div><div class="py">jiǎnzhī zǎocān</div><div class="ru">завтрак для похудения</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">少油少盐</div><div class="py">shǎo yóu shǎo yán</div><div class="ru">мало масла, мало соли</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">西式早餐</div><div class="py">xīshì zǎocān</div><div class="ru">западный завтрак</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">欧式早餐</div><div class="py">ōushì zǎocān</div><div class="ru">европейский завтрак</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">去水肿</div><div class="py">qù shuǐzhǒng</div><div class="ru">убирает отёки</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">甜的</div><div class="py">tián de</div><div class="ru">сладкое</div></div>
+      <div class="vc" style="border-color:#2a7a50"><div class="han">特别香</div><div class="py">tèbié xiāng</div><div class="ru">особенно ароматный</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EX 1: перевод -->
+<section>
+  <h2><span class="nb">1</span> Выберите правильный перевод</h2>
+  <p class="instruction">Нажмите на правильное значение иероглифа или фразы.</p>
+
+  <div class="q">
+    <div class="q-text"><span class="big">油条</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v1" class="opt-input no"><span class="opt">паровые булочки</span></label>
+      <label><input type="radio" name="v1" class="opt-input ok"><span class="opt">жареные палочки (хворост)</span></label>
+      <label><input type="radio" name="v1" class="opt-input no"><span class="opt">рисовая каша</span></label>
+      <label><input type="radio" name="v1" class="opt-input no"><span class="opt">лапша</span></label>
+    </div>
+    <div class="hint-box">✅ 油条 (yóutiáo) — жареные хрустящие палочки из теста, классика китайского завтрака</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">豆浆</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v2" class="opt-input no"><span class="opt">апельсиновый сок</span></label>
+      <label><input type="radio" name="v2" class="opt-input ok"><span class="opt">соевое молоко</span></label>
+      <label><input type="radio" name="v2" class="opt-input no"><span class="opt">рисовый отвар</span></label>
+      <label><input type="radio" name="v2" class="opt-input no"><span class="opt">английский чай</span></label>
+    </div>
+    <div class="hint-box">✅ 豆浆 (dòujiāng) — соевое молоко. 豆 = боб/соя, 浆 = жидкость. Классическая пара с油条.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">拿铁</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v3" class="opt-input no"><span class="opt">эспрессо</span></label>
+      <label><input type="radio" name="v3" class="opt-input no"><span class="opt">капучино</span></label>
+      <label><input type="radio" name="v3" class="opt-input ok"><span class="opt">латте</span></label>
+      <label><input type="radio" name="v3" class="opt-input no"><span class="opt">чёрный кофе</span></label>
+    </div>
+    <div class="hint-box">✅ 拿铁 (nátiě) — латте. Транскрипция итальянского latte. Капучино = 卡布奇诺/卡布, эспрессо = 浓缩咖啡.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">培根</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v4" class="opt-input ok"><span class="opt">бекон</span></label>
+      <label><input type="radio" name="v4" class="opt-input no"><span class="opt">свиная сосиска</span></label>
+      <label><input type="radio" name="v4" class="opt-input no"><span class="opt">чёрный пудинг</span></label>
+      <label><input type="radio" name="v4" class="opt-input no"><span class="opt">жареные грибы</span></label>
+    </div>
+    <div class="hint-box">✅ 培根 (péigēn) — бекон (транскрипция английского bacon). Свиная сосиска = 猪肉香肠.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">暖胃</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v5" class="opt-input no"><span class="opt">по вкусу</span></label>
+      <label><input type="radio" name="v5" class="opt-input no"><span class="opt">освежающий</span></label>
+      <label><input type="radio" name="v5" class="opt-input ok"><span class="opt">согревает желудок</span></label>
+      <label><input type="radio" name="v5" class="opt-input no"><span class="opt">низкий сахар</span></label>
+    </div>
+    <div class="hint-box">✅ 暖胃 (nuǎnwèi) — согревает желудок. 暖 = тёплый/тепло, 胃 = желудок. Говорят про горячую кашу.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">水煮蛋</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v6" class="opt-input no"><span class="opt">яичница</span></label>
+      <label><input type="radio" name="v6" class="opt-input no"><span class="opt">омлет</span></label>
+      <label><input type="radio" name="v6" class="opt-input ok"><span class="opt">варёное яйцо</span></label>
+      <label><input type="radio" name="v6" class="opt-input no"><span class="opt">яйцо-пашот</span></label>
+    </div>
+    <div class="hint-box">✅ 水煮蛋 (shuǐzhǔdàn) — варёное яйцо. 水 = вода, 煮 = варить, 蛋 = яйцо.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">减脂早餐</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v7" class="opt-input no"><span class="opt">быстрый завтрак</span></label>
+      <label><input type="radio" name="v7" class="opt-input ok"><span class="opt">завтрак для похудения</span></label>
+      <label><input type="radio" name="v7" class="opt-input no"><span class="opt">китайский завтрак</span></label>
+      <label><input type="radio" name="v7" class="opt-input no"><span class="opt">европейский завтрак</span></label>
+    </div>
+    <div class="hint-box">✅ 减脂 (jiǎnzhī) = снижать жир/худеть. 减脂早餐 = завтрак для похудения: 少油少盐超健康.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">低血糖</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v8" class="opt-input no"><span class="opt">низкое давление</span></label>
+      <label><input type="radio" name="v8" class="opt-input ok"><span class="opt">низкий сахар в крови</span></label>
+      <label><input type="radio" name="v8" class="opt-input no"><span class="opt">головная боль</span></label>
+      <label><input type="radio" name="v8" class="opt-input no"><span class="opt">плохое самочувствие</span></label>
+    </div>
+    <div class="hint-box">✅ 低血糖 (dī xuètáng) — гипогликемия / низкий сахар. 低 = низкий, 血 = кровь, 糖 = сахар.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">鲜榨橙汁</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v9" class="opt-input no"><span class="opt">апельсиновый сок из пакета</span></label>
+      <label><input type="radio" name="v9" class="opt-input ok"><span class="opt">свежевыжатый апельсиновый сок</span></label>
+      <label><input type="radio" name="v9" class="opt-input no"><span class="opt">грейпфрутовый сок</span></label>
+      <label><input type="radio" name="v9" class="opt-input no"><span class="opt">лимонная вода</span></label>
+    </div>
+    <div class="hint-box">✅ 鲜榨 (xiānzhà) = свежевыжатый. 鲜 = свежий, 榨 = выжимать. Ср. просто 橙汁 = апельсиновый сок.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">边缘脆脆的</span> = ?</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="v10" class="opt-input no"><span class="opt">мягкий и нежный</span></label>
+      <label><input type="radio" name="v10" class="opt-input no"><span class="opt">сочный внутри</span></label>
+      <label><input type="radio" name="v10" class="opt-input ok"><span class="opt">с хрустящими краями</span></label>
+      <label><input type="radio" name="v10" class="opt-input no"><span class="opt">хрустящий насквозь</span></label>
+    </div>
+    <div class="hint-box">✅ 边缘 = край/кромка, 脆脆的 = хрустящий. Так описывают идеальную жареную яичницу!</div>
+  </div>
+</section>
+
+<!-- EX 2: пиньинь -->
+<section>
+  <h2><span class="nb">2</span> Выберите правильный пиньинь</h2>
+  <p class="instruction">Какое произношение соответствует иероглифу?</p>
+
+  <div class="q">
+    <div class="q-text"><span class="big">油条</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p1" class="opt-input no"><span class="opt">yòutiáo</span></label>
+      <label><input type="radio" name="p1" class="opt-input ok"><span class="opt">yóutiáo</span></label>
+      <label><input type="radio" name="p1" class="opt-input no"><span class="opt">yōutiào</span></label>
+      <label><input type="radio" name="p1" class="opt-input no"><span class="opt">yóudiào</span></label>
+    </div>
+    <div class="hint-box">✅ yóutiáo — 油 2-й тон (yóu), 条 2-й тон (tiáo)</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">豆浆</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p2" class="opt-input no"><span class="opt">dóujiāng</span></label>
+      <label><input type="radio" name="p2" class="opt-input no"><span class="opt">dōujiāng</span></label>
+      <label><input type="radio" name="p2" class="opt-input ok"><span class="opt">dòujiāng</span></label>
+      <label><input type="radio" name="p2" class="opt-input no"><span class="opt">dǒujiāng</span></label>
+    </div>
+    <div class="hint-box">✅ dòujiāng — 豆 4-й тон (dòu), 浆 1-й тон (jiāng)</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">拿铁</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p3" class="opt-input no"><span class="opt">nǎtiě</span></label>
+      <label><input type="radio" name="p3" class="opt-input ok"><span class="opt">nátiě</span></label>
+      <label><input type="radio" name="p3" class="opt-input no"><span class="opt">nàtiě</span></label>
+      <label><input type="radio" name="p3" class="opt-input no"><span class="opt">nātiě</span></label>
+    </div>
+    <div class="hint-box">✅ nátiě — 拿 2-й тон (ná), 铁 3-й тон (tiě)</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">稀饭</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p4" class="opt-input ok"><span class="opt">xīfàn</span></label>
+      <label><input type="radio" name="p4" class="opt-input no"><span class="opt">xífàn</span></label>
+      <label><input type="radio" name="p4" class="opt-input no"><span class="opt">xǐfàn</span></label>
+      <label><input type="radio" name="p4" class="opt-input no"><span class="opt">xìfàn</span></label>
+    </div>
+    <div class="hint-box">✅ xīfàn — 稀 1-й тон (xī), 饭 4-й тон (fàn)</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">包子</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p5" class="opt-input ok"><span class="opt">bāozi</span></label>
+      <label><input type="radio" name="p5" class="opt-input no"><span class="opt">báozi</span></label>
+      <label><input type="radio" name="p5" class="opt-input no"><span class="opt">bǎozi</span></label>
+      <label><input type="radio" name="p5" class="opt-input no"><span class="opt">bàozi</span></label>
+    </div>
+    <div class="hint-box">✅ bāozi — 包 1-й тон (bāo), 子 нейтральный тон (zi)</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text"><span class="big">浓缩咖啡</span></div>
+    <div class="opt-grid">
+      <label><input type="radio" name="p6" class="opt-input ok"><span class="opt">nóngsuō kāfēi</span></label>
+      <label><input type="radio" name="p6" class="opt-input no"><span class="opt">nōngsuō kāfēi</span></label>
+      <label><input type="radio" name="p6" class="opt-input no"><span class="opt">nóngsuǒ kāfēi</span></label>
+      <label><input type="radio" name="p6" class="opt-input no"><span class="opt">nóngsuō káfēi</span></label>
+    </div>
+    <div class="hint-box">✅ nóngsuō kāfēi — 浓(2) 缩(1) 咖(1) 啡(1). Все правильно!</div>
+  </div>
+</section>
+
+<!-- EX 3: в предложении -->
+<section>
+  <h2><span class="nb">3</span> Выберите подходящее слово</h2>
+  <p class="instruction">Какое слово подходит по смыслу в предложении?</p>
+
+  <div class="q">
+    <div class="q-text">不吃早饭对___不好。</div>
+    <div class="q-hint">Пропускать завтрак вредно для ___.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c1" class="opt-input no"><span class="opt">心脏</span></label>
+      <label><input type="radio" name="c1" class="opt-input ok"><span class="opt">胃</span></label>
+      <label><input type="radio" name="c1" class="opt-input no"><span class="opt">皮肤</span></label>
+      <label><input type="radio" name="c1" class="opt-input no"><span class="opt">头发</span></label>
+    </div>
+    <div class="hint-box">✅ 胃 (wèi) = желудок. Дословно: «Не есть завтрак для желудка нехорошо».</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">赶时间就做___早餐。</div>
+    <div class="q-hint">Когда торопишься, делай ___ завтрак.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c2" class="opt-input no"><span class="opt">中式</span></label>
+      <label><input type="radio" name="c2" class="opt-input no"><span class="opt">减脂</span></label>
+      <label><input type="radio" name="c2" class="opt-input ok"><span class="opt">快手</span></label>
+      <label><input type="radio" name="c2" class="opt-input no"><span class="opt">英式</span></label>
+    </div>
+    <div class="hint-box">✅ 快手 (kuàishǒu) = быстрый, ловкий. 快手早餐 = быстрый завтрак. 赶时间 = торопиться.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">鸡蛋很有___。</div>
+    <div class="q-hint">Яйца очень ___.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c3" class="opt-input no"><span class="opt">味道</span></label>
+      <label><input type="radio" name="c3" class="opt-input ok"><span class="opt">营养</span></label>
+      <label><input type="radio" name="c3" class="opt-input no"><span class="opt">香味</span></label>
+      <label><input type="radio" name="c3" class="opt-input no"><span class="opt">颜色</span></label>
+    </div>
+    <div class="hint-box">✅ 营养 (yíngyǎng) = питательная ценность / питателен. 很有营养 = очень питателен/полезен.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">减脂早餐少___少盐超健康。</div>
+    <div class="q-hint">Завтрак для похудения: мало ___, мало соли — очень полезно.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c4" class="opt-input ok"><span class="opt">油</span></label>
+      <label><input type="radio" name="c4" class="opt-input no"><span class="opt">水</span></label>
+      <label><input type="radio" name="c4" class="opt-input no"><span class="opt">糖</span></label>
+      <label><input type="radio" name="c4" class="opt-input no"><span class="opt">肉</span></label>
+    </div>
+    <div class="hint-box">✅ 少油少盐 = мало масла, мало соли. 油 = масло/жир. Формула здорового питания!</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">中式早餐喝粥，非常___胃。</div>
+    <div class="q-hint">Китайский завтрак — каша, очень ___ желудок.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c5" class="opt-input no"><span class="opt">冷</span></label>
+      <label><input type="radio" name="c5" class="opt-input no"><span class="opt">伤</span></label>
+      <label><input type="radio" name="c5" class="opt-input ok"><span class="opt">暖</span></label>
+      <label><input type="radio" name="c5" class="opt-input no"><span class="opt">刺激</span></label>
+    </div>
+    <div class="hint-box">✅ 暖胃 = согревает желудок. 暖 = тёплый/согревать. Горячая каша 粥 = идеальный завтрак для желудка!</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">喝了鲜榨橙汁感觉很___。</div>
+    <div class="q-hint">После свежевыжатого сока чувствуешь себя очень ___.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c6" class="opt-input no"><span class="opt">上头</span></label>
+      <label><input type="radio" name="c6" class="opt-input no"><span class="opt">暖胃</span></label>
+      <label><input type="radio" name="c6" class="opt-input ok"><span class="opt">清爽</span></label>
+      <label><input type="radio" name="c6" class="opt-input no"><span class="opt">低血糖</span></label>
+    </div>
+    <div class="hint-box">✅ 清爽 (qīngshuǎng) = освежающий, бодрящий. Свежий сок = освежает. 很上头 — про крепкий кофе/алкоголь.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">我早上___吃早饭___行。</div>
+    <div class="q-hint">Утром мне ___ завтракать ___ нельзя.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c7" class="opt-input no"><span class="opt">要 / 很</span></label>
+      <label><input type="radio" name="c7" class="opt-input ok"><span class="opt">不 / 不</span></label>
+      <label><input type="radio" name="c7" class="opt-input no"><span class="opt">没 / 不</span></label>
+      <label><input type="radio" name="c7" class="opt-input no"><span class="opt">很 / 也</span></label>
+    </div>
+    <div class="hint-box">✅ 不…不行 = без… никак нельзя. 我早上不吃早饭不行 = Утром без завтрака мне никак.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">一定要好好___早餐。</div>
+    <div class="q-hint">Обязательно нужно хорошо ___.</div>
+    <div class="opt-grid">
+      <label><input type="radio" name="c8" class="opt-input no"><span class="opt">做</span></label>
+      <label><input type="radio" name="c8" class="opt-input no"><span class="opt">买</span></label>
+      <label><input type="radio" name="c8" class="opt-input ok"><span class="opt">吃</span></label>
+      <label><input type="radio" name="c8" class="opt-input no"><span class="opt">看</span></label>
+    </div>
+    <div class="hint-box">✅ 吃 (chī) = есть. 好好吃 = хорошенько поесть. 一定要 = обязательно нужно.</div>
+  </div>
+</section>
+
+<!-- EX 4: правда/ложь -->
+<section>
+  <h2><span class="nb">4</span> Правда или нет?</h2>
+  <p class="instruction">Соответствует ли утверждение материалу урока?</p>
+
+  <div class="q">
+    <div class="q-text">「稀饭」和「粥」— это разные блюда, ничего общего</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf1" class="opt-input no"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf1" class="opt-input ok"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Неверно! 稀饭 и 粥 — это одно и то же: рисовая каша/кисель. 喝粥 = кушать кашу. Оба слова означают congee.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">「培根」— это бекон, а「猪肉香肠」— это свиная сосиска. Это разные продукты.</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf2" class="opt-input ok"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf2" class="opt-input no"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Верно! 培根 (péigēn) = бекон, 猪肉香肠 = свиная сосиска. Оба входят в английский завтрак 英式早餐.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">「水煮蛋」готовится на сковороде с маслом</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf3" class="opt-input no"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf3" class="opt-input ok"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Неверно! 水煮 = варить в воде. 水 = вода, 煮 = варить. Это варёное яйцо. На сковороде готовят 煎蛋.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">「减脂早餐少油少盐超健康」— завтрак для похудения: мало масла, мало соли, очень полезно</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf4" class="opt-input ok"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf4" class="opt-input no"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Верно! Это предложение прямо из урока. 少 = мало, 超 = очень/супер, 健康 = здоровый.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">「拿铁」和「卡布」都是黑咖啡 — латте и капучино — это оба чёрный кофе</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf5" class="opt-input no"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf5" class="opt-input ok"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Неверно! 拿铁 = латте (с молоком), 卡布 = капучино (с молоком и пеной). Чёрный кофе = 黑咖啡, эспрессо = 浓缩咖啡.</div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">「没时间吃早饭」— значит у человека есть время на завтрак</div>
+    <div class="tf-row">
+      <label><input type="radio" name="tf6" class="opt-input no"><span class="opt">✓ Верно</span></label>
+      <label><input type="radio" name="tf6" class="opt-input ok"><span class="opt">✗ Неверно</span></label>
+    </div>
+    <div class="hint-box">✅ Неверно! 没时间 = нет времени. 没 = нет (для глаголов/существ.). Полностью: «нет времени есть завтрак».</div>
+  </div>
+</section>
+
+<!-- EX 5: вставь пропуск -->
+<section>
+  <h2><span class="nb">5</span> Вставьте пропущенный иероглиф</h2>
+  <p class="instruction">Впишите иероглифы или пиньинь, затем откройте ответ.</p>
+
+  <div class="fib">
+    1. 不吃早饭对___不好。
+    <span class="ru">Не завтракать вредно для желудка.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">胃</span> <span class="p">(wèi)</span> — желудок<span class="note">Желудок = 胃. Ср.: 心脏 = сердце, 肝 = печень, 肺 = лёгкие.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    2. 赶时间就做快___早餐。
+    <span class="ru">Когда торопишься, делай быстрый завтрак.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">手</span> <span class="p">(shǒu)</span> — рука<span class="note">快手 (kuàishǒu) = быстрый / ловкий (буквально «быстрые руки»). 快手早餐 = быстрый завтрак.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    3. 鸡蛋很有___养。
+    <span class="ru">Яйца очень питательны.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">营</span> <span class="p">(yíng)</span><span class="note">营养 (yíngyǎng) = питательная ценность / питателен. Часто слышно: 这个很有营养！</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    4. 减脂早餐少___少盐超健康。
+    <span class="ru">Завтрак для похудения: мало масла, мало соли — очень полезно.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">油</span> <span class="p">(yóu)</span> — масло / жир<span class="note">少油少盐 = мало масла, мало соли. 油 = масло. Ср.: 油条 тоже содержит 油!</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    5. 焦一点的烤面包___别香。
+    <span class="ru">Слегка подгоревший тост особенно ароматный.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">特</span> <span class="p">(tè)</span><span class="note">特别 (tèbié) = особенно. 特别香 = особенно ароматный / вкусный. 焦 = поджаренный/подгоревший.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    6. 喝完感觉清___，很舒服。
+    <span class="ru">После того как выпил — ощущение свежести, очень приятно.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">爽</span> <span class="p">(shuǎng)</span> — свежий/бодрый<span class="note">清爽 (qīngshuǎng) = освежающий, бодрящий. Говорят о свежем соке, прохладном напитке.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    7. 按___吃，一日三餐。
+    <span class="ru">Есть по расписанию, три раза в день.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">时</span> <span class="p">(shí)</span> — время<span class="note">按时 (àn shí) = вовремя, по расписанию. 按 = согласно/по, 时 = время.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    8. 豆浆和油条是经典的___式早餐搭配。
+    <span class="ru">Соевое молоко и жареные палочки — классика китайского завтрака.</span>
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">中</span> <span class="p">(zhōng)</span> — Китай / средний<span class="note">中式 = китайский стиль. Ср.: 英式 = английский, 西式 = западный, 欧式 = европейский.</span></div>
+    </details>
+  </div>
+</section>
+
+<!-- EX 6: перевод -->
+<section>
+  <h2><span class="nb">6</span> Переведите на китайский</h2>
+  <p class="instruction">Мысленно переведите — затем откройте ответ с пиньинем.</p>
+
+  <div class="fib">
+    1. Не есть завтрак вредно для желудка.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">不吃早饭对胃不好。</span><br><span class="p">Bù chī zǎofàn duì wèi bù hǎo.</span><span class="note">对 = для/по отношению к. Конструкция: 对…不好 = вредно для…</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    2. Утром мне без завтрака никак нельзя.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">我早上不吃早饭不行。</span><br><span class="p">Wǒ zǎoshang bù chī zǎofàn bù xíng.</span><span class="note">不…不行 = без… никак нельзя. 不行 = не годится / нельзя.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    3. Когда торопишься, делай быстрый завтрак.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">赶时间就做快手早餐。</span><br><span class="p">Gǎn shíjiān jiù zuò kuàishǒu zǎocān.</span><span class="note">赶时间 = торопиться, 就 = тогда/то, 做 = делать.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    4. Яйца очень питательны.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">鸡蛋很有营养。</span><br><span class="p">Jīdàn hěn yǒu yíngyǎng.</span><span class="note">很有营养 = очень питателен. Конструкция: 很有 + существительное = очень богат чем-то.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    5. Три раза в день, нужно есть вовремя.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">一日三餐，按时吃。</span><br><span class="p">Yī rì sāncān, àn shí chī.</span><span class="note">一日三餐 = три приёма пищи в день (букв.: один день три еды), 按时 = по расписанию/вовремя.</span></div>
+    </details>
+  </div>
+
+  <div class="fib">
+    6. Завтрак для похудения: мало масла, мало соли — очень полезно.
+    <details class="ans"><summary></summary>
+      <div class="body"><span class="h">减脂早餐少油少盐超健康。</span><br><span class="p">Jiǎnzhī zǎocān shǎo yóu shǎo yán chāo jiànkāng.</span><span class="note">超 = очень/супер (разг.). 少…少… = мало…, мало… Параллельная конструкция.</span></div>
+    </details>
+  </div>
+</section>
+
+<footer><p>加油！🥣 Завтракайте вовремя — 一日三餐，按时吃！</p></footer>
+</div>
+</body>
+</html>
