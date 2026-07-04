@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Тест: Douyin и тренды 2026</title>
+<style>
+    :root{
+      --bg:#fff8f2;
+      --card:#ffffff;
+      --ink:#211c1d;
+      --muted:#706768;
+      --accent:#ff6b4a;
+      --accent-dark:#d94b2e;
+      --line:#efd7ce;
+      --soft:#fff0e8;
+      --ok:#e8f7ee;
+      --ok-line:#37a76a;
+      --ok-text:#17603a;
+      --bad:#ffe9e7;
+      --bad-line:#e14b43;
+      --bad-text:#8d211b;
+      --shadow:0 12px 28px rgba(80,45,30,.12);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans",sans-serif;
+      color:var(--ink);
+      line-height:1.5;
+      background:
+        radial-gradient(circle at 0 0, rgba(255,107,74,.22), transparent 32rem),
+        radial-gradient(circle at 100% 100%, rgba(75,58,190,.13), transparent 30rem),
+        var(--bg);
+    }
+    .wrap{max-width:880px;margin:0 auto;padding:18px 14px 56px}
+    header{
+      border-radius:30px;
+      padding:28px 20px;
+      background:linear-gradient(135deg,#ff7655 0%,#ffc1ad 55%,#fff0e8 100%);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    header:after{content:"";position:absolute;right:-52px;top:-52px;width:165px;height:165px;border-radius:50%;background:rgba(255,255,255,.34)}
+    .eyebrow{font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:#6d2419;margin-bottom:8px}
+    h1{font-size:clamp(28px,7vw,48px);line-height:1.02;margin:0 0 12px;letter-spacing:-.04em}
+    .lead{font-size:17px;max-width:720px;margin:0;color:#4d3530}
+    .note{
+      margin-top:16px;
+      display:inline-block;
+      padding:10px 12px;
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:999px;
+      font-weight:700;
+      color:#4b2b24;
+      font-size:14px;
+    }
+    .nav{display:flex;gap:8px;overflow:auto;padding:14px 0 6px;scrollbar-width:none}
+    .nav a{flex:0 0 auto;text-decoration:none;color:#4d3530;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-size:13px;box-shadow:0 4px 12px rgba(80,45,30,.06)}
+    h2{font-size:19px;margin:26px 0 12px;color:#3b2f8f}
+    .quiz-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 14px 14px;
+      margin:12px 0;
+      box-shadow:var(--shadow);
+    }
+    .q-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .num{
+      width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:50%;background:var(--accent);color:white;font-weight:900;
+      box-shadow:0 5px 12px rgba(255,107,74,.28);
+    }
+    .tag{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+    h3{font-size:19px;line-height:1.28;margin:0 0 14px}
+    .options{display:grid;gap:10px}
+    .option{position:relative}
+    .option input{position:absolute;opacity:0;inset:0;pointer-events:none}
+    .option label{
+      display:flex;align-items:flex-start;gap:10px;
+      width:100%;
+      min-height:52px;
+      padding:13px 12px;
+      border:2px solid #eadbd5;
+      border-radius:18px;
+      background:#fffdfb;
+      font-size:16px;
+      cursor:pointer;
+      transition:background .15s ease,border-color .15s ease,transform .12s ease,box-shadow .15s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .option label:active{transform:scale(.99)}
+    .badge{
+      flex:0 0 auto;
+      width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      background:var(--soft);color:var(--accent-dark);font-weight:900;
+    }
+    .option input:checked + label.correct{
+      background:var(--ok);
+      border-color:var(--ok-line);
+      color:var(--ok-text);
+      box-shadow:0 0 0 4px rgba(55,167,106,.15);
+    }
+    .option input:checked + label.correct .badge{background:var(--ok-line);color:white}
+    .option input:checked + label.correct .badge::after{content:" ✓";font-size:13px}
+    .option input:checked + label.wrong{
+      background:var(--bad);
+      border-color:var(--bad-line);
+      color:var(--bad-text);
+      box-shadow:0 0 0 4px rgba(225,75,67,.13);
+    }
+    .option input:checked + label.wrong .badge{background:var(--bad-line);color:white}
+    .option input:checked + label.wrong .badge::after{content:" ✕";font-size:13px}
+    details{margin-top:12px;border-radius:16px;background:#fff7f2;border:1px solid var(--line);overflow:hidden}
+    summary{cursor:pointer;padding:12px 13px;font-weight:800;color:#59342c;list-style:none}
+    summary::-webkit-details-marker{display:none}
+    summary::after{content:"＋";float:right;color:var(--accent-dark)}
+    details[open] summary::after{content:"−"}
+    details p{margin:0;padding:0 13px 13px;color:#4d3530}
+    .final{background:#2f286f;color:white;border-radius:26px;padding:22px 18px;margin-top:26px;box-shadow:var(--shadow)}
+    .final h2{color:white;margin-top:0}
+    .final p{margin-bottom:0;color:#eee9ff}
+    .footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+    @media (max-width:520px){
+      .wrap{padding:12px 10px 42px}
+      header{padding:24px 16px;border-radius:24px}
+      .quiz-card{border-radius:22px;padding:16px 12px 12px}
+      h3{font-size:18px}
+      .option label{font-size:15.5px;padding:12px 11px}
+      .note{border-radius:18px}
+    }
+    @media print{
+      body{background:white}
+      .nav{display:none}
+      .quiz-card{break-inside:avoid;box-shadow:none}
+      header{box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">HTML + CSS · без JavaScript</div>
+<h1>Тест: Douyin и тренды 2026</h1>
+<p class="lead">Выберите вариант ответа. Правильный вариант подсветится зелёным, неправильный — красным. Верные ответы перемешаны между A/B/C, поэтому тест сложнее проходить по угадыванию.</p>
+<div class="note">Материал: китайский TikTok / Douyin, комментарии, BGM, челленджи и интернет-фразы · ответы в разброс</div>
+</header>
+<nav aria-label="Навигация" class="nav">
+<a href="#q1">Начало</a>
+<a href="#q5">Термины</a>
+<a href="#q13">BGM</a>
+<a href="#q19">Реакции</a>
+<a href="#q23">Работа</a>
+<a href="#q30">Уместность</a>
+</nav>
+<main>
+<h2>Блок 1. Douyin и живая речь</h2>
+<article class="quiz-card" id="q1">
+<div class="q-top"><span class="num">1</span><span class="tag">выбор ответа</span></div>
+<h3>Зачем изучать Douyin на уроках китайского?</h3>
+<div class="options">
+<div class="option">
+<input id="q1_a" name="q1" type="radio"/>
+<label class="wrong" for="q1_a"><span class="badge">A</span><span>чтобы заменить весь учебник грамматики</span></label>
+</div>
+<div class="option">
+<input id="q1_b" name="q1" type="radio"/>
+<label class="correct" for="q1_b"><span class="badge">B</span><span>чтобы увидеть живую речь, реакции и современную культуру</span></label>
+</div>
+<div class="option">
+<input id="q1_c" name="q1" type="radio"/>
+<label class="wrong" for="q1_c"><span class="badge">C</span><span>только чтобы учить названия танцев</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> Douyin показывает короткие естественные фразы, реакции, комментарии и культурный контекст.</p>
+</details>
+</article>
+<article class="quiz-card" id="q2">
+<div class="q-top"><span class="num">2</span><span class="tag">выбор ответа</span></div>
+<h3>Чем Douyin отличается от TikTok в контексте изучения языка?</h3>
+<div class="options">
+<div class="option">
+<input id="q2_a" name="q2" type="radio"/>
+<label class="wrong" for="q2_a"><span class="badge">A</span><span>в Douyin нет комментариев</span></label>
+</div>
+<div class="option">
+<input id="q2_b" name="q2" type="radio"/>
+<label class="correct" for="q2_b"><span class="badge">B</span><span>формат похожий, но культурная среда другая</span></label>
+</div>
+<div class="option">
+<input id="q2_c" name="q2" type="radio"/>
+<label class="wrong" for="q2_c"><span class="badge">C</span><span>это полностью одинаковые платформы</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> Douyin встроен в китайскую локальную экосистему, поэтому шутки и реакции часто зависят от китайского контекста.</p>
+</details>
+</article>
+<article class="quiz-card" id="q3">
+<div class="q-top"><span class="num">3</span><span class="tag">выбор ответа</span></div>
+<h3>Почему комментарии в Douyin важны для изучающего?</h3>
+<div class="options">
+<div class="option">
+<input id="q3_a" name="q3" type="radio"/>
+<label class="correct" for="q3_a"><span class="badge">A</span><span>они помогают понять реакцию аудитории и могут стать мемом</span></label>
+</div>
+<div class="option">
+<input id="q3_b" name="q3" type="radio"/>
+<label class="wrong" for="q3_b"><span class="badge">B</span><span>они всегда официальные</span></label>
+</div>
+<div class="option">
+<input id="q3_c" name="q3" type="radio"/>
+<label class="wrong" for="q3_c"><span class="badge">C</span><span>они нужны только для рекламы</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> Комментарии часто показывают быстрый тон реакции: смешно, жизненно, трогательно, иронично.</p>
+</details>
+</article>
+<article class="quiz-card" id="q4">
+<div class="q-top"><span class="num">4</span><span class="tag">выбор ответа</span></div>
+<h3>Главная задача при изучении трендов — это…</h3>
+<div class="options">
+<div class="option">
+<input id="q4_a" name="q4" type="radio"/>
+<label class="correct" for="q4_a"><span class="badge">A</span><span>понимать тип реакции и ситуацию</span></label>
+</div>
+<div class="option">
+<input id="q4_b" name="q4" type="radio"/>
+<label class="wrong" for="q4_b"><span class="badge">B</span><span>переводить каждую песню дословно</span></label>
+</div>
+<div class="option">
+<input id="q4_c" name="q4" type="radio"/>
+<label class="wrong" for="q4_c"><span class="badge">C</span><span>выучить все мемы наизусть</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> Важнее понимать ситуацию, регистр и эмоцию, чем гнаться за каждым новым мемом.</p>
+</details>
+</article>
+<h2>Блок 2. Слова о трендах</h2>
+<article class="quiz-card" id="q5">
+<div class="q-top"><span class="num">5</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 热梗 rè gěng?</h3>
+<div class="options">
+<div class="option">
+<input id="q5_a" name="q5" type="radio"/>
+<label class="wrong" for="q5_a"><span class="badge">A</span><span>официальное письмо</span></label>
+</div>
+<div class="option">
+<input id="q5_b" name="q5" type="radio"/>
+<label class="wrong" for="q5_b"><span class="badge">B</span><span>домашнее задание</span></label>
+</div>
+<div class="option">
+<input id="q5_c" name="q5" type="radio"/>
+<label class="correct" for="q5_c"><span class="badge">C</span><span>вирусный мем / горячая шутка</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 热梗 — популярная шутка или мем, который активно повторяют.</p>
+</details>
+</article>
+<article class="quiz-card" id="q6">
+<div class="q-top"><span class="num">6</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 玩梗 wán gěng?</h3>
+<div class="options">
+<div class="option">
+<input id="q6_a" name="q6" type="radio"/>
+<label class="wrong" for="q6_a"><span class="badge">A</span><span>отдыхать после работы</span></label>
+</div>
+<div class="option">
+<input id="q6_b" name="q6" type="radio"/>
+<label class="correct" for="q6_b"><span class="badge">B</span><span>использовать мем</span></label>
+</div>
+<div class="option">
+<input id="q6_c" name="q6" type="radio"/>
+<label class="wrong" for="q6_c"><span class="badge">C</span><span>учить иероглифы</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 玩梗 — использовать мем или шутку в подходящем контексте.</p>
+</details>
+</article>
+<article class="quiz-card" id="q7">
+<div class="q-top"><span class="num">7</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 接梗 jiē gěng?</h3>
+<div class="options">
+<div class="option">
+<input id="q7_a" name="q7" type="radio"/>
+<label class="correct" for="q7_a"><span class="badge">A</span><span>подхватить шутку</span></label>
+</div>
+<div class="option">
+<input id="q7_b" name="q7" type="radio"/>
+<label class="wrong" for="q7_b"><span class="badge">B</span><span>перестать смотреть видео</span></label>
+</div>
+<div class="option">
+<input id="q7_c" name="q7" type="radio"/>
+<label class="wrong" for="q7_c"><span class="badge">C</span><span>написать формальный ответ</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 接梗 — понять шутку и продолжить её.</p>
+</details>
+</article>
+<article class="quiz-card" id="q8">
+<div class="q-top"><span class="num">8</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 跟风 gēn fēng?</h3>
+<div class="options">
+<div class="option">
+<input id="q8_a" name="q8" type="radio"/>
+<label class="wrong" for="q8_a"><span class="badge">A</span><span>покупать билет</span></label>
+</div>
+<div class="option">
+<input id="q8_b" name="q8" type="radio"/>
+<label class="wrong" for="q8_b"><span class="badge">B</span><span>плакать от видео</span></label>
+</div>
+<div class="option">
+<input id="q8_c" name="q8" type="radio"/>
+<label class="correct" for="q8_c"><span class="badge">C</span><span>следовать тренду</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 跟风 — делать как другие, подхватывать массовый тренд.</p>
+</details>
+</article>
+<article class="quiz-card" id="q9">
+<div class="q-top"><span class="num">9</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 二创 èr chuàng?</h3>
+<div class="options">
+<div class="option">
+<input id="q9_a" name="q9" type="radio"/>
+<label class="correct" for="q9_a"><span class="badge">A</span><span>вторичное творчество</span></label>
+</div>
+<div class="option">
+<input id="q9_b" name="q9" type="radio"/>
+<label class="wrong" for="q9_b"><span class="badge">B</span><span>первый урок</span></label>
+</div>
+<div class="option">
+<input id="q9_c" name="q9" type="radio"/>
+<label class="wrong" for="q9_c"><span class="badge">C</span><span>рабочее расписание</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 二创 — когда пользователи перерабатывают исходный контент и делают свои версии.</p>
+</details>
+</article>
+<h2>Блок 3. Как рождается мем</h2>
+<article class="quiz-card" id="q10">
+<div class="q-top"><span class="num">10</span><span class="tag">выбор ответа</span></div>
+<h3>Какая формула лучше всего описывает вирусность?</h3>
+<div class="options">
+<div class="option">
+<input id="q10_a" name="q10" type="radio"/>
+<label class="wrong" for="q10_a"><span class="badge">A</span><span>словарь → диктант → перевод</span></label>
+</div>
+<div class="option">
+<input id="q10_b" name="q10" type="radio"/>
+<label class="correct" for="q10_b"><span class="badge">B</span><span>короткая фраза → звук → простое действие → эмоция → повторение</span></label>
+</div>
+<div class="option">
+<input id="q10_c" name="q10" type="radio"/>
+<label class="wrong" for="q10_c"><span class="badge">C</span><span>длинный текст → сложная грамматика → официальный стиль</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> Мем легко распространяется, если его просто узнать, почувствовать и повторить.</p>
+</details>
+</article>
+<article class="quiz-card" id="q11">
+<div class="q-top"><span class="num">11</span><span class="tag">выбор ответа</span></div>
+<h3>Почему фраза 真棒! может легко вируситься?</h3>
+<div class="options">
+<div class="option">
+<input id="q11_a" name="q11" type="radio"/>
+<label class="correct" for="q11_a"><span class="badge">A</span><span>она короткая и эмоционально понятная</span></label>
+</div>
+<div class="option">
+<input id="q11_b" name="q11" type="radio"/>
+<label class="wrong" for="q11_b"><span class="badge">B</span><span>она подходит только для официальных документов</span></label>
+</div>
+<div class="option">
+<input id="q11_c" name="q11" type="radio"/>
+<label class="wrong" for="q11_c"><span class="badge">C</span><span>её невозможно использовать с иронией</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 真棒! легко понять, повторить и перенести в разные ситуации.</p>
+</details>
+</article>
+<article class="quiz-card" id="q12">
+<div class="q-top"><span class="num">12</span><span class="tag">выбор ответа</span></div>
+<h3>Что обычно помогает мему жить отдельно от исходного видео?</h3>
+<div class="options">
+<div class="option">
+<input id="q12_a" name="q12" type="radio"/>
+<label class="wrong" for="q12_a"><span class="badge">A</span><span>только длинное объяснение автора</span></label>
+</div>
+<div class="option">
+<input id="q12_b" name="q12" type="radio"/>
+<label class="wrong" for="q12_b"><span class="badge">B</span><span>запрет на копирование</span></label>
+</div>
+<div class="option">
+<input id="q12_c" name="q12" type="radio"/>
+<label class="correct" for="q12_c"><span class="badge">C</span><span>комментарии и повторение формата</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> Когда люди копируют формат и добавляют свои ситуации, мем начинает жить самостоятельно.</p>
+</details>
+</article>
+<h2>Блок 4. Музыка и челленджи</h2>
+<article class="quiz-card" id="q13">
+<div class="q-top"><span class="num">13</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 洗脑 xǐnǎo в контексте BGM?</h3>
+<div class="options">
+<div class="option">
+<input id="q13_a" name="q13" type="radio"/>
+<label class="wrong" for="q13_a"><span class="badge">A</span><span>звучит официально</span></label>
+</div>
+<div class="option">
+<input id="q13_b" name="q13" type="radio"/>
+<label class="correct" for="q13_b"><span class="badge">B</span><span>заедает в голове</span></label>
+</div>
+<div class="option">
+<input id="q13_c" name="q13" type="radio"/>
+<label class="wrong" for="q13_c"><span class="badge">C</span><span>очень грустно</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 洗脑 — звук или песня, которые «залипают» в голове.</p>
+</details>
+</article>
+<article class="quiz-card" id="q14">
+<div class="q-top"><span class="num">14</span><span class="tag">выбор ответа</span></div>
+<h3>Какой комментарий подходит к песне, которая заедает?</h3>
+<div class="options">
+<div class="option">
+<input id="q14_a" name="q14" type="radio"/>
+<label class="wrong" for="q14_a"><span class="badge">A</span><span>没关系。</span></label>
+</div>
+<div class="option">
+<input id="q14_b" name="q14" type="radio"/>
+<label class="correct" for="q14_b"><span class="badge">B</span><span>这首歌太洗脑了。</span></label>
+</div>
+<div class="option">
+<input id="q14_c" name="q14" type="radio"/>
+<label class="wrong" for="q14_c"><span class="badge">C</span><span>生日快乐。</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 这首歌太洗脑了。— «Эта песня так заедает».</p>
+</details>
+</article>
+<article class="quiz-card" id="q15">
+<div class="q-top"><span class="num">15</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 上头 shàngtóu?</h3>
+<div class="options">
+<div class="option">
+<input id="q15_a" name="q15" type="radio"/>
+<label class="correct" for="q15_a"><span class="badge">A</span><span>затягивает, хочется продолжать</span></label>
+</div>
+<div class="option">
+<input id="q15_b" name="q15" type="radio"/>
+<label class="wrong" for="q15_b"><span class="badge">B</span><span>нужно выключить телефон</span></label>
+</div>
+<div class="option">
+<input id="q15_c" name="q15" type="radio"/>
+<label class="wrong" for="q15_c"><span class="badge">C</span><span>слишком формально</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 上头 используют, когда музыка, видео или сериал сильно увлекают.</p>
+</details>
+</article>
+<article class="quiz-card" id="q16">
+<div class="q-top"><span class="num">16</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 跟拍 gēnpāi?</h3>
+<div class="options">
+<div class="option">
+<input id="q16_a" name="q16" type="radio"/>
+<label class="wrong" for="q16_a"><span class="badge">A</span><span>написать официальное письмо</span></label>
+</div>
+<div class="option">
+<input id="q16_b" name="q16" type="radio"/>
+<label class="correct" for="q16_b"><span class="badge">B</span><span>повторить чей-то видеоформат</span></label>
+</div>
+<div class="option">
+<input id="q16_c" name="q16" type="radio"/>
+<label class="wrong" for="q16_c"><span class="badge">C</span><span>уйти с работы</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 跟拍 — повторить формат, часто с тем же звуком или движением.</p>
+</details>
+</article>
+<article class="quiz-card" id="q17">
+<div class="q-top"><span class="num">17</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 打卡 dǎkǎ?</h3>
+<div class="options">
+<div class="option">
+<input id="q17_a" name="q17" type="radio"/>
+<label class="wrong" for="q17_a"><span class="badge">A</span><span>сказать «спасибо»</span></label>
+</div>
+<div class="option">
+<input id="q17_b" name="q17" type="radio"/>
+<label class="wrong" for="q17_b"><span class="badge">B</span><span>удалить комментарий</span></label>
+</div>
+<div class="option">
+<input id="q17_c" name="q17" type="radio"/>
+<label class="correct" for="q17_c"><span class="badge">C</span><span>отметиться в месте или показать посещение</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 打卡 часто используют для кафе, городских локаций, путешествий и мест, куда хочется сходить.</p>
+</details>
+</article>
+<article class="quiz-card" id="q18">
+<div class="q-top"><span class="num">18</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 整活 zhěnghuó?</h3>
+<div class="options">
+<div class="option">
+<input id="q18_a" name="q18" type="radio"/>
+<label class="correct" for="q18_a"><span class="badge">A</span><span>креативно сделать что-то смешное</span></label>
+</div>
+<div class="option">
+<input id="q18_b" name="q18" type="radio"/>
+<label class="wrong" for="q18_b"><span class="badge">B</span><span>заполнить анкету</span></label>
+</div>
+<div class="option">
+<input id="q18_c" name="q18" type="radio"/>
+<label class="wrong" for="q18_c"><span class="badge">C</span><span>выучить таблицу слов</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 整活 — «выдать номер», придумать смешной ход, сделать что-то необычное.</p>
+</details>
+</article>
+<h2>Блок 5. Комментарии и реакции</h2>
+<article class="quiz-card" id="q19">
+<div class="q-top"><span class="num">19</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 笑死我了?</h3>
+<div class="options">
+<div class="option">
+<input id="q19_a" name="q19" type="radio"/>
+<label class="correct" for="q19_a"><span class="badge">A</span><span>очень смешно</span></label>
+</div>
+<div class="option">
+<input id="q19_b" name="q19" type="radio"/>
+<label class="wrong" for="q19_b"><span class="badge">B</span><span>очень официально</span></label>
+</div>
+<div class="option">
+<input id="q19_c" name="q19" type="radio"/>
+<label class="wrong" for="q19_c"><span class="badge">C</span><span>очень дорого</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 笑死我了 — разговорная реакция: «умираю от смеха».</p>
+</details>
+</article>
+<article class="quiz-card" id="q20">
+<div class="q-top"><span class="num">20</span><span class="tag">выбор ответа</span></div>
+<h3>В какой ситуации лучше всего использовать 谁懂啊?</h3>
+<div class="options">
+<div class="option">
+<input id="q20_a" name="q20" type="radio"/>
+<label class="wrong" for="q20_a"><span class="badge">A</span><span>в поздравлении с днём рождения</span></label>
+</div>
+<div class="option">
+<input id="q20_b" name="q20" type="radio"/>
+<label class="wrong" for="q20_b"><span class="badge">B</span><span>в официальном письме клиенту</span></label>
+</div>
+<div class="option">
+<input id="q20_c" name="q20" type="radio"/>
+<label class="correct" for="q20_c"><span class="badge">C</span><span>когда ситуация жизненная и хочется сказать «кто поймёт»</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 谁懂啊 передаёт ощущение «жиза», «кто меня поймёт».</p>
+</details>
+</article>
+<article class="quiz-card" id="q21">
+<div class="q-top"><span class="num">21</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 破防了?</h3>
+<div class="options">
+<div class="option">
+<input id="q21_a" name="q21" type="radio"/>
+<label class="wrong" for="q21_a"><span class="badge">A</span><span>я открыл дверь</span></label>
+</div>
+<div class="option">
+<input id="q21_b" name="q21" type="radio"/>
+<label class="wrong" for="q21_b"><span class="badge">B</span><span>я закончил урок</span></label>
+</div>
+<div class="option">
+<input id="q21_c" name="q21" type="radio"/>
+<label class="correct" for="q21_c"><span class="badge">C</span><span>эмоционально пробило</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 破防了 используют, когда видео тронуло, задело или эмоционально «пробило».</p>
+</details>
+</article>
+<article class="quiz-card" id="q22">
+<div class="q-top"><span class="num">22</span><span class="tag">выбор ответа</span></div>
+<h3>Какой комментарий подойдёт к очень трогательному видео?</h3>
+<div class="options">
+<div class="option">
+<input id="q22_a" name="q22" type="radio"/>
+<label class="wrong" for="q22_a"><span class="badge">A</span><span>欢迎光临。</span></label>
+</div>
+<div class="option">
+<input id="q22_b" name="q22" type="radio"/>
+<label class="correct" for="q22_b"><span class="badge">B</span><span>我破防了。</span></label>
+</div>
+<div class="option">
+<input id="q22_c" name="q22" type="radio"/>
+<label class="wrong" for="q22_c"><span class="badge">C</span><span>生日快乐。</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 我破防了。— «Меня эмоционально пробило».</p>
+</details>
+</article>
+<h2>Блок 6. Работа и самоирония</h2>
+<article class="quiz-card" id="q23">
+<div class="q-top"><span class="num">23</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 班味太重了?</h3>
+<div class="options">
+<div class="option">
+<input id="q23_a" name="q23" type="radio"/>
+<label class="wrong" for="q23_a"><span class="badge">A</span><span>очень вкусная еда</span></label>
+</div>
+<div class="option">
+<input id="q23_b" name="q23" type="radio"/>
+<label class="correct" for="q23_b"><span class="badge">B</span><span>слишком рабочий / офисный вайб</span></label>
+</div>
+<div class="option">
+<input id="q23_c" name="q23" type="radio"/>
+<label class="wrong" for="q23_c"><span class="badge">C</span><span>красивая музыка</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 班味 — современная шутка про «запах работы» или офисный вайб.</p>
+</details>
+</article>
+<article class="quiz-card" id="q24">
+<div class="q-top"><span class="num">24</span><span class="tag">выбор ответа</span></div>
+<h3>Кому НЕ стоит говорить 班味太重了?</h3>
+<div class="options">
+<div class="option">
+<input id="q24_a" name="q24" type="radio"/>
+<label class="correct" for="q24_a"><span class="badge">A</span><span>начальнику или деловому партнёру</span></label>
+</div>
+<div class="option">
+<input id="q24_b" name="q24" type="radio"/>
+<label class="wrong" for="q24_b"><span class="badge">B</span><span>себе в самоиронии</span></label>
+</div>
+<div class="option">
+<input id="q24_c" name="q24" type="radio"/>
+<label class="wrong" for="q24_c"><span class="badge">C</span><span>другу в шутливом чате</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> Фраза неформальная и может прозвучать грубо в деловой ситуации.</p>
+</details>
+</article>
+<article class="quiz-card" id="q25">
+<div class="q-top"><span class="num">25</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 打工人?</h3>
+<div class="options">
+<div class="option">
+<input id="q25_a" name="q25" type="radio"/>
+<label class="wrong" for="q25_a"><span class="badge">A</span><span>профессиональный спортсмен</span></label>
+</div>
+<div class="option">
+<input id="q25_b" name="q25" type="radio"/>
+<label class="wrong" for="q25_b"><span class="badge">B</span><span>популярная песня</span></label>
+</div>
+<div class="option">
+<input id="q25_c" name="q25" type="radio"/>
+<label class="correct" for="q25_c"><span class="badge">C</span><span>ироничное «работяга»</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 打工人 — самоироничное слово о человеке, который работает/«пашет».</p>
+</details>
+</article>
+<article class="quiz-card" id="q26">
+<div class="q-top"><span class="num">26</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 摆烂?</h3>
+<div class="options">
+<div class="option">
+<input id="q26_a" name="q26" type="radio"/>
+<label class="wrong" for="q26_a"><span class="badge">A</span><span>официально представить проект</span></label>
+</div>
+<div class="option">
+<input id="q26_b" name="q26" type="radio"/>
+<label class="wrong" for="q26_b"><span class="badge">B</span><span>сделать идеально</span></label>
+</div>
+<div class="option">
+<input id="q26_c" name="q26" type="radio"/>
+<label class="correct" for="q26_c"><span class="badge">C</span><span>пустить всё на самотёк</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 摆烂 — перестать стараться, махнуть рукой, пустить всё как идёт.</p>
+</details>
+</article>
+<h2>Блок 7. Атмосфера и оценка</h2>
+<article class="quiz-card" id="q27">
+<div class="q-top"><span class="num">27</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 活人感?</h3>
+<div class="options">
+<div class="option">
+<input id="q27_a" name="q27" type="radio"/>
+<label class="wrong" for="q27_a"><span class="badge">A</span><span>страшное видео</span></label>
+</div>
+<div class="option">
+<input id="q27_b" name="q27" type="radio"/>
+<label class="correct" for="q27_b"><span class="badge">B</span><span>ощущение живого человека, естественность</span></label>
+</div>
+<div class="option">
+<input id="q27_c" name="q27" type="radio"/>
+<label class="wrong" for="q27_c"><span class="badge">C</span><span>дорогая покупка</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> 活人感 часто положительно описывает естественный, живой стиль блогера или видео.</p>
+</details>
+</article>
+<article class="quiz-card" id="q28">
+<div class="q-top"><span class="num">28</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 松弛感?</h3>
+<div class="options">
+<div class="option">
+<input id="q28_a" name="q28" type="radio"/>
+<label class="correct" for="q28_a"><span class="badge">A</span><span>расслабленная естественность</span></label>
+</div>
+<div class="option">
+<input id="q28_b" name="q28" type="radio"/>
+<label class="wrong" for="q28_b"><span class="badge">B</span><span>полный хаос</span></label>
+</div>
+<div class="option">
+<input id="q28_c" name="q28" type="radio"/>
+<label class="wrong" for="q28_c"><span class="badge">C</span><span>строгий деловой стиль</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 松弛感 — ощущение лёгкости, расслабленности и естественности.</p>
+</details>
+</article>
+<article class="quiz-card" id="q29">
+<div class="q-top"><span class="num">29</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 有点东西?</h3>
+<div class="options">
+<div class="option">
+<input id="q29_a" name="q29" type="radio"/>
+<label class="wrong" for="q29_a"><span class="badge">A</span><span>у меня есть вещь</span></label>
+</div>
+<div class="option">
+<input id="q29_b" name="q29" type="radio"/>
+<label class="wrong" for="q29_b"><span class="badge">B</span><span>это нельзя смотреть</span></label>
+</div>
+<div class="option">
+<input id="q29_c" name="q29" type="radio"/>
+<label class="correct" for="q29_c"><span class="badge">C</span><span>в этом что-то есть</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 有点东西 — одобрительная оценка: человек или идея интересные, «что-то в этом есть».</p>
+</details>
+</article>
+<h2>Блок 8. Абсурд и уместность</h2>
+<article class="quiz-card" id="q30">
+<div class="q-top"><span class="num">30</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 抽象 в интернет-юморе?</h3>
+<div class="options">
+<div class="option">
+<input id="q30_a" name="q30" type="radio"/>
+<label class="correct" for="q30_a"><span class="badge">A</span><span>абсурдно-мемный</span></label>
+</div>
+<div class="option">
+<input id="q30_b" name="q30" type="radio"/>
+<label class="wrong" for="q30_b"><span class="badge">B</span><span>полностью понятный без контекста</span></label>
+</div>
+<div class="option">
+<input id="q30_c" name="q30" type="radio"/>
+<label class="wrong" for="q30_c"><span class="badge">C</span><span>очень формальный</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: A.</b> 抽象 описывает странный, нелепый, мемный юмор.</p>
+</details>
+</article>
+<article class="quiz-card" id="q31">
+<div class="q-top"><span class="num">31</span><span class="tag">выбор ответа</span></div>
+<h3>Что значит 离谱?</h3>
+<div class="options">
+<div class="option">
+<input id="q31_a" name="q31" type="radio"/>
+<label class="wrong" for="q31_a"><span class="badge">A</span><span>милый кот</span></label>
+</div>
+<div class="option">
+<input id="q31_b" name="q31" type="radio"/>
+<label class="wrong" for="q31_b"><span class="badge">B</span><span>официальное приглашение</span></label>
+</div>
+<div class="option">
+<input id="q31_c" name="q31" type="radio"/>
+<label class="correct" for="q31_c"><span class="badge">C</span><span>перебор / слишком</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> 离谱 часто значит «это уже слишком», «перебор», «странно».</p>
+</details>
+</article>
+<article class="quiz-card" id="q32">
+<div class="q-top"><span class="num">32</span><span class="tag">выбор ответа</span></div>
+<h3>Где лучше НЕ использовать интернет-фразы из лекции?</h3>
+<div class="options">
+<div class="option">
+<input id="q32_a" name="q32" type="radio"/>
+<label class="wrong" for="q32_a"><span class="badge">A</span><span>в переписке с друзьями</span></label>
+</div>
+<div class="option">
+<input id="q32_b" name="q32" type="radio"/>
+<label class="correct" for="q32_b"><span class="badge">B</span><span>в официальном письме, с начальником или клиентом</span></label>
+</div>
+<div class="option">
+<input id="q32_c" name="q32" type="radio"/>
+<label class="wrong" for="q32_c"><span class="badge">C</span><span>в комментариях к роликам</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: B.</b> Большинство фраз из лекции неформальные, поэтому важны регистр и уместность.</p>
+</details>
+</article>
+<article class="quiz-card" id="q33">
+<div class="q-top"><span class="num">33</span><span class="tag">выбор ответа</span></div>
+<h3>Какая стратегия самая безопасная для иностранца?</h3>
+<div class="options">
+<div class="option">
+<input id="q33_a" name="q33" type="radio"/>
+<label class="wrong" for="q33_a"><span class="badge">A</span><span>сразу писать их начальнику</span></label>
+</div>
+<div class="option">
+<input id="q33_b" name="q33" type="radio"/>
+<label class="wrong" for="q33_b"><span class="badge">B</span><span>использовать каждое слово в любой ситуации</span></label>
+</div>
+<div class="option">
+<input id="q33_c" name="q33" type="radio"/>
+<label class="correct" for="q33_c"><span class="badge">C</span><span>сначала использовать фразы в комментариях, потом с друзьями</span></label>
+</div>
+</div>
+<details>
+<summary>Показать объяснение</summary>
+<p><b>Правильный ответ: C.</b> Лучше сначала почувствовать оттенок слова в комментариях и неформальной среде.</p>
+</details>
+</article>
+</main>
+<section class="final">
+<h2>Как проходить</h2>
+<p>Нажмите на один вариант. Если он верный, карточка станет зелёной. Если неверный — красной. Для самопроверки можно раскрыть объяснение под вопросом.</p>
+</section>
+<p class="footer">Тест по лекции «Китайский TikTok / Douyin и тренды 2026»</p>
+</div>
+</body>
+</html>
