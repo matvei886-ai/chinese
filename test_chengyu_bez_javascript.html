@@ -1,0 +1,1738 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>成语 — интерактивный тест без JavaScript</title>
+  <style>
+    :root {
+      --bg: #f7f4ed;
+      --paper: #ffffff;
+      --text: #25231f;
+      --muted: #716d64;
+      --line: #e7e0d4;
+      --accent: #b44836;
+      --accent-soft: #f8e8e3;
+      --correct: #147a45;
+      --correct-bg: #e7f6ed;
+      --correct-line: #8ed1aa;
+      --wrong: #b3261e;
+      --wrong-bg: #fdebea;
+      --wrong-line: #edaaa5;
+      --shadow: 0 14px 40px rgba(60, 47, 32, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+                   "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(180,72,54,.10), transparent 28rem),
+        linear-gradient(180deg, #fbf8f2 0%, var(--bg) 100%);
+      line-height: 1.55;
+    }
+
+    .page {
+      width: min(860px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 70px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .hero::after {
+      content: "成语";
+      position: absolute;
+      right: -12px;
+      bottom: -35px;
+      font-size: clamp(92px, 22vw, 180px);
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(180,72,54,.07);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 650px;
+      margin: 0 0 12px;
+      font-size: clamp(31px, 7vw, 54px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+
+    .lead {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 22px;
+      max-width: 650px;
+    }
+
+    .rule {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #faf7f2;
+      border: 1px solid var(--line);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    form { display: grid; gap: 16px; }
+
+    .question-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--paper);
+      box-shadow: 0 8px 24px rgba(60,47,32,.045);
+    }
+
+    .question-number {
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: clamp(19px, 4.7vw, 24px);
+      line-height: 1.35;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .option {
+      position: relative;
+    }
+
+    .option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option label {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 58px;
+      padding: 11px 13px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .option label:hover {
+      transform: translateY(-1px);
+      border-color: #cfc5b6;
+    }
+
+    .letter {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #f3efe8;
+      color: #5d584f;
+      font-weight: 900;
+    }
+
+    .option-text {
+      font-size: 16px;
+    }
+
+    .result {
+      display: none;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .option input.correct-radio:checked + label.correct {
+      border-color: var(--correct-line);
+      background: var(--correct-bg);
+      color: var(--correct);
+    }
+
+    .option input.correct-radio:checked + label.correct .letter {
+      background: var(--correct);
+      color: white;
+    }
+
+    .option input.correct-radio:checked + label.correct .result {
+      display: inline;
+      color: var(--correct);
+    }
+
+    .option input.wrong-radio:checked + label.wrong {
+      border-color: var(--wrong-line);
+      background: var(--wrong-bg);
+      color: var(--wrong);
+    }
+
+    .option input.wrong-radio:checked + label.wrong .letter {
+      background: var(--wrong);
+      color: white;
+    }
+
+    .option input.wrong-radio:checked + label.wrong .result {
+      display: inline;
+      color: var(--wrong);
+    }
+
+    .option input:focus-visible + label {
+      outline: 3px solid rgba(180,72,54,.25);
+      outline-offset: 2px;
+    }
+
+    details {
+      margin-top: 14px;
+      border-top: 1px dashed var(--line);
+      padding-top: 12px;
+      color: var(--muted);
+    }
+
+    summary {
+      cursor: pointer;
+      color: #625e56;
+      font-weight: 800;
+    }
+
+    details p {
+      margin: 9px 0 0;
+      font-size: 14px;
+    }
+
+    .footer-actions {
+      position: sticky;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 22px;
+      padding: 10px;
+      border: 1px solid rgba(231,224,212,.9);
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 13px;
+      padding: 13px 18px;
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .reset {
+      background: var(--accent);
+      color: white;
+    }
+
+    .top {
+      background: #f2eee7;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 13px;
+      padding: 13px 18px;
+      font-weight: 850;
+    }
+
+    .small-note {
+      margin: 20px 2px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 18px, 860px);
+        padding-top: 10px;
+      }
+
+      .hero {
+        padding: 24px 20px;
+        border-radius: 22px;
+      }
+
+      .rules {
+        grid-template-columns: 1fr;
+      }
+
+      .question-card {
+        padding: 20px 15px;
+        border-radius: 19px;
+      }
+
+      .option label {
+        grid-template-columns: 32px 1fr;
+        gap: 10px;
+        padding: 11px;
+      }
+
+      .letter {
+        width: 32px;
+        height: 32px;
+      }
+
+      .result {
+        grid-column: 2;
+        margin-top: -5px;
+      }
+
+      .footer-actions {
+        bottom: 7px;
+      }
+
+      button, .top {
+        flex: 1;
+        text-align: center;
+        padding-inline: 12px;
+      }
+    }
+
+    @media print {
+      body { background: white; }
+      .page { width: 100%; }
+      .hero, .question-card { box-shadow: none; break-inside: avoid; }
+      .footer-actions { display: none; }
+    }
+  </style>
+</head>
+<body id="top">
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">Интерактивная практика · без JavaScript</div>
+      <h1>成语: выберите верный ответ</h1>
+      <p class="lead">
+        Тест по значениям, образам и ситуациям употребления китайских 成语.
+        Нажмите на вариант: правильный загорится зелёным, ошибочный — красным.
+      </p>
+      <div class="rules">
+        <div class="rule">30 вопросов</div>
+        <div class="rule">Работает на телефоне</div>
+        <div class="rule">Никаких скриптов</div>
+      </div>
+    </header>
+
+    <form>
+      
+      <section class="question-card">
+        <div class="question-number">Вопрос 1 из 30</div>
+        <h2>Что означает 画蛇添足 (huà shé tiān zú)?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q1" id="q1_0" class="wrong-radio">
+            <label for="q1_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Ждать удачи, ничего не делая</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q1" id="q1_1" class="correct-radio">
+            <label for="q1_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Сделать лишнее и испортить хороший результат</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q1" id="q1_2" class="wrong-radio">
+            <label for="q1_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Помочь в самый нужный момент</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q1" id="q1_3" class="wrong-radio">
+            <label for="q1_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Быстро посмотреть, не вникая</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>画蛇添足 — «дорисовать змее ноги»: добавить ненужную деталь и всё испортить.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 2 из 30</div>
+        <h2>Какая ситуация лучше всего описывается как 守株待兔?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q2" id="q2_0" class="correct-radio">
+            <label for="q2_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">Человек ждёт идеальную работу, но не отправляет резюме</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q2" id="q2_1" class="wrong-radio">
+            <label for="q2_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">Он сравнил две одинаковые вещи</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q2" id="q2_2" class="wrong-radio">
+            <label for="q2_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Друзья помогли ему в трудный момент</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q2" id="q2_3" class="wrong-radio">
+            <label for="q2_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Человек нашёл эффективный способ учиться</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>守株待兔 — пассивно надеяться на случай вместо реальных действий.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 3 из 30</div>
+        <h2>Что означает 自相矛盾 (zì xiāng máo dùn)?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q3" id="q3_0" class="wrong-radio">
+            <label for="q3_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Получать двойную пользу</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q3" id="q3_1" class="correct-radio">
+            <label for="q3_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Противоречить самому себе</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q3" id="q3_2" class="wrong-radio">
+            <label for="q3_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Говорить слишком сложно</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q3" id="q3_3" class="wrong-radio">
+            <label for="q3_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Бросать дело на середине</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>自相矛盾 — слова, аргументы или действия человека не согласуются друг с другом.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 4 из 30</div>
+        <h2>Выберите подходящий 成语: «Я объяснял ему правила полчаса, но он даже не слушал».</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q4" id="q4_0" class="correct-radio">
+            <label for="q4_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">对牛弹琴</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q4" id="q4_1" class="wrong-radio">
+            <label for="q4_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q4" id="q4_2" class="wrong-radio">
+            <label for="q4_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q4" id="q4_3" class="wrong-radio">
+            <label for="q4_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>对牛弹琴 — объяснять тому, кто не понимает или не хочет воспринимать смысл.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 5 из 30</div>
+        <h2>Как лучше перевести 马马虎虎?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q5" id="q5_0" class="wrong-radio">
+            <label for="q5_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Слишком подробно</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q5" id="q5_1" class="correct-radio">
+            <label for="q5_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Так себе; средне; кое-как</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q5" id="q5_2" class="wrong-radio">
+            <label for="q5_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Совершенно одинаково</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q5" id="q5_3" class="wrong-radio">
+            <label for="q5_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Очень эффективно</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>马马虎虎 часто употребляют как спокойную оценку: «нормально, но могло быть лучше».</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 6 из 30</div>
+        <h2>Что означает 一模一样 (yì mú yí yàng)?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q6" id="q6_0" class="wrong-radio">
+            <label for="q6_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Полезный сразу в двух отношениях</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q6" id="q6_1" class="correct-radio">
+            <label for="q6_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Совершенно одинаковый, точь-в-точь</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q6" id="q6_2" class="wrong-radio">
+            <label for="q6_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Почти законченный</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q6" id="q6_3" class="wrong-radio">
+            <label for="q6_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Сделанный наспех</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>一模一样 — два предмета, ответа или человека почти невозможно различить.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 7 из 30</div>
+        <h2>Выберите 成语: «Он начал заниматься спортом, но через две недели всё бросил».</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q7" id="q7_0" class="wrong-radio">
+            <label for="q7_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">守株待兔</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q7" id="q7_1" class="wrong-radio">
+            <label for="q7_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">举一反三</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q7" id="q7_2" class="wrong-radio">
+            <label for="q7_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">火上浇油</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q7" id="q7_3" class="correct-radio">
+            <label for="q7_3" class="correct">
+              <span class="letter">D</span>
+              <span class="option-text">半途而废</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>半途而废 — начать дело и не довести его до конца.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 8 из 30</div>
+        <h2>Какой 成语 означает «одним действием получить двойную пользу»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q8" id="q8_0" class="wrong-radio">
+            <label for="q8_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">自相矛盾</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q8" id="q8_1" class="wrong-radio">
+            <label for="q8_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q8" id="q8_2" class="wrong-radio">
+            <label for="q8_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">事半功倍</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q8" id="q8_3" class="correct-radio">
+            <label for="q8_3" class="correct">
+              <span class="letter">D</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>一举两得 — одно действие одновременно решает две задачи.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 9 из 30</div>
+        <h2>Какой пример лучше всего подходит для 事半功倍?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q9" id="q9_0" class="wrong-radio">
+            <label for="q9_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Он ждал, пока проблема решится сама</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q9" id="q9_1" class="correct-radio">
+            <label for="q9_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Он составил план повторения и стал запоминать быстрее</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q9" id="q9_2" class="wrong-radio">
+            <label for="q9_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Он добавил лишние картинки и испортил дизайн</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q9" id="q9_3" class="wrong-radio">
+            <label for="q9_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Он быстро пробежал глазами весь текст</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>事半功倍 — правильный метод позволяет получить больший результат меньшими усилиями.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 10 из 30</div>
+        <h2>Что означает 火上浇油 (huǒ shàng jiāo yóu)?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q10" id="q10_0" class="wrong-radio">
+            <label for="q10_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Помочь вовремя</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q10" id="q10_1" class="correct-radio">
+            <label for="q10_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Усилить конфликт или напряжение</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q10" id="q10_2" class="wrong-radio">
+            <label for="q10_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Понять принцип по одному примеру</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q10" id="q10_3" class="wrong-radio">
+            <label for="q10_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Сделать две вещи одновременно</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>火上浇油 — буквально «подливать масло в огонь»: сделать конфликт ещё острее.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 11 из 30</div>
+        <h2>Выберите 成语: «Когда мне срочно понадобился перевод, подруга сразу помогла».</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q11" id="q11_0" class="wrong-radio">
+            <label for="q11_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">画蛇添足</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q11" id="q11_1" class="correct-radio">
+            <label for="q11_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q11" id="q11_2" class="wrong-radio">
+            <label for="q11_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">马马虎虎</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q11" id="q11_3" class="wrong-radio">
+            <label for="q11_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>雪中送炭 — оказать ценную помощь именно тогда, когда она особенно нужна.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 12 из 30</div>
+        <h2>Что означает 举一反三 (jǔ yī fǎn sān)?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q12" id="q12_0" class="wrong-radio">
+            <label for="q12_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Быстро осмотреть несколько мест</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q12" id="q12_1" class="wrong-radio">
+            <label for="q12_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">Сделать работу наполовину</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q12" id="q12_2" class="wrong-radio">
+            <label for="q12_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Повторить одно и то же три раза</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q12" id="q12_3" class="correct-radio">
+            <label for="q12_3" class="correct">
+              <span class="letter">D</span>
+              <span class="option-text">По одному примеру понять принцип и применить его дальше</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>举一反三 — не просто запомнить пример, а понять закономерность и перенести её на новые случаи.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 13 из 30</div>
+        <h2>Выберите 成语: «Мы за двадцать минут осмотрели весь музей, но почти ничего не запомнили».</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q13" id="q13_0" class="wrong-radio">
+            <label for="q13_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">对牛弹琴</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q13" id="q13_1" class="correct-radio">
+            <label for="q13_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q13" id="q13_2" class="wrong-radio">
+            <label for="q13_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q13" id="q13_3" class="wrong-radio">
+            <label for="q13_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">事半功倍</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>走马观花 — смотреть бегло и поверхностно, не вникая в детали.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 14 из 30</div>
+        <h2>Какой буквальный образ стоит за 画蛇添足?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q14" id="q14_0" class="correct-radio">
+            <label for="q14_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">Дорисовать змее ноги</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q14" id="q14_1" class="wrong-radio">
+            <label for="q14_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">Нести уголь по снегу</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q14" id="q14_2" class="wrong-radio">
+            <label for="q14_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Ждать зайца у пня</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q14" id="q14_3" class="wrong-radio">
+            <label for="q14_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Смотреть на цветы с лошади</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Именно нелепые «ноги у змеи» создают образ ненужного дополнения.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 15 из 30</div>
+        <h2>Какой буквальный образ стоит за 守株待兔?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q15" id="q15_0" class="wrong-radio">
+            <label for="q15_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Бросить путь на середине</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q15" id="q15_1" class="correct-radio">
+            <label for="q15_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Ждать зайца у пня</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q15" id="q15_2" class="wrong-radio">
+            <label for="q15_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Подливать масло в огонь</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q15" id="q15_3" class="wrong-radio">
+            <label for="q15_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Играть музыку перед коровой</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Крестьянин надеялся, что случай с зайцем повторится, и перестал работать.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 16 из 30</div>
+        <h2>Какой буквальный образ стоит за 对牛弹琴?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q16" id="q16_0" class="wrong-radio">
+            <label for="q16_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Смотреть на цветы в снегу</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q16" id="q16_1" class="correct-radio">
+            <label for="q16_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Играть на цине перед коровой</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q16" id="q16_2" class="wrong-radio">
+            <label for="q16_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Говорить с тигром</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q16" id="q16_3" class="wrong-radio">
+            <label for="q16_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Рисовать лошадь и тигра</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Музыка может быть прекрасной, но адресат не способен её понять.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 17 из 30</div>
+        <h2>Какой 成语 подходит: «Он говорит, что у него нет времени, но каждый вечер играет по четыре часа»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q17" id="q17_0" class="wrong-radio">
+            <label for="q17_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">马马虎虎</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q17" id="q17_1" class="correct-radio">
+            <label for="q17_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">自相矛盾</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q17" id="q17_2" class="wrong-radio">
+            <label for="q17_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q17" id="q17_3" class="wrong-radio">
+            <label for="q17_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Его слова и действия противоречат друг другу — 自相矛盾.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 18 из 30</div>
+        <h2>Какой 成语 подходит: «Дизайн был аккуратным, но потом добавили ещё пять украшений, и стало хуже»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q18" id="q18_0" class="correct-radio">
+            <label for="q18_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">画蛇添足</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q18" id="q18_1" class="wrong-radio">
+            <label for="q18_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">守株待兔</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q18" id="q18_2" class="wrong-radio">
+            <label for="q18_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">举一反三</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q18" id="q18_3" class="wrong-radio">
+            <label for="q18_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">半途而废</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Лишние детали испортили уже хороший результат — 画蛇添足.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 19 из 30</div>
+        <h2>Какой 成语 подходит: «Все уже спорили, а он добавил ещё одну колкую шутку»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q19" id="q19_0" class="correct-radio">
+            <label for="q19_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">火上浇油</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q19" id="q19_1" class="wrong-radio">
+            <label for="q19_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q19" id="q19_2" class="wrong-radio">
+            <label for="q19_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">事半功倍</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q19" id="q19_3" class="wrong-radio">
+            <label for="q19_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">对牛弹琴</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Колкая шутка усилила напряжение — это 火上浇油.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 20 из 30</div>
+        <h2>Какой 成语 подходит: «Смотреть сериал на китайском — и отдыхать, и практиковать язык»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q20" id="q20_0" class="correct-radio">
+            <label for="q20_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q20" id="q20_1" class="wrong-radio">
+            <label for="q20_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q20" id="q20_2" class="wrong-radio">
+            <label for="q20_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">自相矛盾</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q20" id="q20_3" class="wrong-radio">
+            <label for="q20_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">马马虎虎</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Одно действие даёт две пользы — 一举两得.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 21 из 30</div>
+        <h2>Какой 成语 скорее похвалит человека за умение мыслить самостоятельно?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q21" id="q21_0" class="correct-radio">
+            <label for="q21_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">举一反三</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q21" id="q21_1" class="wrong-radio">
+            <label for="q21_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">半途而废</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q21" id="q21_2" class="wrong-radio">
+            <label for="q21_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">火上浇油</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q21" id="q21_3" class="wrong-radio">
+            <label for="q21_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">守株待兔</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>举一反三 описывает умение увидеть принцип и применить его к новым ситуациям.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 22 из 30</div>
+        <h2>Какой 成语 обычно содержит отрицательную оценку поверхностного знакомства с темой?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q22" id="q22_0" class="wrong-radio">
+            <label for="q22_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q22" id="q22_1" class="wrong-radio">
+            <label for="q22_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q22" id="q22_2" class="wrong-radio">
+            <label for="q22_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q22" id="q22_3" class="correct-radio">
+            <label for="q22_3" class="correct">
+              <span class="letter">D</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>走马观花 подчёркивает, что человек увидел многое, но не разобрался в деталях.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 23 из 30</div>
+        <h2>Выберите предложение, где 马马虎虎 употреблено естественно.</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q23" id="q23_0" class="wrong-radio">
+            <label for="q23_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Я 马马虎虎 понял принцип по одному примеру。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q23" id="q23_1" class="correct-radio">
+            <label for="q23_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">— Как прошёл тест? — 马马虎虎, могло быть лучше。</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q23" id="q23_2" class="wrong-radio">
+            <label for="q23_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Эти две сумки 马马虎虎, они одинаковые。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q23" id="q23_3" class="wrong-radio">
+            <label for="q23_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Он помог мне 马马虎虎 именно в трудную минуту。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>马马虎虎 естественно отвечает на вопрос о качестве, результате или самочувствии.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 24 из 30</div>
+        <h2>Выберите предложение, где 一模一样 употреблено естественно.</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q24" id="q24_0" class="wrong-radio">
+            <label for="q24_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Она 一模一样 подлила масла в огонь。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q24" id="q24_1" class="wrong-radio">
+            <label for="q24_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">Он 一模一样 бросил курс на середине。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q24" id="q24_2" class="correct-radio">
+            <label for="q24_2" class="correct">
+              <span class="letter">C</span>
+              <span class="option-text">Эти две фотографии 一模一样, я не вижу разницы。</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q24" id="q24_3" class="wrong-radio">
+            <label for="q24_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Мы 一模一样 помогли ему вовремя。</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>一模一样 используется для полного или почти полного сходства.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 25 из 30</div>
+        <h2>В каком случае лучше сказать 雪中送炭, а не просто «помочь»?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q25" id="q25_0" class="wrong-radio">
+            <label for="q25_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Когда две вещи оказались одинаковыми</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q25" id="q25_1" class="correct-radio">
+            <label for="q25_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">Когда помощь пришла именно в критический момент</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q25" id="q25_2" class="wrong-radio">
+            <label for="q25_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">Когда помощь была случайной и ненужной</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q25" id="q25_3" class="wrong-radio">
+            <label for="q25_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">Когда человек всё сделал сам</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Главный оттенок 雪中送炭 — своевременность и реальная ценность поддержки.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 26 из 30</div>
+        <h2>Чем 一举两得 отличается от 事半功倍?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q26" id="q26_0" class="wrong-radio">
+            <label for="q26_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">Они полностью одинаковы</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q26" id="q26_1" class="wrong-radio">
+            <label for="q26_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">一举两得 всегда отрицательное, а 事半功倍 положительное</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q26" id="q26_2" class="correct-radio">
+            <label for="q26_2" class="correct">
+              <span class="letter">C</span>
+              <span class="option-text">一举两得 — две выгоды от одного действия; 事半功倍 — высокая эффективность</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q26" id="q26_3" class="wrong-radio">
+            <label for="q26_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">事半功倍 означает бросить дело на середине</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>一举两得 подчёркивает две цели, а 事半功倍 — соотношение усилий и результата.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 27 из 30</div>
+        <h2>Какой 成语 описывает человека, который ждёт клиентов, но ничего не рекламирует и никому не пишет?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q27" id="q27_0" class="correct-radio">
+            <label for="q27_0" class="correct">
+              <span class="letter">A</span>
+              <span class="option-text">守株待兔</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q27" id="q27_1" class="wrong-radio">
+            <label for="q27_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q27" id="q27_2" class="wrong-radio">
+            <label for="q27_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q27" id="q27_3" class="wrong-radio">
+            <label for="q27_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">举一反三</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Ожидание результата без действий — типичная ситуация 守株待兔.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 28 из 30</div>
+        <h2>Какой 成语 НЕ содержит критику?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q28" id="q28_0" class="wrong-radio">
+            <label for="q28_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">半途而废</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q28" id="q28_1" class="wrong-radio">
+            <label for="q28_1" class="wrong">
+              <span class="letter">B</span>
+              <span class="option-text">画蛇添足</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q28" id="q28_2" class="wrong-radio">
+            <label for="q28_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">火上浇油</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q28" id="q28_3" class="correct-radio">
+            <label for="q28_3" class="correct">
+              <span class="letter">D</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>雪中送炭 — положительная оценка своевременной помощи.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 29 из 30</div>
+        <h2>Какой 成语 лучше всего описывает хороший учебный метод, который экономит время?</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q29" id="q29_0" class="wrong-radio">
+            <label for="q29_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">自相矛盾</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q29" id="q29_1" class="correct-radio">
+            <label for="q29_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">事半功倍</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q29" id="q29_2" class="wrong-radio">
+            <label for="q29_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">走马观花</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q29" id="q29_3" class="wrong-radio">
+            <label for="q29_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">对牛弹琴</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>Эффективный метод даёт больший результат при меньших затратах — 事半功倍.</p>
+        </details>
+      </section>
+    
+
+      <section class="question-card">
+        <div class="question-number">Вопрос 30 из 30</div>
+        <h2>Закончите: «Начать учить язык с энтузиазмом, а потом всё бросить — это…»</h2>
+        <div class="options">
+          
+          <div class="option">
+            <input type="radio" name="q30" id="q30_0" class="wrong-radio">
+            <label for="q30_0" class="wrong">
+              <span class="letter">A</span>
+              <span class="option-text">一举两得</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q30" id="q30_1" class="correct-radio">
+            <label for="q30_1" class="correct">
+              <span class="letter">B</span>
+              <span class="option-text">半途而废</span>
+              <span class="result">✓ Верно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q30" id="q30_2" class="wrong-radio">
+            <label for="q30_2" class="wrong">
+              <span class="letter">C</span>
+              <span class="option-text">一模一样</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="q30" id="q30_3" class="wrong-radio">
+            <label for="q30_3" class="wrong">
+              <span class="letter">D</span>
+              <span class="option-text">雪中送炭</span>
+              <span class="result">✗ Неверно</span>
+            </label>
+          </div>
+        </div>
+        <details>
+          <summary>Пояснение</summary>
+          <p>半途而废 — остановиться на полпути и не достичь цели.</p>
+        </details>
+      </section>
+    
+
+      <div class="footer-actions">
+        <button class="reset" type="reset">Сбросить ответы</button>
+        <a class="top" href="#top">Наверх ↑</a>
+      </div>
+    </form>
+
+    <p class="small-note">
+      Файл можно открыть в любом современном браузере. Подключение к интернету не требуется.
+    </p>
+  </main>
+</body>
+</html>
