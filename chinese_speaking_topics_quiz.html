@@ -1,0 +1,1902 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chinese Speaking Topics — Interactive Quiz</title>
+<style>
+:root{
+  --navy:#071e36; --navy2:#0b3456; --gold:#dcae58; --gold2:#f0ce87;
+  --cream:#fbf7ef; --muted:#b9c9d6; --panel:#0b2945; --green:#178552;
+  --green2:#29ad6b; --red:#a83b49; --red2:#d95765;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh;
+  font-family:Arial,"Noto Sans","Microsoft YaHei",sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(220,174,88,.09),transparent 25%),
+    radial-gradient(circle at 85% 20%,rgba(220,174,88,.05),transparent 24%),
+    linear-gradient(145deg,#041525,#082945 58%,#061c31);
+  color:var(--cream);
+}
+.page{max-width:1120px;margin:auto;padding:28px 14px 70px}
+.hero{
+  border:1px solid rgba(220,174,88,.78); border-radius:28px;
+  background:linear-gradient(135deg,rgba(10,45,74,.98),rgba(5,26,47,.98));
+  box-shadow:0 25px 65px rgba(0,0,0,.28); padding:38px 34px 32px; position:relative; overflow:hidden
+}
+.hero:before,.hero:after{content:"";position:absolute;border:1px solid rgba(220,174,88,.16);border-radius:50%;width:280px;height:280px}
+.hero:before{right:-130px;top:-140px}.hero:after{left:-160px;bottom:-180px}
+.brand{font-size:13px;letter-spacing:.22em;color:var(--gold2);font-weight:800}
+h1{font-size:clamp(36px,6vw,65px);line-height:1;margin:16px 0 12px}
+h1 span{color:var(--gold)}
+.intro{max-width:850px;font-size:17px;line-height:1.55;color:#dbe3e9}
+.rule{
+  margin-top:20px;padding:13px 16px;border-radius:14px;background:rgba(220,174,88,.08);
+  border:1px solid rgba(220,174,88,.35);color:var(--gold2);line-height:1.5;font-size:15px
+}
+.tabs{margin-top:24px}
+.tabs > input.tab-radio{position:absolute;opacity:0;pointer-events:none}
+.tab-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;position:sticky;top:0;z-index:20;padding:10px 0;background:linear-gradient(#061b30f2,#061b30e8)}
+.tab-label{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  min-height:64px;padding:10px 8px;border:1px solid rgba(220,174,88,.32);
+  border-radius:15px;background:#0a2b49;color:#dce5ec;font-weight:700;cursor:pointer;
+  transition:.16s;font-size:13px;line-height:1.25
+}
+.tab-label:hover{border-color:var(--gold);transform:translateY(-1px)}
+.panel{display:none;margin-top:18px}
+#tab-market:checked ~ .tab-labels label[for="tab-market"],
+#tab-lottery:checked ~ .tab-labels label[for="tab-lottery"],
+#tab-fate:checked ~ .tab-labels label[for="tab-fate"],
+#tab-family:checked ~ .tab-labels label[for="tab-family"],
+#tab-weekend:checked ~ .tab-labels label[for="tab-weekend"]{
+  background:linear-gradient(135deg,#d5a84f,#f1cf87);color:#071e36;border-color:#f3d58f
+}
+#tab-market:checked ~ .panels #panel-market,
+#tab-lottery:checked ~ .panels #panel-lottery,
+#tab-fate:checked ~ .panels #panel-fate,
+#tab-family:checked ~ .panels #panel-family,
+#tab-weekend:checked ~ .panels #panel-weekend{display:block}
+.topic-head{
+  border:1px solid rgba(220,174,88,.42);border-radius:20px;padding:24px 25px;
+  background:linear-gradient(135deg,#0b3151,#071f38);margin-bottom:16px
+}
+.topic-head .eyebrow{color:var(--gold2);font-size:13px;letter-spacing:.12em;font-weight:800;text-transform:uppercase}
+.topic-head h2{font-size:30px;margin:8px 0 4px}.topic-head p{margin:0;color:var(--muted)}
+.progress-note{margin-top:12px;color:#dbe4ea;font-size:14px}
+.q{
+  background:linear-gradient(145deg,rgba(12,46,76,.98),rgba(7,30,53,.98));
+  border:1px solid rgba(220,174,88,.24);border-radius:20px;padding:22px;margin:14px 0;
+  box-shadow:0 10px 28px rgba(0,0,0,.13)
+}
+.qh{display:flex;gap:13px;align-items:flex-start}
+.num{width:38px;height:38px;min-width:38px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold2);font-weight:800}
+.qt{font-size:18px;font-weight:750;line-height:1.48;padding-top:3px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}
+.choice{position:relative}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice label{
+  display:block;height:100%;padding:13px 15px;border:1px solid rgba(255,255,255,.18);
+  border-radius:13px;background:rgba(255,255,255,.035);cursor:pointer;line-height:1.4;
+  transition:.14s
+}
+.choice label:hover{border-color:var(--gold);background:rgba(220,174,88,.06)}
+.choice input.correct:checked+label{background:linear-gradient(135deg,var(--green),var(--green2));border-color:#7de0ae;color:white}
+.choice input.wrong:checked+label{background:linear-gradient(135deg,var(--red),var(--red2));border-color:#f39aa2;color:white}
+.feedback{display:none;margin-top:8px;border-radius:11px;padding:10px 12px;font-size:14px;line-height:1.4}
+.choice input.correct:checked~.feedback{display:block;background:rgba(23,133,82,.17);color:#c8f3da;border:1px solid rgba(65,190,124,.35)}
+.choice input.wrong:checked~.feedback{display:block;background:rgba(168,59,73,.17);color:#ffd4d8;border:1px solid rgba(217,87,101,.35)}
+.actions{display:flex;justify-content:center;margin:28px 0 6px}
+.reset{border:1px solid var(--gold);background:transparent;color:var(--gold2);border-radius:999px;padding:12px 24px;font-weight:800;cursor:pointer}
+.reset:hover{background:rgba(220,174,88,.09)}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px;line-height:1.5}
+@media(max-width:800px){
+  .tab-labels{grid-template-columns:1fr 1fr;position:static}
+  .answers{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .page{padding:12px 8px 45px}.hero{padding:28px 18px}.q{padding:18px 13px}.qt{font-size:16px}
+  .tab-labels{grid-template-columns:1fr}.tab-label{min-height:50px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ · ИНТЕРАКТИВНАЯ ПРАКТИКА</div>
+    <h1>5 тем — <span>5 вкладок</span></h1>
+    <div class="intro">Интерактивные тесты по пяти материалам: рынок, лотерея, судьба, семья и планы на выходные. Нажмите на ответ: правильный станет зелёным, неправильный — красным.</div>
+    <div class="rule"><b>Без JavaScript:</b> файл работает только на HTML + CSS и подходит для GitHub Pages. В каждом разделе 10 вопросов, а правильные ответы распределены по разным позициям.</div>
+  </section>
+
+  <div class="tabs">
+    <input class="tab-radio" type="radio" name="tabs" id="tab-market" checked>
+    <input class="tab-radio" type="radio" name="tabs" id="tab-lottery">
+    <input class="tab-radio" type="radio" name="tabs" id="tab-fate">
+    <input class="tab-radio" type="radio" name="tabs" id="tab-family">
+    <input class="tab-radio" type="radio" name="tabs" id="tab-weekend">
+
+    <div class="tab-labels">
+      <label class="tab-label" for="tab-market">HSK2<br>市场买菜</label>
+      <label class="tab-label" for="tab-lottery">HSK4–5<br>中彩票</label>
+      <label class="tab-label" for="tab-fate">HSK4–5<br>命运</label>
+      <label class="tab-label" for="tab-family">HSK1<br>我的家</label>
+      <label class="tab-label" for="tab-weekend">HSK2<br>周末的打算</label>
+    </div>
+
+    <div class="panels">
+
+      <section class="panel" id="panel-market">
+        <div class="topic-head">
+          <div class="eyebrow">Тема 1 · 10 вопросов</div>
+          <h2>HSK2 · 市场买菜</h2>
+          <p>Покупка продуктов на рынке</p>
+          <div class="progress-note">Выберите один ответ в каждом вопросе. После нажатия сразу появится цветовая проверка и пояснение.</div>
+        </div>
+        <form>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">1</div>
+              <div class="qt">Что означает 斤 (jīn)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q1" id="market_q1_0" class="wrong">
+                <label for="market_q1_0"><b>A.</b> килограмм</label>
+                <div class="feedback">✕ Правильный ответ: цзинь, 500 граммов. В материале 斤 (jīn) = цзинь, то есть 500 граммов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q1" id="market_q1_1" class="correct">
+                <label for="market_q1_1"><b>B.</b> цзинь, 500 граммов</label>
+                <div class="feedback">✓ В материале 斤 (jīn) = цзинь, то есть 500 граммов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q1" id="market_q1_2" class="wrong">
+                <label for="market_q1_2"><b>C.</b> юань</label>
+                <div class="feedback">✕ Правильный ответ: цзинь, 500 граммов. В материале 斤 (jīn) = цзинь, то есть 500 граммов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q1" id="market_q1_3" class="wrong">
+                <label for="market_q1_3"><b>D.</b> пакет</label>
+                <div class="feedback">✕ Правильный ответ: цзинь, 500 граммов. В материале 斤 (jīn) = цзинь, то есть 500 граммов.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">2</div>
+              <div class="qt">Как спросить: «Сколько стоит один цзинь?»</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q2" id="market_q2_0" class="wrong">
+                <label for="market_q2_0"><b>A.</b> 一共多少钱？</label>
+                <div class="feedback">✕ Правильный ответ: 一斤多少钱？. 一斤多少钱？ — «Сколько стоит один цзинь?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q2" id="market_q2_1" class="wrong">
+                <label for="market_q2_1"><b>B.</b> 这个新鲜吗？</label>
+                <div class="feedback">✕ Правильный ответ: 一斤多少钱？. 一斤多少钱？ — «Сколько стоит один цзинь?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q2" id="market_q2_2" class="wrong">
+                <label for="market_q2_2"><b>C.</b> 你要多少？</label>
+                <div class="feedback">✕ Правильный ответ: 一斤多少钱？. 一斤多少钱？ — «Сколько стоит один цзинь?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q2" id="market_q2_3" class="correct">
+                <label for="market_q2_3"><b>D.</b> 一斤多少钱？</label>
+                <div class="feedback">✓ 一斤多少钱？ — «Сколько стоит один цзинь?»</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">3</div>
+              <div class="qt">Как по-китайски сказать «Можно немного дешевле?»</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q3" id="market_q3_0" class="wrong">
+                <label for="market_q3_0"><b>A.</b> 这个新鲜吗？</label>
+                <div class="feedback">✕ Правильный ответ: 可以便宜一点儿吗？. 可以便宜一点儿吗？ используется для вежливого торга.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q3" id="market_q3_1" class="wrong">
+                <label for="market_q3_1"><b>B.</b> 一共多少钱？</label>
+                <div class="feedback">✕ Правильный ответ: 可以便宜一点儿吗？. 可以便宜一点儿吗？ используется для вежливого торга.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q3" id="market_q3_2" class="correct">
+                <label for="market_q3_2"><b>C.</b> 可以便宜一点儿吗？</label>
+                <div class="feedback">✓ 可以便宜一点儿吗？ используется для вежливого торга.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q3" id="market_q3_3" class="wrong">
+                <label for="market_q3_3"><b>D.</b> 我要两斤。</label>
+                <div class="feedback">✕ Правильный ответ: 可以便宜一点儿吗？. 可以便宜一点儿吗？ используется для вежливого торга.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">4</div>
+              <div class="qt">Что означает 新鲜 (xīnxiān)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q4" id="market_q4_0" class="correct">
+                <label for="market_q4_0"><b>A.</b> свежий</label>
+                <div class="feedback">✓ 新鲜 (xīnxiān) — «свежий».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q4" id="market_q4_1" class="wrong">
+                <label for="market_q4_1"><b>B.</b> дорогой</label>
+                <div class="feedback">✕ Правильный ответ: свежий. 新鲜 (xīnxiān) — «свежий».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q4" id="market_q4_2" class="wrong">
+                <label for="market_q4_2"><b>C.</b> дешёвый</label>
+                <div class="feedback">✕ Правильный ответ: свежий. 新鲜 (xīnxiān) — «свежий».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q4" id="market_q4_3" class="wrong">
+                <label for="market_q4_3"><b>D.</b> сладкий</label>
+                <div class="feedback">✕ Правильный ответ: свежий. 新鲜 (xīnxiān) — «свежий».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">5</div>
+              <div class="qt">Как сказать «Я хочу купить…»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q5" id="market_q5_0" class="wrong">
+                <label for="market_q5_0"><b>A.</b> 我不买……</label>
+                <div class="feedback">✕ Правильный ответ: 我想买……. 我想买…… — «Я хочу купить…».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q5" id="market_q5_1" class="wrong">
+                <label for="market_q5_1"><b>B.</b> 我卖……</label>
+                <div class="feedback">✕ Правильный ответ: 我想买……. 我想买…… — «Я хочу купить…».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q5" id="market_q5_2" class="correct">
+                <label for="market_q5_2"><b>C.</b> 我想买……</label>
+                <div class="feedback">✓ 我想买…… — «Я хочу купить…».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q5" id="market_q5_3" class="wrong">
+                <label for="market_q5_3"><b>D.</b> 我看……</label>
+                <div class="feedback">✕ Правильный ответ: 我想买……. 我想买…… — «Я хочу купить…».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">6</div>
+              <div class="qt">Что означает 扫码付款 (sǎomǎ fùkuǎn)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q6" id="market_q6_0" class="wrong">
+                <label for="market_q6_0"><b>A.</b> платить наличными</label>
+                <div class="feedback">✕ Правильный ответ: оплатить по QR-коду. 扫码付款 — «оплатить по QR-коду».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q6" id="market_q6_1" class="correct">
+                <label for="market_q6_1"><b>B.</b> оплатить по QR-коду</label>
+                <div class="feedback">✓ 扫码付款 — «оплатить по QR-коду».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q6" id="market_q6_2" class="wrong">
+                <label for="market_q6_2"><b>C.</b> дать сдачу</label>
+                <div class="feedback">✕ Правильный ответ: оплатить по QR-коду. 扫码付款 — «оплатить по QR-коду».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q6" id="market_q6_3" class="wrong">
+                <label for="market_q6_3"><b>D.</b> попросить пакет</label>
+                <div class="feedback">✕ Правильный ответ: оплатить по QR-коду. 扫码付款 — «оплатить по QR-коду».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">7</div>
+              <div class="qt">После торга сколько стоил один цзинь помидоров в диалоге?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q7" id="market_q7_0" class="wrong">
+                <label for="market_q7_0"><b>A.</b> 3 юаня</label>
+                <div class="feedback">✕ Правильный ответ: 4 юаня 5 мао. Продавец снижает цену до 四元五角一斤 — 4 юаня 5 мао за цзинь.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q7" id="market_q7_1" class="wrong">
+                <label for="market_q7_1"><b>B.</b> 5 юаней</label>
+                <div class="feedback">✕ Правильный ответ: 4 юаня 5 мао. Продавец снижает цену до 四元五角一斤 — 4 юаня 5 мао за цзинь.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q7" id="market_q7_2" class="wrong">
+                <label for="market_q7_2"><b>C.</b> 6 юаней</label>
+                <div class="feedback">✕ Правильный ответ: 4 юаня 5 мао. Продавец снижает цену до 四元五角一斤 — 4 юаня 5 мао за цзинь.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q7" id="market_q7_3" class="correct">
+                <label for="market_q7_3"><b>D.</b> 4 юаня 5 мао</label>
+                <div class="feedback">✓ Продавец снижает цену до 四元五角一斤 — 4 юаня 5 мао за цзинь.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">8</div>
+              <div class="qt">Сколько стоил один цзинь огурцов в диалоге?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q8" id="market_q8_0" class="correct">
+                <label for="market_q8_0"><b>A.</b> 3 юаня</label>
+                <div class="feedback">✓ Продавец говорит: 三元一斤，很新鲜。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q8" id="market_q8_1" class="wrong">
+                <label for="market_q8_1"><b>B.</b> 4 юаня 5 мао</label>
+                <div class="feedback">✕ Правильный ответ: 3 юаня. Продавец говорит: 三元一斤，很新鲜。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q8" id="market_q8_2" class="wrong">
+                <label for="market_q8_2"><b>C.</b> 5 юаней</label>
+                <div class="feedback">✕ Правильный ответ: 3 юаня. Продавец говорит: 三元一斤，很新鲜。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q8" id="market_q8_3" class="wrong">
+                <label for="market_q8_3"><b>D.</b> 6 юаней</label>
+                <div class="feedback">✕ Правильный ответ: 3 юаня. Продавец говорит: 三元一斤，很新鲜。</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">9</div>
+              <div class="qt">Как спросить итоговую стоимость покупки?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q9" id="market_q9_0" class="wrong">
+                <label for="market_q9_0"><b>A.</b> 一斤多少钱？</label>
+                <div class="feedback">✕ Правильный ответ: 一共多少钱？. 一共多少钱？ — «Сколько всего?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q9" id="market_q9_1" class="correct">
+                <label for="market_q9_1"><b>B.</b> 一共多少钱？</label>
+                <div class="feedback">✓ 一共多少钱？ — «Сколько всего?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q9" id="market_q9_2" class="wrong">
+                <label for="market_q9_2"><b>C.</b> 多少钱一公斤？</label>
+                <div class="feedback">✕ Правильный ответ: 一共多少钱？. 一共多少钱？ — «Сколько всего?»</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q9" id="market_q9_3" class="wrong">
+                <label for="market_q9_3"><b>D.</b> 可以便宜吗？</label>
+                <div class="feedback">✕ Правильный ответ: 一共多少钱？. 一共多少钱？ — «Сколько всего?»</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">10</div>
+              <div class="qt">Что говорит продавец на прощание?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="market_q10" id="market_q10_0" class="wrong">
+                <label for="market_q10_0"><b>A.</b> 请坐！</label>
+                <div class="feedback">✕ Правильный ответ: 慢走！. 慢走！ — вежливое «До свидания / счастливого пути».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q10" id="market_q10_1" class="wrong">
+                <label for="market_q10_1"><b>B.</b> 没关系！</label>
+                <div class="feedback">✕ Правильный ответ: 慢走！. 慢走！ — вежливое «До свидания / счастливого пути».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q10" id="market_q10_2" class="correct">
+                <label for="market_q10_2"><b>C.</b> 慢走！</label>
+                <div class="feedback">✓ 慢走！ — вежливое «До свидания / счастливого пути».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="market_q10" id="market_q10_3" class="wrong">
+                <label for="market_q10_3"><b>D.</b> 再来一斤！</label>
+                <div class="feedback">✕ Правильный ответ: 慢走！. 慢走！ — вежливое «До свидания / счастливого пути».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions"><button type="reset" class="reset">Сбросить ответы этой вкладки</button></div>
+        </form>
+      </section>
+
+      <section class="panel" id="panel-lottery">
+        <div class="topic-head">
+          <div class="eyebrow">Тема 2 · 10 вопросов</div>
+          <h2>HSK4–5 · 假如你中了彩票</h2>
+          <p>Если бы вы выиграли в лотерею</p>
+          <div class="progress-note">Выберите один ответ в каждом вопросе. После нажатия сразу появится цветовая проверка и пояснение.</div>
+        </div>
+        <form>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">1</div>
+              <div class="qt">Что означает 中彩票 (zhòng cǎipiào)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q1" id="lottery_q1_0" class="wrong">
+                <label for="lottery_q1_0"><b>A.</b> купить лотерейный билет</label>
+                <div class="feedback">✕ Правильный ответ: выиграть в лотерею. 中彩票 — «выиграть в лотерею».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q1" id="lottery_q1_1" class="wrong">
+                <label for="lottery_q1_1"><b>B.</b> потерять деньги</label>
+                <div class="feedback">✕ Правильный ответ: выиграть в лотерею. 中彩票 — «выиграть в лотерею».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q1" id="lottery_q1_2" class="correct">
+                <label for="lottery_q1_2"><b>C.</b> выиграть в лотерею</label>
+                <div class="feedback">✓ 中彩票 — «выиграть в лотерею».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q1" id="lottery_q1_3" class="wrong">
+                <label for="lottery_q1_3"><b>D.</b> получить зарплату</label>
+                <div class="feedback">✕ Правильный ответ: выиграть в лотерею. 中彩票 — «выиграть в лотерею».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">2</div>
+              <div class="qt">Что такое 税后金额 (shuìhòu jīn&#x27;é)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q2" id="lottery_q2_0" class="correct">
+                <label for="lottery_q2_0"><b>A.</b> сумма после уплаты налогов</label>
+                <div class="feedback">✓ 税后金额 — сумма, которая остаётся после уплаты налогов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q2" id="lottery_q2_1" class="wrong">
+                <label for="lottery_q2_1"><b>B.</b> сумма до налогов</label>
+                <div class="feedback">✕ Правильный ответ: сумма после уплаты налогов. 税后金额 — сумма, которая остаётся после уплаты налогов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q2" id="lottery_q2_2" class="wrong">
+                <label for="lottery_q2_2"><b>C.</b> ежемесячный бюджет</label>
+                <div class="feedback">✕ Правильный ответ: сумма после уплаты налогов. 税后金额 — сумма, которая остаётся после уплаты налогов.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q2" id="lottery_q2_3" class="wrong">
+                <label for="lottery_q2_3"><b>D.</b> банковский вклад</label>
+                <div class="feedback">✕ Правильный ответ: сумма после уплаты налогов. 税后金额 — сумма, которая остаётся после уплаты налогов.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">3</div>
+              <div class="qt">Какое слово означает «расточать деньги»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q3" id="lottery_q3_0" class="wrong">
+                <label for="lottery_q3_0"><b>A.</b> 存款 cúnkuǎn</label>
+                <div class="feedback">✕ Правильный ответ: 挥霍 huīhuò. 挥霍 — тратить деньги расточительно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q3" id="lottery_q3_1" class="wrong">
+                <label for="lottery_q3_1"><b>B.</b> 预算 yùsuàn</label>
+                <div class="feedback">✕ Правильный ответ: 挥霍 huīhuò. 挥霍 — тратить деньги расточительно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q3" id="lottery_q3_2" class="wrong">
+                <label for="lottery_q3_2"><b>C.</b> 回报 huíbào</label>
+                <div class="feedback">✕ Правильный ответ: 挥霍 huīhuò. 挥霍 — тратить деньги расточительно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q3" id="lottery_q3_3" class="correct">
+                <label for="lottery_q3_3"><b>D.</b> 挥霍 huīhuò</label>
+                <div class="feedback">✓ 挥霍 — тратить деньги расточительно.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">4</div>
+              <div class="qt">Что означает 坐吃山空 (zuò chī shān kōng)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q4" id="lottery_q4_0" class="wrong">
+                <label for="lottery_q4_0"><b>A.</b> быстро разбогатеть</label>
+                <div class="feedback">✕ Правильный ответ: проесть накопления, не имея дохода. 坐吃山空 — постепенно проесть накопления без нового дохода.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q4" id="lottery_q4_1" class="correct">
+                <label for="lottery_q4_1"><b>B.</b> проесть накопления, не имея дохода</label>
+                <div class="feedback">✓ 坐吃山空 — постепенно проесть накопления без нового дохода.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q4" id="lottery_q4_2" class="wrong">
+                <label for="lottery_q4_2"><b>C.</b> скрыть выигрыш</label>
+                <div class="feedback">✕ Правильный ответ: проесть накопления, не имея дохода. 坐吃山空 — постепенно проесть накопления без нового дохода.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q4" id="lottery_q4_3" class="wrong">
+                <label for="lottery_q4_3"><b>D.</b> жить по средствам</label>
+                <div class="feedback">✕ Правильный ответ: проесть накопления, не имея дохода. 坐吃山空 — постепенно проесть накопления без нового дохода.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">5</div>
+              <div class="qt">Как переводится 保持低调 (bǎochí dīdiào)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q5" id="lottery_q5_0" class="correct">
+                <label for="lottery_q5_0"><b>A.</b> не привлекать к себе внимание</label>
+                <div class="feedback">✓ 保持低调 — вести себя неброско, не привлекать лишнего внимания.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q5" id="lottery_q5_1" class="wrong">
+                <label for="lottery_q5_1"><b>B.</b> раскрыть свою личность</label>
+                <div class="feedback">✕ Правильный ответ: не привлекать к себе внимание. 保持低调 — вести себя неброско, не привлекать лишнего внимания.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q5" id="lottery_q5_2" class="wrong">
+                <label for="lottery_q5_2"><b>C.</b> потратить всё сразу</label>
+                <div class="feedback">✕ Правильный ответ: не привлекать к себе внимание. 保持低调 — вести себя неброско, не привлекать лишнего внимания.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q5" id="lottery_q5_3" class="wrong">
+                <label for="lottery_q5_3"><b>D.</b> строить долгосрочные планы</label>
+                <div class="feedback">✕ Правильный ответ: не привлекать к себе внимание. 保持低调 — вести себя неброско, не привлекать лишнего внимания.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">6</div>
+              <div class="qt">Что означает 分散投资 (fēnsàn tóuzī)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q6" id="lottery_q6_0" class="wrong">
+                <label for="lottery_q6_0"><b>A.</b> отказаться от инвестиций</label>
+                <div class="feedback">✕ Правильный ответ: распределять инвестиции. 分散投资 — распределять инвестиции.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q6" id="lottery_q6_1" class="wrong">
+                <label for="lottery_q6_1"><b>B.</b> взять кредит</label>
+                <div class="feedback">✕ Правильный ответ: распределять инвестиции. 分散投资 — распределять инвестиции.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q6" id="lottery_q6_2" class="wrong">
+                <label for="lottery_q6_2"><b>C.</b> погасить кредит</label>
+                <div class="feedback">✕ Правильный ответ: распределять инвестиции. 分散投资 — распределять инвестиции.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q6" id="lottery_q6_3" class="correct">
+                <label for="lottery_q6_3"><b>D.</b> распределять инвестиции</label>
+                <div class="feedback">✓ 分散投资 — распределять инвестиции.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">7</div>
+              <div class="qt">Какое выражение означает «финансовая независимость»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q7" id="lottery_q7_0" class="wrong">
+                <label for="lottery_q7_0"><b>A.</b> 意外之财 yìwài zhī cái</label>
+                <div class="feedback">✕ Правильный ответ: 财务自由 cáiwù zìyóu. 财务自由 — финансовая независимость.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q7" id="lottery_q7_1" class="wrong">
+                <label for="lottery_q7_1"><b>B.</b> 慈善 císhàn</label>
+                <div class="feedback">✕ Правильный ответ: 财务自由 cáiwù zìyóu. 财务自由 — финансовая независимость.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q7" id="lottery_q7_2" class="correct">
+                <label for="lottery_q7_2"><b>C.</b> 财务自由 cáiwù zìyóu</label>
+                <div class="feedback">✓ 财务自由 — финансовая независимость.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q7" id="lottery_q7_3" class="wrong">
+                <label for="lottery_q7_3"><b>D.</b> 奖金 jiǎngjīn</label>
+                <div class="feedback">✕ Правильный ответ: 财务自由 cáiwù zìyóu. 财务自由 — финансовая независимость.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">8</div>
+              <div class="qt">Что означает 保密 (bǎomì)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q8" id="lottery_q8_0" class="wrong">
+                <label for="lottery_q8_0"><b>A.</b> объявить публично</label>
+                <div class="feedback">✕ Правильный ответ: сохранять в тайне. 保密 — хранить информацию в тайне.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q8" id="lottery_q8_1" class="correct">
+                <label for="lottery_q8_1"><b>B.</b> сохранять в тайне</label>
+                <div class="feedback">✓ 保密 — хранить информацию в тайне.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q8" id="lottery_q8_2" class="wrong">
+                <label for="lottery_q8_2"><b>C.</b> помочь родственникам</label>
+                <div class="feedback">✕ Правильный ответ: сохранять в тайне. 保密 — хранить информацию в тайне.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q8" id="lottery_q8_3" class="wrong">
+                <label for="lottery_q8_3"><b>D.</b> сменить работу</label>
+                <div class="feedback">✕ Правильный ответ: сохранять в тайне. 保密 — хранить информацию в тайне.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">9</div>
+              <div class="qt">Что означает интернет-фраза 我酸了 (wǒ suān le)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q9" id="lottery_q9_0" class="wrong">
+                <label for="lottery_q9_0"><b>A.</b> «мне повезло»</label>
+                <div class="feedback">✕ Правильный ответ: ироничное «завидую». 我酸了 — ироничное признание лёгкой зависти.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q9" id="lottery_q9_1" class="wrong">
+                <label for="lottery_q9_1"><b>B.</b> «я увольняюсь»</label>
+                <div class="feedback">✕ Правильный ответ: ироничное «завидую». 我酸了 — ироничное признание лёгкой зависти.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q9" id="lottery_q9_2" class="wrong">
+                <label for="lottery_q9_2"><b>C.</b> «я всё потратил»</label>
+                <div class="feedback">✕ Правильный ответ: ироничное «завидую». 我酸了 — ироничное признание лёгкой зависти.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q9" id="lottery_q9_3" class="correct">
+                <label for="lottery_q9_3"><b>D.</b> ироничное «завидую»</label>
+                <div class="feedback">✓ 我酸了 — ироничное признание лёгкой зависти.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">10</div>
+              <div class="qt">Что означает 天选之人 (tiānxuǎn zhī rén)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="lottery_q10" id="lottery_q10_0" class="correct">
+                <label for="lottery_q10_0"><b>A.</b> избранник судьбы, которому необыкновенно повезло</label>
+                <div class="feedback">✓ 天选之人 — «избранник судьбы», очень везучий человек.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q10" id="lottery_q10_1" class="wrong">
+                <label for="lottery_q10_1"><b>B.</b> человек, который живёт по средствам</label>
+                <div class="feedback">✕ Правильный ответ: избранник судьбы, которому необыкновенно повезло. 天选之人 — «избранник судьбы», очень везучий человек.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q10" id="lottery_q10_2" class="wrong">
+                <label for="lottery_q10_2"><b>C.</b> человек, который скрывает доходы</label>
+                <div class="feedback">✕ Правильный ответ: избранник судьбы, которому необыкновенно повезло. 天选之人 — «избранник судьбы», очень везучий человек.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="lottery_q10" id="lottery_q10_3" class="wrong">
+                <label for="lottery_q10_3"><b>D.</b> профессиональный инвестор</label>
+                <div class="feedback">✕ Правильный ответ: избранник судьбы, которому необыкновенно повезло. 天选之人 — «избранник судьбы», очень везучий человек.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions"><button type="reset" class="reset">Сбросить ответы этой вкладки</button></div>
+        </form>
+      </section>
+
+      <section class="panel" id="panel-fate">
+        <div class="topic-head">
+          <div class="eyebrow">Тема 3 · 10 вопросов</div>
+          <h2>HSK4–5 · 你相信命运吗</h2>
+          <p>Верите ли вы в судьбу?</p>
+          <div class="progress-note">Выберите один ответ в каждом вопросе. После нажатия сразу появится цветовая проверка и пояснение.</div>
+        </div>
+        <form>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">1</div>
+              <div class="qt">Что означает 命运 (mìngyùn)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q1" id="fate_q1_0" class="wrong">
+                <label for="fate_q1_0"><b>A.</b> удача</label>
+                <div class="feedback">✕ Правильный ответ: судьба. 命运 — «судьба».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q1" id="fate_q1_1" class="wrong">
+                <label for="fate_q1_1"><b>B.</b> характер</label>
+                <div class="feedback">✕ Правильный ответ: судьба. 命运 — «судьба».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q1" id="fate_q1_2" class="wrong">
+                <label for="fate_q1_2"><b>C.</b> совпадение</label>
+                <div class="feedback">✕ Правильный ответ: судьба. 命运 — «судьба».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q1" id="fate_q1_3" class="correct">
+                <label for="fate_q1_3"><b>D.</b> судьба</label>
+                <div class="feedback">✓ 命运 — «судьба».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">2</div>
+              <div class="qt">Что означает 巧合 (qiǎohé)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q2" id="fate_q2_0" class="wrong">
+                <label for="fate_q2_0"><b>A.</b> предсказание</label>
+                <div class="feedback">✕ Правильный ответ: совпадение. 巧合 — совпадение.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q2" id="fate_q2_1" class="correct">
+                <label for="fate_q2_1"><b>B.</b> совпадение</label>
+                <div class="feedback">✓ 巧合 — совпадение.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q2" id="fate_q2_2" class="wrong">
+                <label for="fate_q2_2"><b>C.</b> последствие</label>
+                <div class="feedback">✕ Правильный ответ: совпадение. 巧合 — совпадение.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q2" id="fate_q2_3" class="wrong">
+                <label for="fate_q2_3"><b>D.</b> ответственность</label>
+                <div class="feedback">✕ Правильный ответ: совпадение. 巧合 — совпадение.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">3</div>
+              <div class="qt">Как переводится 运气 (yùnqi)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q3" id="fate_q3_0" class="correct">
+                <label for="fate_q3_0"><b>A.</b> удача, везение</label>
+                <div class="feedback">✓ 运气 — «удача, везение».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q3" id="fate_q3_1" class="wrong">
+                <label for="fate_q3_1"><b>B.</b> окружение</label>
+                <div class="feedback">✕ Правильный ответ: удача, везение. 运气 — «удача, везение».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q3" id="fate_q3_2" class="wrong">
+                <label for="fate_q3_2"><b>C.</b> выбор</label>
+                <div class="feedback">✕ Правильный ответ: удача, везение. 运气 — «удача, везение».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q3" id="fate_q3_3" class="wrong">
+                <label for="fate_q3_3"><b>D.</b> причина и следствие</label>
+                <div class="feedback">✕ Правильный ответ: удача, везение. 运气 — «удача, везение».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">4</div>
+              <div class="qt">Что означает 承担后果 (chéngdān hòuguǒ)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q4" id="fate_q4_0" class="wrong">
+                <label for="fate_q4_0"><b>A.</b> изменить судьбу</label>
+                <div class="feedback">✕ Правильный ответ: нести ответственность за последствия. 承担后果 — нести ответственность за последствия.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q4" id="fate_q4_1" class="wrong">
+                <label for="fate_q4_1"><b>B.</b> предсказывать будущее</label>
+                <div class="feedback">✕ Правильный ответ: нести ответственность за последствия. 承担后果 — нести ответственность за последствия.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q4" id="fate_q4_2" class="correct">
+                <label for="fate_q4_2"><b>C.</b> нести ответственность за последствия</label>
+                <div class="feedback">✓ 承担后果 — нести ответственность за последствия.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q4" id="fate_q4_3" class="wrong">
+                <label for="fate_q4_3"><b>D.</b> положиться на удачу</label>
+                <div class="feedback">✕ Правильный ответ: нести ответственность за последствия. 承担后果 — нести ответственность за последствия.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">5</div>
+              <div class="qt">Как переводится 顺其自然 (shùn qí zìrán)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q5" id="fate_q5_0" class="wrong">
+                <label for="fate_q5_0"><b>A.</b> полностью контролировать события</label>
+                <div class="feedback">✕ Правильный ответ: позволить событиям идти своим ходом. 顺其自然 — позволить событиям развиваться естественно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q5" id="fate_q5_1" class="correct">
+                <label for="fate_q5_1"><b>B.</b> позволить событиям идти своим ходом</label>
+                <div class="feedback">✓ 顺其自然 — позволить событиям развиваться естественно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q5" id="fate_q5_2" class="wrong">
+                <label for="fate_q5_2"><b>C.</b> обязательно изменить судьбу</label>
+                <div class="feedback">✕ Правильный ответ: позволить событиям идти своим ходом. 顺其自然 — позволить событиям развиваться естественно.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q5" id="fate_q5_3" class="wrong">
+                <label for="fate_q5_3"><b>D.</b> делать прогноз</label>
+                <div class="feedback">✕ Правильный ответ: позволить событиям идти своим ходом. 顺其自然 — позволить событиям развиваться естественно.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">6</div>
+              <div class="qt">Что означает 事在人为 (shì zài rén wéi)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q6" id="fate_q6_0" class="wrong">
+                <label for="fate_q6_0"><b>A.</b> всё заранее предопределено</label>
+                <div class="feedback">✕ Правильный ответ: результат зависит от действий человека. 事在人为 подчёркивает роль человеческих действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q6" id="fate_q6_1" class="wrong">
+                <label for="fate_q6_1"><b>B.</b> удача важнее всего</label>
+                <div class="feedback">✕ Правильный ответ: результат зависит от действий человека. 事在人为 подчёркивает роль человеческих действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q6" id="fate_q6_2" class="wrong">
+                <label for="fate_q6_2"><b>C.</b> ничего нельзя изменить</label>
+                <div class="feedback">✕ Правильный ответ: результат зависит от действий человека. 事在人为 подчёркивает роль человеческих действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q6" id="fate_q6_3" class="correct">
+                <label for="fate_q6_3"><b>D.</b> результат зависит от действий человека</label>
+                <div class="feedback">✓ 事在人为 подчёркивает роль человеческих действий.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">7</div>
+              <div class="qt">Что означает 听天由命 (tīng tiān yóu mìng)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q7" id="fate_q7_0" class="correct">
+                <label for="fate_q7_0"><b>A.</b> положиться на судьбу и ничего не менять</label>
+                <div class="feedback">✓ 听天由命 — отдаться судьбе и ничего не предпринимать.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q7" id="fate_q7_1" class="wrong">
+                <label for="fate_q7_1"><b>B.</b> воспользоваться возможностью</label>
+                <div class="feedback">✕ Правильный ответ: положиться на судьбу и ничего не менять. 听天由命 — отдаться судьбе и ничего не предпринимать.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q7" id="fate_q7_2" class="wrong">
+                <label for="fate_q7_2"><b>C.</b> нести ответственность</label>
+                <div class="feedback">✕ Правильный ответ: положиться на судьбу и ничего не менять. 听天由命 — отдаться судьбе и ничего не предпринимать.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q7" id="fate_q7_3" class="wrong">
+                <label for="fate_q7_3"><b>D.</b> сделать выбор</label>
+                <div class="feedback">✕ Правильный ответ: положиться на судьбу и ничего не менять. 听天由命 — отдаться судьбе и ничего не предпринимать.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">8</div>
+              <div class="qt">Как в интернет-речи используется 水逆 (shuǐnì)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q8" id="fate_q8_0" class="wrong">
+                <label for="fate_q8_0"><b>A.</b> название жизненной цели</label>
+                <div class="feedback">✕ Правильный ответ: шутливое объяснение полосы неудач «ретроградным Меркурием». 水逆 — интернет-выражение про «ретроградный Меркурий» и полосу неудач.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q8" id="fate_q8_1" class="wrong">
+                <label for="fate_q8_1"><b>B.</b> слово для природного таланта</label>
+                <div class="feedback">✕ Правильный ответ: шутливое объяснение полосы неудач «ретроградным Меркурием». 水逆 — интернет-выражение про «ретроградный Меркурий» и полосу неудач.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q8" id="fate_q8_2" class="correct">
+                <label for="fate_q8_2"><b>C.</b> шутливое объяснение полосы неудач «ретроградным Меркурием»</label>
+                <div class="feedback">✓ 水逆 — интернет-выражение про «ретроградный Меркурий» и полосу неудач.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q8" id="fate_q8_3" class="wrong">
+                <label for="fate_q8_3"><b>D.</b> термин для свободы воли</label>
+                <div class="feedback">✕ Правильный ответ: шутливое объяснение полосы неудач «ретроградным Меркурием». 水逆 — интернет-выражение про «ретроградный Меркурий» и полосу неудач.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">9</div>
+              <div class="qt">Кого называют 非酋 (fēiqiú)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q9" id="fate_q9_0" class="correct">
+                <label for="fate_q9_0"><b>A.</b> крайне невезучего человека</label>
+                <div class="feedback">✓ 非酋 — самоироничное обозначение крайне невезучего человека.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q9" id="fate_q9_1" class="wrong">
+                <label for="fate_q9_1"><b>B.</b> человека, которому всегда везёт</label>
+                <div class="feedback">✕ Правильный ответ: крайне невезучего человека. 非酋 — самоироничное обозначение крайне невезучего человека.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q9" id="fate_q9_2" class="wrong">
+                <label for="fate_q9_2"><b>C.</b> человека с сильным характером</label>
+                <div class="feedback">✕ Правильный ответ: крайне невезучего человека. 非酋 — самоироничное обозначение крайне невезучего человека.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q9" id="fate_q9_3" class="wrong">
+                <label for="fate_q9_3"><b>D.</b> того, кто делает прогнозы</label>
+                <div class="feedback">✕ Правильный ответ: крайне невезучего человека. 非酋 — самоироничное обозначение крайне невезучего человека.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">10</div>
+              <div class="qt">Что означает 尽人事，听天命 (jìn rénshì, tīng tiānmìng)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="fate_q10" id="fate_q10_0" class="wrong">
+                <label for="fate_q10_0"><b>A.</b> ничего не делать и ждать</label>
+                <div class="feedback">✕ Правильный ответ: сделать всё возможное и принять результат. Фраза соединяет личные усилия с принятием итогового результата.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q10" id="fate_q10_1" class="wrong">
+                <label for="fate_q10_1"><b>B.</b> верить только в предсказания</label>
+                <div class="feedback">✕ Правильный ответ: сделать всё возможное и принять результат. Фраза соединяет личные усилия с принятием итогового результата.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q10" id="fate_q10_2" class="wrong">
+                <label for="fate_q10_2"><b>C.</b> избегать любого риска</label>
+                <div class="feedback">✕ Правильный ответ: сделать всё возможное и принять результат. Фраза соединяет личные усилия с принятием итогового результата.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="fate_q10" id="fate_q10_3" class="correct">
+                <label for="fate_q10_3"><b>D.</b> сделать всё возможное и принять результат</label>
+                <div class="feedback">✓ Фраза соединяет личные усилия с принятием итогового результата.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions"><button type="reset" class="reset">Сбросить ответы этой вкладки</button></div>
+        </form>
+      </section>
+
+      <section class="panel" id="panel-family">
+        <div class="topic-head">
+          <div class="eyebrow">Тема 4 · 10 вопросов</div>
+          <h2>HSK1 · 我的家</h2>
+          <p>Моя семья</p>
+          <div class="progress-note">Выберите один ответ в каждом вопросе. После нажатия сразу появится цветовая проверка и пояснение.</div>
+        </div>
+        <form>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">1</div>
+              <div class="qt">Что означает 家人 (jiārén)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q1" id="family_q1_0" class="wrong">
+                <label for="family_q1_0"><b>A.</b> дом</label>
+                <div class="feedback">✕ Правильный ответ: семья; члены семьи. 家人 — «семья; члены семьи».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q1" id="family_q1_1" class="correct">
+                <label for="family_q1_1"><b>B.</b> семья; члены семьи</label>
+                <div class="feedback">✓ 家人 — «семья; члены семьи».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q1" id="family_q1_2" class="wrong">
+                <label for="family_q1_2"><b>C.</b> родители</label>
+                <div class="feedback">✕ Правильный ответ: семья; члены семьи. 家人 — «семья; члены семьи».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q1" id="family_q1_3" class="wrong">
+                <label for="family_q1_3"><b>D.</b> ребёнок</label>
+                <div class="feedback">✕ Правильный ответ: семья; члены семьи. 家人 — «семья; члены семьи».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">2</div>
+              <div class="qt">Кто такой 哥哥 (gēge)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q2" id="family_q2_0" class="wrong">
+                <label for="family_q2_0"><b>A.</b> младший брат</label>
+                <div class="feedback">✕ Правильный ответ: старший брат. 哥哥 — старший брат.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q2" id="family_q2_1" class="wrong">
+                <label for="family_q2_1"><b>B.</b> старшая сестра</label>
+                <div class="feedback">✕ Правильный ответ: старший брат. 哥哥 — старший брат.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q2" id="family_q2_2" class="correct">
+                <label for="family_q2_2"><b>C.</b> старший брат</label>
+                <div class="feedback">✓ 哥哥 — старший брат.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q2" id="family_q2_3" class="wrong">
+                <label for="family_q2_3"><b>D.</b> папа</label>
+                <div class="feedback">✕ Правильный ответ: старший брат. 哥哥 — старший брат.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">3</div>
+              <div class="qt">Кто такая 妹妹 (mèimei)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q3" id="family_q3_0" class="wrong">
+                <label for="family_q3_0"><b>A.</b> старшая сестра</label>
+                <div class="feedback">✕ Правильный ответ: младшая сестра. 妹妹 — младшая сестра.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q3" id="family_q3_1" class="wrong">
+                <label for="family_q3_1"><b>B.</b> мама</label>
+                <div class="feedback">✕ Правильный ответ: младшая сестра. 妹妹 — младшая сестра.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q3" id="family_q3_2" class="wrong">
+                <label for="family_q3_2"><b>C.</b> жена</label>
+                <div class="feedback">✕ Правильный ответ: младшая сестра. 妹妹 — младшая сестра.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q3" id="family_q3_3" class="correct">
+                <label for="family_q3_3"><b>D.</b> младшая сестра</label>
+                <div class="feedback">✓ 妹妹 — младшая сестра.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">4</div>
+              <div class="qt">Как сказать: «В моей семье три человека»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q4" id="family_q4_0" class="correct">
+                <label for="family_q4_0"><b>A.</b> 我家有三口人。</label>
+                <div class="feedback">✓ 我家有三口人。 — базовая конструкция для количества членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q4" id="family_q4_1" class="wrong">
+                <label for="family_q4_1"><b>B.</b> 我有三家人。</label>
+                <div class="feedback">✕ Правильный ответ: 我家有三口人。. 我家有三口人。 — базовая конструкция для количества членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q4" id="family_q4_2" class="wrong">
+                <label for="family_q4_2"><b>C.</b> 我家是三口人。</label>
+                <div class="feedback">✕ Правильный ответ: 我家有三口人。. 我家有三口人。 — базовая конструкция для количества членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q4" id="family_q4_3" class="wrong">
+                <label for="family_q4_3"><b>D.</b> 三口人有我家。</label>
+                <div class="feedback">✕ Правильный ответ: 我家有三口人。. 我家有三口人。 — базовая конструкция для количества членов семьи.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">5</div>
+              <div class="qt">Как сказать: «Это моя старшая сестра»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q5" id="family_q5_0" class="wrong">
+                <label for="family_q5_0"><b>A.</b> 她是我的妹妹。</label>
+                <div class="feedback">✕ Правильный ответ: 这是我的姐姐。. 这是我的姐姐。 — «Это моя старшая сестра».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q5" id="family_q5_1" class="wrong">
+                <label for="family_q5_1"><b>B.</b> 这是我的哥哥。</label>
+                <div class="feedback">✕ Правильный ответ: 这是我的姐姐。. 这是我的姐姐。 — «Это моя старшая сестра».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q5" id="family_q5_2" class="wrong">
+                <label for="family_q5_2"><b>C.</b> 我家有姐姐。</label>
+                <div class="feedback">✕ Правильный ответ: 这是我的姐姐。. 这是我的姐姐。 — «Это моя старшая сестра».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q5" id="family_q5_3" class="correct">
+                <label for="family_q5_3"><b>D.</b> 这是我的姐姐。</label>
+                <div class="feedback">✓ 这是我的姐姐。 — «Это моя старшая сестра».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">6</div>
+              <div class="qt">Как спросить: «Кем работает твой папа?»</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q6" id="family_q6_0" class="wrong">
+                <label for="family_q6_0"><b>A.</b> 你爸爸叫什么名字？</label>
+                <div class="feedback">✕ Правильный ответ: 你爸爸是做什么的？. 你爸爸是做什么的？ — вопрос о профессии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q6" id="family_q6_1" class="correct">
+                <label for="family_q6_1"><b>B.</b> 你爸爸是做什么的？</label>
+                <div class="feedback">✓ 你爸爸是做什么的？ — вопрос о профессии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q6" id="family_q6_2" class="wrong">
+                <label for="family_q6_2"><b>C.</b> 你爸爸在哪儿？</label>
+                <div class="feedback">✕ Правильный ответ: 你爸爸是做什么的？. 你爸爸是做什么的？ — вопрос о профессии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q6" id="family_q6_3" class="wrong">
+                <label for="family_q6_3"><b>D.</b> 你爸爸几岁？</label>
+                <div class="feedback">✕ Правильный ответ: 你爸爸是做什么的？. 你爸爸是做什么的？ — вопрос о профессии.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">7</div>
+              <div class="qt">Что означает 工程师 (gōngchéngshī)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q7" id="family_q7_0" class="wrong">
+                <label for="family_q7_0"><b>A.</b> врач</label>
+                <div class="feedback">✕ Правильный ответ: инженер. 工程师 — инженер.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q7" id="family_q7_1" class="wrong">
+                <label for="family_q7_1"><b>B.</b> водитель</label>
+                <div class="feedback">✕ Правильный ответ: инженер. 工程师 — инженер.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q7" id="family_q7_2" class="correct">
+                <label for="family_q7_2"><b>C.</b> инженер</label>
+                <div class="feedback">✓ 工程师 — инженер.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q7" id="family_q7_3" class="wrong">
+                <label for="family_q7_3"><b>D.</b> менеджер</label>
+                <div class="feedback">✕ Правильный ответ: инженер. 工程师 — инженер.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">8</div>
+              <div class="qt">Кто такая 姥姥 (lǎolao)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q8" id="family_q8_0" class="correct">
+                <label for="family_q8_0"><b>A.</b> бабушка по маме</label>
+                <div class="feedback">✓ 姥姥 — бабушка по материнской линии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q8" id="family_q8_1" class="wrong">
+                <label for="family_q8_1"><b>B.</b> бабушка по папе</label>
+                <div class="feedback">✕ Правильный ответ: бабушка по маме. 姥姥 — бабушка по материнской линии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q8" id="family_q8_2" class="wrong">
+                <label for="family_q8_2"><b>C.</b> дедушка по маме</label>
+                <div class="feedback">✕ Правильный ответ: бабушка по маме. 姥姥 — бабушка по материнской линии.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q8" id="family_q8_3" class="wrong">
+                <label for="family_q8_3"><b>D.</b> тётя</label>
+                <div class="feedback">✕ Правильный ответ: бабушка по маме. 姥姥 — бабушка по материнской линии.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">9</div>
+              <div class="qt">Как спросить: «Сколько человек в твоей семье?»</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q9" id="family_q9_0" class="wrong">
+                <label for="family_q9_0"><b>A.</b> 你家都有谁？</label>
+                <div class="feedback">✕ Правильный ответ: 你家有几口人？. 你家有几口人？ — вопрос о количестве членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q9" id="family_q9_1" class="wrong">
+                <label for="family_q9_1"><b>B.</b> 你家在哪儿？</label>
+                <div class="feedback">✕ Правильный ответ: 你家有几口人？. 你家有几口人？ — вопрос о количестве членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q9" id="family_q9_2" class="correct">
+                <label for="family_q9_2"><b>C.</b> 你家有几口人？</label>
+                <div class="feedback">✓ 你家有几口人？ — вопрос о количестве членов семьи.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q9" id="family_q9_3" class="wrong">
+                <label for="family_q9_3"><b>D.</b> 你有哥哥吗？</label>
+                <div class="feedback">✕ Правильный ответ: 你家有几口人？. 你家有几口人？ — вопрос о количестве членов семьи.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">10</div>
+              <div class="qt">В диалоге на вопрос 你爸爸是做什么的？ какой дан ответ?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="family_q10" id="family_q10_0" class="wrong">
+                <label for="family_q10_0"><b>A.</b> 他是老师。</label>
+                <div class="feedback">✕ Правильный ответ: 他是医生。. В примере ответ: 他是医生。 — «Он врач».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q10" id="family_q10_1" class="correct">
+                <label for="family_q10_1"><b>B.</b> 他是医生。</label>
+                <div class="feedback">✓ В примере ответ: 他是医生。 — «Он врач».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q10" id="family_q10_2" class="wrong">
+                <label for="family_q10_2"><b>C.</b> 他是工程师。</label>
+                <div class="feedback">✕ Правильный ответ: 他是医生。. В примере ответ: 他是医生。 — «Он врач».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="family_q10" id="family_q10_3" class="wrong">
+                <label for="family_q10_3"><b>D.</b> 他是司机。</label>
+                <div class="feedback">✕ Правильный ответ: 他是医生。. В примере ответ: 他是医生。 — «Он врач».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions"><button type="reset" class="reset">Сбросить ответы этой вкладки</button></div>
+        </form>
+      </section>
+
+      <section class="panel" id="panel-weekend">
+        <div class="topic-head">
+          <div class="eyebrow">Тема 5 · 10 вопросов</div>
+          <h2>HSK2 · 周末的打算</h2>
+          <p>Планы на выходные</p>
+          <div class="progress-note">Выберите один ответ в каждом вопросе. После нажатия сразу появится цветовая проверка и пояснение.</div>
+        </div>
+        <form>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">1</div>
+              <div class="qt">Что означает 周末 (zhōumò)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q1" id="weekend_q1_0" class="wrong">
+                <label for="weekend_q1_0"><b>A.</b> понедельник</label>
+                <div class="feedback">✕ Правильный ответ: выходные. 周末 — «выходные».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q1" id="weekend_q1_1" class="wrong">
+                <label for="weekend_q1_1"><b>B.</b> вечер</label>
+                <div class="feedback">✕ Правильный ответ: выходные. 周末 — «выходные».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q1" id="weekend_q1_2" class="correct">
+                <label for="weekend_q1_2"><b>C.</b> выходные</label>
+                <div class="feedback">✓ 周末 — «выходные».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q1" id="weekend_q1_3" class="wrong">
+                <label for="weekend_q1_3"><b>D.</b> план</label>
+                <div class="feedback">✕ Правильный ответ: выходные. 周末 — «выходные».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">2</div>
+              <div class="qt">Что означает 打算 (dǎsuàn)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q2" id="weekend_q2_0" class="wrong">
+                <label for="weekend_q2_0"><b>A.</b> отдыхать</label>
+                <div class="feedback">✕ Правильный ответ: планировать; план. 打算 — «планировать; план».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q2" id="weekend_q2_1" class="wrong">
+                <label for="weekend_q2_1"><b>B.</b> встречаться</label>
+                <div class="feedback">✕ Правильный ответ: планировать; план. 打算 — «планировать; план».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q2" id="weekend_q2_2" class="wrong">
+                <label for="weekend_q2_2"><b>C.</b> плавать</label>
+                <div class="feedback">✕ Правильный ответ: планировать; план. 打算 — «планировать; план».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q2" id="weekend_q2_3" class="correct">
+                <label for="weekend_q2_3"><b>D.</b> планировать; план</label>
+                <div class="feedback">✓ 打算 — «планировать; план».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">3</div>
+              <div class="qt">Как переводится 有空 (yǒu kòng)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q3" id="weekend_q3_0" class="wrong">
+                <label for="weekend_q3_0"><b>A.</b> быть занятым</label>
+                <div class="feedback">✕ Правильный ответ: быть свободным. 有空 — «быть свободным».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q3" id="weekend_q3_1" class="correct">
+                <label for="weekend_q3_1"><b>B.</b> быть свободным</label>
+                <div class="feedback">✓ 有空 — «быть свободным».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q3" id="weekend_q3_2" class="wrong">
+                <label for="weekend_q3_2"><b>C.</b> быть дома</label>
+                <div class="feedback">✕ Правильный ответ: быть свободным. 有空 — «быть свободным».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q3" id="weekend_q3_3" class="wrong">
+                <label for="weekend_q3_3"><b>D.</b> быть уставшим</label>
+                <div class="feedback">✕ Правильный ответ: быть свободным. 有空 — «быть свободным».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">4</div>
+              <div class="qt">Что означает 看电影 (kàn diànyǐng)?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q4" id="weekend_q4_0" class="correct">
+                <label for="weekend_q4_0"><b>A.</b> смотреть фильм</label>
+                <div class="feedback">✓ 看电影 — смотреть фильм.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q4" id="weekend_q4_1" class="wrong">
+                <label for="weekend_q4_1"><b>B.</b> читать книгу</label>
+                <div class="feedback">✕ Правильный ответ: смотреть фильм. 看电影 — смотреть фильм.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q4" id="weekend_q4_2" class="wrong">
+                <label for="weekend_q4_2"><b>C.</b> идти за покупками</label>
+                <div class="feedback">✕ Правильный ответ: смотреть фильм. 看电影 — смотреть фильм.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q4" id="weekend_q4_3" class="wrong">
+                <label for="weekend_q4_3"><b>D.</b> готовить еду</label>
+                <div class="feedback">✕ Правильный ответ: смотреть фильм. 看电影 — смотреть фильм.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">5</div>
+              <div class="qt">Какая конструкция означает «сначала…, потом…»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q5" id="weekend_q5_0" class="wrong">
+                <label for="weekend_q5_0"><b>A.</b> 如果……就……</label>
+                <div class="feedback">✕ Правильный ответ: 先……然后……. 先……然后…… задаёт последовательность действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q5" id="weekend_q5_1" class="correct">
+                <label for="weekend_q5_1"><b>B.</b> 先……然后……</label>
+                <div class="feedback">✓ 先……然后…… задаёт последовательность действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q5" id="weekend_q5_2" class="wrong">
+                <label for="weekend_q5_2"><b>C.</b> 我和……一起……</label>
+                <div class="feedback">✕ Правильный ответ: 先……然后……. 先……然后…… задаёт последовательность действий.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q5" id="weekend_q5_3" class="wrong">
+                <label for="weekend_q5_3"><b>D.</b> 因为……所以……</label>
+                <div class="feedback">✕ Правильный ответ: 先……然后……. 先……然后…… задаёт последовательность действий.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">6</div>
+              <div class="qt">Как сказать: «Если погода будет хорошая, я…»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q6" id="weekend_q6_0" class="wrong">
+                <label for="weekend_q6_0"><b>A.</b> 这个周末，我打算……</label>
+                <div class="feedback">✕ Правильный ответ: 如果天气好，我就……. 如果天气好，我就…… — условная конструкция из материала.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q6" id="weekend_q6_1" class="wrong">
+                <label for="weekend_q6_1"><b>B.</b> 我先……，然后……</label>
+                <div class="feedback">✕ Правильный ответ: 如果天气好，我就……. 如果天气好，我就…… — условная конструкция из материала.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q6" id="weekend_q6_2" class="correct">
+                <label for="weekend_q6_2"><b>C.</b> 如果天气好，我就……</label>
+                <div class="feedback">✓ 如果天气好，我就…… — условная конструкция из материала.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q6" id="weekend_q6_3" class="wrong">
+                <label for="weekend_q6_3"><b>D.</b> 星期天下午，我要……</label>
+                <div class="feedback">✕ Правильный ответ: 如果天气好，我就……. 如果天气好，我就…… — условная конструкция из материала.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">7</div>
+              <div class="qt">Как пригласить: «Ты свободен в эти выходные? Давай вместе…»?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q7" id="weekend_q7_0" class="correct">
+                <label for="weekend_q7_0"><b>A.</b> 这个周末你有空吗？我们一起……吧。</label>
+                <div class="feedback">✓ Эта фраза прямо используется для приглашения.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q7" id="weekend_q7_1" class="wrong">
+                <label for="weekend_q7_1"><b>B.</b> 这个周末你有什么打算？</label>
+                <div class="feedback">✕ Правильный ответ: 这个周末你有空吗？我们一起……吧。. Эта фраза прямо используется для приглашения.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q7" id="weekend_q7_2" class="wrong">
+                <label for="weekend_q7_2"><b>C.</b> 你想看什么电影？</label>
+                <div class="feedback">✕ Правильный ответ: 这个周末你有空吗？我们一起……吧。. Эта фраза прямо используется для приглашения.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q7" id="weekend_q7_3" class="wrong">
+                <label for="weekend_q7_3"><b>D.</b> 几点见面？</label>
+                <div class="feedback">✕ Правильный ответ: 这个周末你有空吗？我们一起……吧。. Эта фраза прямо используется для приглашения.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">8</div>
+              <div class="qt">Когда в диалоге ученики договорились смотреть фильм?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q8" id="weekend_q8_0" class="wrong">
+                <label for="weekend_q8_0"><b>A.</b> в субботу утром</label>
+                <div class="feedback">✕ Правильный ответ: в воскресенье днём. В диалоге: 星期天下午我们一起看电影吧。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q8" id="weekend_q8_1" class="wrong">
+                <label for="weekend_q8_1"><b>B.</b> в субботу вечером</label>
+                <div class="feedback">✕ Правильный ответ: в воскресенье днём. В диалоге: 星期天下午我们一起看电影吧。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q8" id="weekend_q8_2" class="wrong">
+                <label for="weekend_q8_2"><b>C.</b> в воскресенье утром</label>
+                <div class="feedback">✕ Правильный ответ: в воскресенье днём. В диалоге: 星期天下午我们一起看电影吧。</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q8" id="weekend_q8_3" class="correct">
+                <label for="weekend_q8_3"><b>D.</b> в воскресенье днём</label>
+                <div class="feedback">✓ В диалоге: 星期天下午我们一起看电影吧。</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">9</div>
+              <div class="qt">Во сколько они договорились встретиться?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q9" id="weekend_q9_0" class="wrong">
+                <label for="weekend_q9_0"><b>A.</b> в 10:00</label>
+                <div class="feedback">✕ Правильный ответ: в 14:00. Ответ в диалоге: 下午两点 — два часа дня.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q9" id="weekend_q9_1" class="wrong">
+                <label for="weekend_q9_1"><b>B.</b> в 12:00</label>
+                <div class="feedback">✕ Правильный ответ: в 14:00. Ответ в диалоге: 下午两点 — два часа дня.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q9" id="weekend_q9_2" class="correct">
+                <label for="weekend_q9_2"><b>C.</b> в 14:00</label>
+                <div class="feedback">✓ Ответ в диалоге: 下午两点 — два часа дня.</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q9" id="weekend_q9_3" class="wrong">
+                <label for="weekend_q9_3"><b>D.</b> в 18:00</label>
+                <div class="feedback">✕ Правильный ответ: в 14:00. Ответ в диалоге: 下午两点 — два часа дня.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="q">
+            <div class="qh">
+              <div class="num">10</div>
+              <div class="qt">Где они договорились встретиться?</div>
+            </div>
+            <div class="answers">
+
+              <div class="choice">
+                <input type="radio" name="weekend_q10" id="weekend_q10_0" class="wrong">
+                <label for="weekend_q10_0"><b>A.</b> в парке</label>
+                <div class="feedback">✕ Правильный ответ: у станции метро. В диалоге: 在地铁站见。 — «Встретимся у метро».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q10" id="weekend_q10_1" class="correct">
+                <label for="weekend_q10_1"><b>B.</b> у станции метро</label>
+                <div class="feedback">✓ В диалоге: 在地铁站见。 — «Встретимся у метро».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q10" id="weekend_q10_2" class="wrong">
+                <label for="weekend_q10_2"><b>C.</b> в ресторане</label>
+                <div class="feedback">✕ Правильный ответ: у станции метро. В диалоге: 在地铁站见。 — «Встретимся у метро».</div>
+              </div>
+
+              <div class="choice">
+                <input type="radio" name="weekend_q10" id="weekend_q10_3" class="wrong">
+                <label for="weekend_q10_3"><b>D.</b> дома</label>
+                <div class="feedback">✕ Правильный ответ: у станции метро. В диалоге: 在地铁站见。 — «Встретимся у метро».</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions"><button type="reset" class="reset">Сбросить ответы этой вкладки</button></div>
+        </form>
+      </section>
+
+    </div>
+  </div>
+  <div class="footer">Китайский с носителями · учебная практика по загруженным материалам</div>
+</div>
+</body>
+</html>
