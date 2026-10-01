@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jeopardy: Physics Grade 7</title>
+<style>
+  :root{
+    --bg:#06152f;
+    --panel:#0d2a59;
+    --panel2:#123a78;
+    --accent:#ffd54a;
+    --accent2:#ff9f1c;
+    --text:#f7fbff;
+    --muted:#a8bdd8;
+    --danger:#ff5d73;
+    --success:#4ade80;
+    --shadow:0 16px 40px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(24,80,155,.35), transparent 35%),
+      radial-gradient(circle at 80% 10%, rgba(255,159,28,.10), transparent 25%),
+      linear-gradient(160deg,#041127,#071b3e 55%,#06152f);
+    overflow-x:hidden;
+  }
+  button,input{font:inherit}
+  button{cursor:pointer}
+  .screen{display:none; min-height:100vh; padding:28px}
+  .screen.active{display:flex}
+  #startScreen,#finalScreen{
+    align-items:center; justify-content:center; text-align:center;
+  }
+  .hero{
+    width:min(960px,95vw);
+    background:rgba(13,42,89,.92);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:28px;
+    padding:44px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(8px);
+  }
+  h1{
+    margin:0 0 12px;
+    font-size:clamp(38px,6vw,72px);
+    line-height:1.05;
+    color:var(--accent);
+    text-shadow:0 4px 0 rgba(0,0,0,.15);
+  }
+  .subtitle{font-size:clamp(18px,2.2vw,28px); color:var(--muted); margin-bottom:30px}
+  .team-config{
+    display:grid;
+    gap:14px;
+    width:min(620px,100%);
+    margin:24px auto;
+  }
+  .team-row{
+    display:grid;
+    grid-template-columns:140px 1fr;
+    gap:12px;
+    align-items:center;
+  }
+  .team-row label{font-weight:700;text-align:right}
+  .team-row input{
+    width:100%;
+    padding:14px 16px;
+    border:none;
+    border-radius:14px;
+    background:#eef5ff;
+    color:#0a1d3c;
+    outline:3px solid transparent;
+  }
+  .team-row input:focus{outline-color:var(--accent)}
+  .primary,.secondary,.danger{
+    border:none;
+    border-radius:14px;
+    padding:14px 24px;
+    font-weight:800;
+    transition:.2s transform,.2s filter;
+  }
+  .primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#13213b}
+  .secondary{background:#194b96;color:white}
+  .danger{background:#9d2940;color:white}
+  .primary:hover,.secondary:hover,.danger:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .topbar{
+    display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .game-title{font-size:clamp(26px,3vw,42px);font-weight:900;color:var(--accent)}
+  .teams{display:flex; gap:10px; flex-wrap:wrap}
+  .team-card{
+    min-width:170px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:16px;
+    padding:10px 14px;
+    text-align:center;
+  }
+  .team-card.selected{outline:3px solid var(--accent); background:rgba(255,213,74,.12)}
+  .team-card .name{font-weight:800;font-size:18px}
+  .team-card .score{font-weight:900;font-size:30px;color:var(--accent)}
+  .board-wrap{
+    width:100%;
+    overflow:auto;
+    border-radius:20px;
+    box-shadow:var(--shadow);
+  }
+  .board{
+    min-width:980px;
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    background:#041127;
+    padding:8px;
+  }
+  .topic{
+    min-height:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:12px;
+    background:linear-gradient(180deg,#123a78,#0a2c61);
+    border-radius:12px;
+    font-size:clamp(16px,1.4vw,22px);
+    font-weight:900;
+  }
+  .cell{
+    min-height:112px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(180deg,#174a98,#10376f);
+    color:var(--accent);
+    font-size:clamp(30px,4vw,54px);
+    font-weight:1000;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+    transition:transform .18s ease, filter .18s ease, opacity .3s ease;
+  }
+  .cell:hover:not(:disabled){transform:scale(1.035); filter:brightness(1.12)}
+  .cell.used{
+    background:#18243a;
+    color:#60718e;
+    opacity:.55;
+    transform:rotateX(180deg);
+  }
+  .game-actions{display:flex;justify-content:flex-end;margin-top:16px}
+  .modal{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(0,8,22,.84);
+    align-items:center; justify-content:center;
+    padding:18px;
+    z-index:10;
+  }
+  .modal.open{display:flex; animation:fade .18s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal-card{
+    width:min(1100px,96vw);
+    min-height:min(720px,92vh);
+    background:linear-gradient(180deg,#102e60,#091d40);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:28px;
+    box-shadow:0 28px 80px rgba(0,0,0,.55);
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+    animation:zoom .2s ease;
+  }
+  @keyframes zoom{from{transform:scale(.92)}to{transform:scale(1)}}
+  .q-head{
+    display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap
+  }
+  .q-topic{font-size:20px;font-weight:800;color:var(--muted)}
+  .q-value{font-size:32px;font-weight:1000;color:var(--accent)}
+  .timer-wrap{display:flex;align-items:center;gap:10px}
+  .timer{
+    min-width:90px;text-align:center;
+    font-size:34px;font-weight:1000;
+    color:white;
+    background:#07152f;border-radius:14px;padding:8px 14px
+  }
+  .timer.warning{color:#ffcf5b}
+  .timer.danger{color:#ff6a78;animation:pulse .75s infinite alternate}
+  @keyframes pulse{to{transform:scale(1.06)}}
+  .question{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:clamp(30px,4vw,58px);
+    font-weight:900;
+    line-height:1.2;
+    padding:24px 8px;
+  }
+  .answer{
+    display:none;
+    background:rgba(74,222,128,.11);
+    border:2px solid rgba(74,222,128,.45);
+    border-radius:18px;
+    padding:18px;
+    font-size:clamp(24px,3vw,40px);
+    font-weight:800;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .answer.show{display:block}
+  .controls{
+    display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  }
+  .score-controls{
+    display:none;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px;
+    margin:16px 0;
+  }
+  .score-controls.show{display:grid}
+  .score-box{
+    background:rgba(255,255,255,.06);
+    border-radius:16px;
+    padding:12px;text-align:center
+  }
+  .score-box strong{display:block;margin-bottom:10px;font-size:20px}
+  .score-buttons{display:flex;gap:8px;justify-content:center}
+  .plus,.minus{
+    border:none;border-radius:12px;padding:10px 14px;color:white;font-weight:900
+  }
+  .plus{background:#167d4f}.minus{background:#a12a42}
+  .winner{
+    font-size:clamp(36px,6vw,76px);font-weight:1000;color:var(--accent);margin:18px 0
+  }
+  .final-scores{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:22px 0}
+  .final-score{
+    min-width:190px;background:rgba(255,255,255,.08);
+    border-radius:16px;padding:18px
+  }
+  .final-score b{display:block;font-size:24px}
+  .final-score span{font-size:38px;color:var(--accent);font-weight:1000}
+  @media (max-width:700px){
+    .screen{padding:14px}
+    .hero{padding:28px 18px}
+    .team-row{grid-template-columns:1fr}
+    .team-row label{text-align:left}
+    .modal-card{padding:18px;min-height:88vh}
+    .question{font-size:30px}
+  }
+</style>
+</head>
+<body>
+
+<section id="startScreen" class="screen active">
+  <div class="hero">
+    <h1>Jeopardy</h1>
+    <div class="subtitle">Физика • 7 класс</div>
+
+    <div class="team-config">
+      <div class="team-row"><label>Команда 1</label><input id="team1" value="Команда 1"></div>
+      <div class="team-row"><label>Команда 2</label><input id="team2" value="Команда 2"></div>
+      <div class="team-row"><label>Команда 3</label><input id="team3" placeholder="Можно оставить пустым"></div>
+    </div>
+
+    <button class="primary" id="startBtn">Начать игру</button>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div style="width:100%">
+    <div class="topbar">
+      <div class="game-title">Jeopardy: Physics Grade 7</div>
+      <div id="teamsBar" class="teams"></div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board" class="board"></div>
+    </div>
+
+    <div class="game-actions">
+      <button id="resetBtn" class="danger">Сбросить игру</button>
+    </div>
+  </div>
+</section>
+
+<section id="finalScreen" class="screen">
+  <div class="hero">
+    <h1>Игра окончена!</h1>
+    <div id="winnerText" class="winner"></div>
+    <div id="finalScores" class="final-scores"></div>
+    <button id="playAgainBtn" class="primary">Сыграть ещё раз</button>
+  </div>
+</section>
+
+<div id="questionModal" class="modal">
+  <div class="modal-card">
+    <div class="q-head">
+      <div>
+        <div id="modalTopic" class="q-topic"></div>
+        <div id="modalValue" class="q-value"></div>
+      </div>
+      <div class="timer-wrap">
+        <div id="timer" class="timer">60</div>
+        <button id="pauseBtn" class="secondary">Пауза</button>
+      </div>
+    </div>
+
+    <div id="questionText" class="question"></div>
+    <div id="answerText" class="answer"></div>
+
+    <div id="scoreControls" class="score-controls"></div>
+
+    <div class="controls">
+      <button id="showAnswerBtn" class="primary">Показать ответ</button>
+      <button id="backBtn" class="secondary" style="display:none">Вернуться к полю</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    topic:"🔥 Тепловые явления",
+    items:[
+      {v:100,q:"Что показывает температура тела?",a:"Насколько тело нагрето или охлаждено."},
+      {v:200,q:"Как называется прибор для измерения температуры?",a:"Термометр."},
+      {v:300,q:"Почему лёд в тёплой комнате начинает таять?",a:"Он получает тепло от более тёплого воздуха и окружающих предметов."},
+      {v:400,q:"Назовите три способа теплопередачи.",a:"Теплопроводность, конвекция и излучение."},
+      {v:500,q:"Почему металлическая ложка в горячем чае нагревается быстрее деревянной?",a:"Металл лучше проводит тепло, чем дерево."}
+    ]
+  },
+  {
+    topic:"🧲 Магнитные явления",
+    items:[
+      {v:100,q:"Как называются два конца магнита?",a:"Северный и южный полюсы."},
+      {v:200,q:"Что происходит с одинаковыми полюсами двух магнитов?",a:"Они отталкиваются."},
+      {v:300,q:"Какой прибор помогает определить стороны света с помощью магнита?",a:"Компас."},
+      {v:400,q:"Почему стрелка компаса поворачивается в определённом направлении?",a:"Она ориентируется в магнитном поле Земли."},
+      {v:500,q:"Назовите два примера применения магнитов в технике или быту.",a:"Например: динамики, электродвигатели, магнитные замки, компасы, подъёмные краны для металла."}
+    ]
+  },
+  {
+    topic:"📏 Цена деления",
+    items:[
+      {v:100,q:"Между 0 и 10 см на шкале линейки 10 равных делений. Какова цена деления?",a:"1 см."},
+      {v:200,q:"На шкале между 10 и 20 мл — 5 равных делений. Какова цена деления?",a:"2 мл."},
+      {v:300,q:"На термометре между 20 °C и 30 °C — 10 равных делений. Какова цена одного деления?",a:"1 °C."},
+      {v:400,q:"На амперметре между 1 А и 2 А — 5 равных делений. Стрелка стоит на третьем делении после 1 А. Какое показание?",a:"Цена деления 0,2 А, показание 1,6 А."},
+      {v:500,q:"В мензурке между 40 и 60 мл — 10 равных делений. Уровень жидкости находится на 7-м делении после 40 мл. Какой объём?",a:"Цена деления 2 мл, объём 54 мл."}
+    ]
+  },
+  {
+    topic:"⚛️ Строение вещества",
+    items:[
+      {v:100,q:"Из каких мельчайших частиц состоят вещества?",a:"Из атомов и молекул."},
+      {v:200,q:"Назовите три основных агрегатных состояния вещества.",a:"Твёрдое, жидкое и газообразное."},
+      {v:300,q:"Как называется самопроизвольное перемешивание частиц разных веществ?",a:"Диффузия."},
+      {v:400,q:"Почему запах духов через некоторое время чувствуется по всей комнате?",a:"Из-за диффузии: молекулы духов движутся и смешиваются с воздухом."},
+      {v:500,q:"Почему газы можно сжать значительно сильнее, чем жидкости?",a:"В газах расстояния между частицами намного больше."}
+    ]
+  },
+  {
+    topic:"🌍 Естественные науки",
+    items:[
+      {v:100,q:"Какая наука изучает явления природы, движение, тепло, свет и другие физические процессы?",a:"Физика."},
+      {v:200,q:"Какая наука изучает небесные тела и Вселенную?",a:"Астрономия."},
+      {v:300,q:"Как называется беспорядочное движение очень мелких частиц, взвешенных в жидкости или газе?",a:"Броуновское движение."},
+      {v:400,q:"Почему броуновское движение важно для понимания строения вещества?",a:"Оно подтверждает непрерывное хаотическое движение молекул."},
+      {v:500,q:"Назовите одну экологическую проблему и одну её возможную причину.",a:"Например: загрязнение воздуха — выбросы транспорта и промышленности; усиление парникового эффекта — рост содержания парниковых газов."}
+    ]
+  }
+];
+
+let teams = [];
+let current = null;
+let usedCount = 0;
+let seconds = 60;
+let timerId = null;
+let paused = false;
+
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const finalScreen = document.getElementById("finalScreen");
+const board = document.getElementById("board");
+const teamsBar = document.getElementById("teamsBar");
+const modal = document.getElementById("questionModal");
+const timerEl = document.getElementById("timer");
+const answerText = document.getElementById("answerText");
+const showAnswerBtn = document.getElementById("showAnswerBtn");
+const backBtn = document.getElementById("backBtn");
+const scoreControls = document.getElementById("scoreControls");
+const pauseBtn = document.getElementById("pauseBtn");
+
+function showScreen(el){
+  [startScreen,gameScreen,finalScreen].forEach(s=>s.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function startGame(){
+  const names = [
+    document.getElementById("team1").value.trim() || "Команда 1",
+    document.getElementById("team2").value.trim() || "Команда 2",
+    document.getElementById("team3").value.trim()
+  ].filter(Boolean);
+
+  if(names.length < 2){
+    alert("Нужно минимум 2 команды.");
+    return;
+  }
+
+  teams = names.map((name,i)=>({name,score:0,id:i}));
+  usedCount = 0;
+  buildBoard();
+  renderTeams();
+  showScreen(gameScreen);
+}
+
+function buildBoard(){
+  board.innerHTML = "";
+  questions.forEach(cat=>{
+    const h = document.createElement("div");
+    h.className = "topic";
+    h.textContent = cat.topic;
+    board.appendChild(h);
+  });
+
+  for(let row=0; row<5; row++){
+    questions.forEach((cat,col)=>{
+      const item = cat.items[row];
+      const btn = document.createElement("button");
+      btn.className = "cell";
+      btn.textContent = item.v;
+      btn.dataset.col = col;
+      btn.dataset.row = row;
+      btn.addEventListener("click",()=>openQuestion(col,row,btn));
+      board.appendChild(btn);
+    });
+  }
+}
+
+function renderTeams(){
+  teamsBar.innerHTML = "";
+  teams.forEach((t,i)=>{
+    const card = document.createElement("div");
+    card.className = "team-card" + (i===0 ? " selected":"");
+    card.innerHTML = `<div class="name">${escapeHtml(t.name)}</div><div class="score">${t.score}</div>`;
+    card.onclick = ()=>{
+      [...teamsBar.children].forEach(c=>c.classList.remove("selected"));
+      card.classList.add("selected");
+    };
+    teamsBar.appendChild(card);
+  });
+}
+
+function openQuestion(col,row,cell){
+  const data = questions[col].items[row];
+  current = {col,row,cell,data};
+  document.getElementById("modalTopic").textContent = questions[col].topic;
+  document.getElementById("modalValue").textContent = `${data.v} очков`;
+  document.getElementById("questionText").textContent = data.q;
+  answerText.textContent = data.a;
+  answerText.classList.remove("show");
+  scoreControls.classList.remove("show");
+  showAnswerBtn.style.display = "inline-block";
+  backBtn.style.display = "none";
+  modal.classList.add("open");
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerId);
+  seconds = 60;
+  paused = false;
+  pauseBtn.textContent = "Пауза";
+  renderTimer();
+  timerId = setInterval(()=>{
+    if(!paused && seconds>0){
+      seconds--;
+      renderTimer();
+    }
+    if(seconds===0) clearInterval(timerId);
+  },1000);
+}
+
+function renderTimer(){
+  timerEl.textContent = seconds;
+  timerEl.classList.toggle("warning", seconds<=20 && seconds>10);
+  timerEl.classList.toggle("danger", seconds<=10);
+}
+
+pauseBtn.onclick = ()=>{
+  paused = !paused;
+  pauseBtn.textContent = paused ? "Продолжить" : "Пауза";
+};
+
+showAnswerBtn.onclick = ()=>{
+  answerText.classList.add("show");
+  scoreControls.classList.add("show");
+  showAnswerBtn.style.display = "none";
+  backBtn.style.display = "inline-block";
+  renderScoreControls();
+};
+
+function renderScoreControls(){
+  scoreControls.innerHTML = "";
+  teams.forEach((t,i)=>{
+    const box = document.createElement("div");
+    box.className = "score-box";
+    box.innerHTML = `
+      <strong>${escapeHtml(t.name)}: ${t.score}</strong>
+      <div class="score-buttons">
+        <button class="plus">+${current.data.v}</button>
+        <button class="minus">−${current.data.v}</button>
+      </div>`;
+    const [plus,minus] = box.querySelectorAll("button");
+    plus.onclick = ()=>changeScore(i,current.data.v);
+    minus.onclick = ()=>changeScore(i,-current.data.v);
+    scoreControls.appendChild(box);
+  });
+}
+
+function changeScore(index,delta){
+  teams[index].score += delta;
+  renderTeams();
+  renderScoreControls();
+}
+
+backBtn.onclick = closeQuestion;
+
+function closeQuestion(){
+  clearInterval(timerId);
+  modal.classList.remove("open");
+  if(current && !current.cell.disabled){
+    current.cell.disabled = true;
+    current.cell.classList.add("used");
+    current.cell.textContent = "✓";
+    usedCount++;
+  }
+  current = null;
+  if(usedCount===25) showFinal();
+}
+
+function showFinal(){
+  const max = Math.max(...teams.map(t=>t.score));
+  const winners = teams.filter(t=>t.score===max);
+  const winnerText = document.getElementById("winnerText");
+  winnerText.textContent = winners.length===1
+    ? `Победитель: ${winners[0].name}`
+    : `Ничья: ${winners.map(w=>w.name).join(" и ")}`;
+
+  const finalScores = document.getElementById("finalScores");
+  finalScores.innerHTML = teams
+    .slice()
+    .sort((a,b)=>b.score-a.score)
+    .map(t=>`<div class="final-score"><b>${escapeHtml(t.name)}</b><span>${t.score}</span></div>`)
+    .join("");
+
+  showScreen(finalScreen);
+}
+
+function resetGame(){
+  if(confirm("Сбросить игру и все очки?")){
+    clearInterval(timerId);
+    modal.classList.remove("open");
+    showScreen(startScreen);
+  }
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+document.getElementById("startBtn").onclick = startGame;
+document.getElementById("resetBtn").onclick = resetGame;
+document.getElementById("playAgainBtn").onclick = ()=>showScreen(startScreen);
+</script>
+</body>
+</html>
