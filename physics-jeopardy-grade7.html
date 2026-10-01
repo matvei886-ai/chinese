@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeopardy: Physics Grade 7</title>
+<style>
+  :root{
+    --bg1:#0a1446; --bg2:#050b2b; --cell:#1a2d8f; --cell2:#132270;
+    --gold:#ffc93c; --orange:#ff8a00; --text:#f4f6ff; --muted:#9aa6d8;
+    --green:#2ecc71; --red:#ff4d5e;
+    --font:"Segoe UI", "Trebuchet MS", Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font); color:var(--text); overflow-x:hidden;
+    background:radial-gradient(ellipse at 50% -10%, #23379e 0%, var(--bg1) 45%, var(--bg2) 100%) fixed;
+  }
+  button{font-family:inherit;cursor:pointer;border:none}
+  .screen{display:none;min-height:100vh}
+  .screen.active{display:flex}
+
+  /* ---------- Кнопки ---------- */
+  .btn{
+    background:linear-gradient(180deg,var(--gold),var(--orange)); color:#1b1340;
+    font-weight:800; font-size:clamp(18px,1.6vw,26px); padding:.6em 1.4em;
+    border-radius:14px; box-shadow:0 6px 0 #a35400, 0 10px 24px rgba(0,0,0,.4);
+    transition:transform .12s, box-shadow .12s, filter .2s;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a35400,0 4px 10px rgba(0,0,0,.4)}
+  .btn.big{font-size:clamp(24px,2.4vw,40px);padding:.55em 2em}
+  .btn.ghost{background:rgba(255,255,255,.08);color:var(--text);box-shadow:none;border:2px solid rgba(255,255,255,.2);font-weight:600}
+  .btn.ghost:hover{background:rgba(255,255,255,.16)}
+  .btn.small{font-size:clamp(14px,1.1vw,18px);padding:.45em 1em}
+
+  /* ---------- Старт ---------- */
+  #start{flex-direction:column;align-items:center;justify-content:center;gap:3vh;padding:24px;text-align:center}
+  .logo{font-size:clamp(48px,7vw,120px);font-weight:900;letter-spacing:.02em;line-height:1;
+    background:linear-gradient(180deg,#fff3c4,var(--gold) 45%,var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 6px 0 rgba(0,0,0,.35));animation:pop .8s cubic-bezier(.2,1.4,.4,1) both}
+  .sub{font-size:clamp(22px,2.6vw,42px);font-weight:700;color:var(--text);opacity:.9;animation:fadeUp .8s .2s both}
+  .emojis{font-size:clamp(32px,4vw,64px);letter-spacing:.3em;animation:fadeUp .8s .35s both}
+  .setup{background:rgba(255,255,255,.06);border:2px solid rgba(255,201,60,.35);border-radius:22px;padding:28px 36px;
+    display:flex;flex-direction:column;gap:18px;align-items:center;min-width:min(560px,92vw);animation:fadeUp .8s .5s both}
+  .count{font-size:clamp(18px,1.6vw,26px);display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .count button{font-size:inherit;font-weight:800;width:2.4em;height:2.4em;border-radius:12px;background:rgba(255,255,255,.1);color:var(--text);border:2px solid transparent;transition:.2s}
+  .count button.on{background:var(--gold);color:#1b1340}
+  #teamInputs{display:flex;flex-direction:column;gap:10px;width:100%}
+  #teamInputs input{width:100%;font:inherit;font-size:clamp(18px,1.6vw,26px);padding:.5em .8em;border-radius:12px;border:2px solid rgba(255,255,255,.2);
+    background:rgba(0,0,0,.25);color:var(--text);outline:none;transition:border-color .2s}
+  #teamInputs input:focus{border-color:var(--gold)}
+
+  /* ---------- Игровое поле ---------- */
+  #game{flex-direction:column;height:100vh;padding:1.2vh 1.2vw;gap:1.2vh}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  header h2{font-size:clamp(20px,2vw,34px);font-weight:900;color:var(--gold);text-shadow:0 3px 0 rgba(0,0,0,.4)}
+  header .tools{display:flex;gap:10px}
+  #board{flex:1;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto repeat(5,1fr);gap:.8vw;min-height:0}
+  .theme{background:linear-gradient(180deg,#2a42c0,#1a2d8f);border:2px solid rgba(255,201,60,.6);border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:.6vh .5vw;
+    font-weight:800;font-size:clamp(13px,1.45vw,26px);line-height:1.15;text-transform:uppercase;min-height:9vh}
+  .theme .ic{font-size:clamp(22px,2.4vw,42px);margin-bottom:.2em}
+  .cell{perspective:1000px;background:none;min-height:0}
+  .cell .inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+  .cell .front,.cell .back{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .cell .front{background:linear-gradient(160deg,var(--cell),var(--cell2));border:2px solid rgba(255,255,255,.12);
+    color:var(--gold);font-weight:900;font-size:clamp(26px,4.2vw,72px);text-shadow:0 4px 0 rgba(0,0,0,.45);
+    box-shadow:inset 0 0 30px rgba(0,0,0,.35);transition:transform .2s, box-shadow .2s, border-color .2s}
+  .cell:hover .front{transform:scale(1.04);border-color:var(--gold);box-shadow:0 0 24px rgba(255,201,60,.45), inset 0 0 30px rgba(0,0,0,.35)}
+  .cell .back{transform:rotateY(180deg);background:#0b1236;border:2px solid rgba(255,255,255,.05);color:#2b3a7a;font-size:clamp(22px,3vw,48px);font-weight:900}
+  .cell.used{pointer-events:none}
+  .cell.used .inner{transform:rotateY(180deg)}
+  .cell.deal .inner{animation:deal .6s both}
+  .cell.used.deal .inner{animation:none}
+
+  #scores{display:flex;gap:1vw;justify-content:center;flex-wrap:wrap}
+  .score{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:14px;padding:.5vh 1.6vw;
+    display:flex;align-items:baseline;gap:.7em;font-size:clamp(18px,1.7vw,30px);font-weight:700}
+  .score b{color:var(--gold);font-size:1.25em;font-variant-numeric:tabular-nums}
+  .score b.neg{color:var(--red)}
+
+  /* ---------- Модальное окно вопроса ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(3,6,25,.82);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10;padding:2vh 2vw}
+  .overlay.open{display:flex;animation:fade .3s both}
+  .overlay.closing{animation:fadeOut .3s both}
+  .card{position:relative;width:min(1400px,96vw);max-height:96vh;overflow:auto;background:linear-gradient(170deg,#22379f,#101d6b);
+    border:3px solid var(--gold);border-radius:24px;padding:3vh 3vw;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:2.2vh}
+  .card .top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .card .label{font-size:clamp(18px,1.7vw,30px);font-weight:800;color:var(--muted)}
+  .card .label span{color:var(--gold)}
+  .closeX{position:absolute;top:10px;right:14px;background:none;color:var(--muted);font-size:28px;opacity:.6}
+  .closeX:hover{opacity:1;color:#fff}
+  .timer{display:flex;align-items:center;gap:12px}
+  .timer .num{font-size:clamp(32px,3.4vw,60px);font-weight:900;font-variant-numeric:tabular-nums;color:var(--gold);min-width:2.2em;text-align:right}
+  .timer.warn .num{color:var(--red);animation:pulse 1s infinite}
+  .bar{height:12px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+  .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--orange),var(--gold));transition:width .25s linear}
+  .timer.warn + .bar i, .bar.warn i{background:var(--red)}
+  .question{font-size:clamp(28px,3.3vw,56px);font-weight:700;line-height:1.3;text-align:center;padding:2vh 0;min-height:22vh;display:flex;align-items:center;justify-content:center}
+  .answer{display:none;background:rgba(0,0,0,.28);border:2px solid var(--green);border-radius:18px;padding:2vh 2vw;text-align:center}
+  .answer.show{display:block;animation:flipIn .6s cubic-bezier(.2,.8,.2,1) both}
+  .answer .a{font-size:clamp(26px,2.8vw,48px);font-weight:900;color:var(--gold)}
+  .answer .n{font-size:clamp(20px,1.8vw,32px);margin-top:.6em;color:#dfe5ff;line-height:1.35}
+  .actions{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+  .teams{display:flex;gap:1.2vw;justify-content:center;flex-wrap:wrap}
+  .trow{background:rgba(0,0,0,.25);border-radius:14px;padding:.8vh 1vw;display:flex;align-items:center;gap:.6em;font-size:clamp(16px,1.4vw,24px);font-weight:700}
+  .trow .s{color:var(--gold);font-variant-numeric:tabular-nums;min-width:3em;text-align:right}
+  .trow .s.flash{animation:flash .6s}
+  .trow button{font-size:inherit;font-weight:800;padding:.35em .7em;border-radius:10px;color:#fff;transition:transform .1s,filter .2s}
+  .trow button:hover{filter:brightness(1.15)}
+  .trow button:active{transform:scale(.94)}
+  .plus{background:var(--green)} .minus{background:var(--red)}
+
+  /* ---------- Финал ---------- */
+  #final{flex-direction:column;align-items:center;justify-content:center;gap:3vh;text-align:center;padding:24px;position:relative;overflow:hidden}
+  #final .trophy{font-size:clamp(80px,10vw,180px);animation:pop 1s cubic-bezier(.2,1.4,.4,1) both}
+  #final h1{font-size:clamp(36px,4.6vw,80px);font-weight:900;color:var(--gold);text-shadow:0 5px 0 rgba(0,0,0,.4);animation:fadeUp .8s .3s both}
+  #finalList{display:flex;flex-direction:column;gap:12px;min-width:min(600px,92vw);animation:fadeUp .8s .5s both}
+  .frow{display:flex;justify-content:space-between;background:rgba(255,255,255,.07);border-radius:14px;padding:.6em 1.2em;font-size:clamp(22px,2.2vw,38px);font-weight:700}
+  .frow.win{background:linear-gradient(90deg,rgba(255,201,60,.35),rgba(255,138,0,.25));border:2px solid var(--gold)}
+  .frow b{color:var(--gold)}
+  .confetti{position:absolute;top:-5vh;font-size:clamp(20px,2vw,34px);animation:fall linear forwards;pointer-events:none}
+
+  /* ---------- Анимации ---------- */
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes fadeUp{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes fadeOut{from{opacity:1}to{opacity:0}}
+  @keyframes deal{from{transform:rotateY(-90deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
+  @keyframes flipIn{from{transform:rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+  @keyframes pulse{50%{transform:scale(1.12)}}
+  @keyframes flash{30%{transform:scale(1.4);color:#fff}}
+  @keyframes fall{to{transform:translateY(115vh) rotate(720deg)}}
+
+  @media (max-width:800px){
+    #board{gap:6px}
+    .theme{font-size:11px}
+    .card{padding:20px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Стартовый экран -->
+<section id="start" class="screen active">
+  <div class="logo">Jeopardy!</div>
+  <div class="sub">Physics · Grade 7</div>
+  <div class="emojis">🔥🧲📏⚛️🌍</div>
+  <div class="setup">
+    <div class="count">Количество команд:
+      <button data-n="2" class="on">2</button>
+      <button data-n="3">3</button>
+    </div>
+    <div id="teamInputs"></div>
+    <button id="startBtn" class="btn big">Начать</button>
+    <button id="continueBtn" class="btn ghost small" hidden>Продолжить сохранённую игру</button>
+  </div>
+</section>
+
+<!-- Игровое поле -->
+<section id="game" class="screen">
+  <header>
+    <h2>Jeopardy: Physics Grade 7</h2>
+    <div class="tools">
+      <button class="btn ghost small" id="fsBtn">⛶ Во весь экран</button>
+      <button class="btn ghost small" id="resetBtn">↺ Сбросить игру</button>
+    </div>
+  </header>
+  <div id="board"></div>
+  <div id="scores"></div>
+</section>
+
+<!-- Финальный экран -->
+<section id="final" class="screen">
+  <div class="trophy">🏆</div>
+  <h1 id="winnerText"></h1>
+  <div id="finalList"></div>
+  <button class="btn big" id="newGameBtn">Новая игра</button>
+</section>
+
+<!-- Окно вопроса -->
+<div class="overlay" id="modal">
+  <div class="card" id="card">
+    <button class="closeX" id="closeX" title="Закрыть без ответа (вопрос останется на поле)">✕</button>
+    <div class="top">
+      <div class="label" id="qLabel"></div>
+      <div class="timer" id="timer">
+        <div class="num" id="tNum">60</div>
+        <button class="btn ghost small" id="pauseBtn">⏸ Пауза</button>
+        <button class="btn ghost small" id="restartBtn">↻ 60 с</button>
+      </div>
+    </div>
+    <div class="bar" id="bar"><i id="barFill"></i></div>
+    <div class="question" id="qText"></div>
+    <div class="answer" id="answer"><div class="a" id="aText"></div><div class="n" id="nText"></div></div>
+    <div class="teams" id="teamBtns"></div>
+    <div class="actions">
+      <button class="btn" id="showBtn">Показать ответ</button>
+      <button class="btn" id="backBtn" hidden>Вернуться к полю</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= ВОПРОСЫ ================= */
+const PRICES = [100, 200, 300, 400, 500];
+const THEMES = [
+  { title: "Тепловые явления", icon: "🔥", q: [
+    { q: "Каким прибором измеряют температуру?",
+      a: "Термометром.", n: "" },
+    { q: "Кубик льда положили на тарелку в тёплой комнате. Что с ним произойдёт?",
+      a: "Лёд растает — превратится в воду.", n: "Лёд получает тепло от тёплого воздуха и плавится." },
+    { q: "Почему ручку металлического чайника делают из пластмассы или дерева?",
+      a: "Пластмасса и дерево плохо проводят тепло.", n: "Ручка остаётся холодной, и человек не обжигается." },
+    { q: "Каким способом тепло от Солнца доходит до Земли, если между ними почти пустое космическое пространство?",
+      a: "Излучением.", n: "Для излучения не нужно вещество — оно передаётся даже через пустоту." },
+    { q: "Почему батареи отопления ставят внизу, у пола, а не под потолком?",
+      a: "Тёплый воздух поднимается вверх, а холодный опускается вниз.", n: "Так воздух перемешивается и прогревается вся комната. Это конвекция." }
+  ]},
+  { title: "Магнитные явления", icon: "🧲", q: [
+    { q: "Сколько полюсов у любого магнита? Как они называются?",
+      a: "Два: северный (N) и южный (S).", n: "" },
+    { q: "Как взаимодействуют два магнита, если их сблизить одноимёнными полюсами?",
+      a: "Отталкиваются.", n: "Одноимённые полюса отталкиваются, разноимённые — притягиваются." },
+    { q: "Что из этого притянется к магниту: деревянная линейка, железный гвоздь, стеклянный стакан, медная проволока?",
+      a: "Железный гвоздь.", n: "Магнит притягивает железо, а дерево, стекло и медь — нет." },
+    { q: "Почему стрелка компаса всегда показывает на север?",
+      a: "Земля — большой магнит.", n: "Стрелка компаса — маленький магнит, она поворачивается вдоль магнитного поля Земли." },
+    { q: "Полосовой магнит разрезали пополам. Что получится?",
+      a: "Два магнита, у каждого — свои северный и южный полюсы.", n: "Получить магнит только с одним полюсом невозможно." }
+  ]},
+  { title: "Цена деления", icon: "📏", q: [
+    { q: "Что называют ценой деления шкалы прибора?",
+      a: "Значение одного (самого маленького) деления шкалы.", n: "Это расстояние между двумя соседними штрихами, выраженное в единицах прибора." },
+    { q: "На линейке между отметками 0 и 1 см — 10 делений. Какова цена деления?",
+      a: "1 мм (0,1 см).", n: "(1 см − 0 см) : 10 = 0,1 см = 1 мм." },
+    { q: "На мензурке между отметками 10 мл и 20 мл — 5 делений. Какова цена деления?",
+      a: "2 мл.", n: "(20 − 10) : 5 = 2 мл." },
+    { q: "На термометре между отметками 20 °C и 30 °C — 5 делений. Столбик остановился на 3-м делении выше 20 °C. Какая температура?",
+      a: "26 °C.", n: "Цена деления: (30 − 20) : 5 = 2 °C. Показание: 20 + 3 · 2 = 26 °C." },
+    { q: "На амперметре между отметками 0 А и 2 А — 10 делений. Стрелка стоит на 7-м делении от нуля. Что показывает амперметр?",
+      a: "1,4 А.", n: "Цена деления: (2 − 0) : 10 = 0,2 А. Показание: 7 · 0,2 = 1,4 А." }
+  ]},
+  { title: "Строение вещества", icon: "⚛️", q: [
+    { q: "Из чего состоят все вещества?",
+      a: "Из мельчайших частиц — молекул и атомов.", n: "" },
+    { q: "Назовите три агрегатных состояния вещества. Приведите пример для воды.",
+      a: "Твёрдое, жидкое, газообразное.", n: "Вода: лёд — вода — водяной пар." },
+    { q: "Что такое диффузия? Приведите пример.",
+      a: "Взаимное проникновение частиц одного вещества между частицами другого.", n: "Пример: запах духов распространяется по всей комнате." },
+    { q: "Почему воздух в шприце легко сжать, а воду — почти невозможно?",
+      a: "В газе молекулы находятся далеко друг от друга, а в жидкости — очень близко.", n: "У газа большие промежутки между молекулами, поэтому его легко сжать." },
+    { q: "В стакан с горячей водой и стакан с холодной водой капнули краску. Где вода окрасится быстрее и почему?",
+      a: "В горячей воде.", n: "Чем выше температура, тем быстрее движутся молекулы, тем быстрее идёт диффузия." }
+  ]},
+  { title: "Природа и Вселенная", icon: "🌍", q: [
+    { q: "Солнце — это планета или звезда?",
+      a: "Звезда.", n: "Солнце — ближайшая к Земле звезда." },
+    { q: "Как называется естественный спутник Земли?",
+      a: "Луна.", n: "" },
+    { q: "Какая наука изучает живые организмы, а какая — связь живых организмов с окружающей средой?",
+      a: "Биология и экология.", n: "Биология — живые организмы; экология — их связь со средой обитания." },
+    { q: "Что такое броуновское движение и кто его открыл?",
+      a: "Беспорядочное движение мельчайших частиц в жидкости или газе. Открыл Роберт Броун.", n: "Броун увидел его в микроскоп, наблюдая частицы пыльцы в воде (1827 год). Оно доказывает, что молекулы постоянно и хаотично движутся." },
+    { q: "Что такое парниковый эффект и чем опасно его усиление?",
+      a: "Газы в атмосфере (например, углекислый газ) задерживают тепло у поверхности Земли, как плёнка в теплице.", n: "Если таких газов становится больше, Земля нагревается — происходит глобальное потепление." }
+  ]}
+];
+
+/* ================= СОСТОЯНИЕ ================= */
+const KEY = "svoya-igra-fizika-7";
+let state = load();
+let teamCount = 2;
+let current = null;
+const $ = id => document.getElementById(id);
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+}
+
+/* ================= СТАРТ ================= */
+function renderInputs(){
+  const box = $("teamInputs");
+  const old = [...box.querySelectorAll("input")].map(i => i.value);
+  box.innerHTML = "";
+  for (let i = 0; i < teamCount; i++){
+    const inp = document.createElement("input");
+    inp.placeholder = "Команда " + (i + 1);
+    inp.value = old[i] || "";
+    inp.maxLength = 24;
+    box.appendChild(inp);
+  }
+}
+document.querySelectorAll(".count button").forEach(b => b.onclick = () => {
+  teamCount = +b.dataset.n;
+  document.querySelectorAll(".count button").forEach(x => x.classList.toggle("on", x === b));
+  renderInputs();
+});
+$("startBtn").onclick = () => {
+  const names = [...$("teamInputs").querySelectorAll("input")].map((i, k) => i.value.trim() || "Команда " + (k + 1));
+  state = { teams: names.map(n => ({ name: n, score: 0 })), used: {} };
+  save();
+  enterGame();
+};
+$("continueBtn").onclick = enterGame;
+
+function enterGame(){
+  if (usedCount() === 25) { showFinal(); return; }
+  showScreen("game");
+  buildBoard(true);
+  renderScores();
+}
+
+/* ================= ПОЛЕ ================= */
+function usedCount(){ return Object.keys(state.used).length; }
+
+function buildBoard(animate){
+  const board = $("board");
+  board.innerHTML = "";
+  THEMES.forEach(t => {
+    const h = document.createElement("div");
+    h.className = "theme";
+    h.innerHTML = `<div class="ic">${t.icon}</div><div>${t.title}</div>`;
+    board.appendChild(h);
+  });
+  PRICES.forEach((p, r) => {
+    THEMES.forEach((t, c) => {
+      const key = c + "-" + r;
+      const cell = document.createElement("button");
+      cell.className = "cell" + (state.used[key] ? " used" : "") + (animate ? " deal" : "");
+      cell.innerHTML = `<div class="inner"><div class="front">${p}</div><div class="back">✓</div></div>`;
+      if (animate) cell.querySelector(".inner").style.animationDelay = (r * 5 + c) * 35 + "ms";
+      cell.onclick = () => openQuestion(c, r, cell);
+      board.appendChild(cell);
+    });
+  });
+}
+
+function renderScores(){
+  const box = $("scores");
+  box.innerHTML = "";
+  state.teams.forEach(t => {
+    const d = document.createElement("div");
+    d.className = "score";
+    const name = document.createElement("span");
+    name.textContent = t.name;
+    const b = document.createElement("b");
+    b.textContent = t.score;
+    if (t.score < 0) b.className = "neg";
+    d.append(name, b);
+    box.appendChild(d);
+  });
+}
+
+/* ================= ВОПРОС ================= */
+function openQuestion(c, r, cell){
+  const th = THEMES[c], item = th.q[r], price = PRICES[r];
+  current = { c, r, cell, price };
+  $("qLabel").innerHTML = `${th.icon} ${th.title} · <span>${price}</span>`;
+  $("qText").textContent = item.q;
+  $("aText").textContent = item.a;
+  $("nText").textContent = item.n;
+  $("nText").style.display = item.n ? "" : "none";
+  $("answer").classList.remove("show");
+  $("showBtn").hidden = false;
+  $("backBtn").hidden = true;
+
+  const tb = $("teamBtns");
+  tb.innerHTML = "";
+  state.teams.forEach((t, i) => {
+    const row = document.createElement("div");
+    row.className = "trow";
+    const nm = document.createElement("span"); nm.textContent = t.name;
+    const sc = document.createElement("span"); sc.className = "s"; sc.textContent = t.score;
+    const plus = document.createElement("button"); plus.className = "plus"; plus.textContent = "+" + price;
+    const minus = document.createElement("button"); minus.className = "minus"; minus.textContent = "−" + price;
+    plus.onclick = () => addScore(i, price, sc);
+    minus.onclick = () => addScore(i, -price, sc);
+    row.append(nm, sc, plus, minus);
+    tb.appendChild(row);
+  });
+
+  const modal = $("modal"), card = $("card");
+  modal.classList.remove("closing");
+  modal.classList.add("open");
+  const cr = cell.getBoundingClientRect(), kr = card.getBoundingClientRect();
+  const dx = cr.left + cr.width / 2 - (kr.left + kr.width / 2);
+  const dy = cr.top + cr.height / 2 - (kr.top + kr.height / 2);
+  const s = Math.max(cr.width / kr.width, 0.05);
+  if (card.animate) card.animate(
+    [{ transform: `translate(${dx}px,${dy}px) scale(${s})`, opacity: .4 }, { transform: "none", opacity: 1 }],
+    { duration: 500, easing: "cubic-bezier(.2,.8,.2,1)" }
+  );
+  startTimer();
+}
+
+function addScore(i, delta, el){
+  state.teams[i].score += delta;
+  save();
+  el.textContent = state.teams[i].score;
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  renderScores();
+}
+
+function showAnswer(){
+  $("answer").classList.add("show");
+  $("showBtn").hidden = true;
+  $("backBtn").hidden = false;
+  pauseTimer(true);
+}
+
+function closeQuestion(markUsed){
+  stopTimer();
+  const modal = $("modal");
+  modal.classList.add("closing");
+  setTimeout(() => modal.classList.remove("open", "closing"), 280);
+  if (markUsed && current){
+    state.used[current.c + "-" + current.r] = true;
+    save();
+    const cell = current.cell;
+    setTimeout(() => cell.classList.add("used"), 250);
+    if (usedCount() === 25) setTimeout(showFinal, 1300);
+  }
+  current = null;
+}
+
+$("showBtn").onclick = showAnswer;
+$("backBtn").onclick = () => closeQuestion(true);
+$("closeX").onclick = () => closeQuestion(false);
+
+/* ================= ТАЙМЕР ================= */
+const TOTAL = 60;
+let tLeft = TOTAL, tId = null, tLast = 0;
+
+function startTimer(){ stopTimer(); tLeft = TOTAL; renderTimer(); resumeTimer(); }
+function resumeTimer(){
+  if (tLeft <= 0) return;
+  tLast = performance.now();
+  tId = setInterval(tick, 200);
+  $("pauseBtn").textContent = "⏸ Пауза";
+}
+function pauseTimer(){
+  clearInterval(tId); tId = null;
+  if (tLeft > 0) $("pauseBtn").textContent = "▶ Продолжить";
+}
+function stopTimer(){ clearInterval(tId); tId = null; }
+function tick(){
+  const now = performance.now();
+  tLeft -= (now - tLast) / 1000; tLast = now;
+  if (tLeft <= 0){ tLeft = 0; stopTimer(); $("pauseBtn").textContent = "⏱ Время вышло"; beep(); }
+  renderTimer();
+}
+function renderTimer(){
+  const sec = Math.ceil(tLeft);
+  $("tNum").textContent = sec;
+  $("barFill").style.width = (tLeft / TOTAL * 100) + "%";
+  const warn = sec <= 10;
+  $("timer").classList.toggle("warn", warn);
+  $("bar").classList.toggle("warn", warn);
+}
+$("pauseBtn").onclick = () => { if (tLeft <= 0) return; tId ? pauseTimer() : resumeTimer(); };
+$("restartBtn").onclick = startTimer;
+
+function beep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.35, 0.7].forEach(t => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "square"; o.frequency.value = 520;
+      g.gain.setValueAtTime(0.15, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.3);
+    });
+  }catch(e){}
+}
+
+/* ================= ФИНАЛ ================= */
+function showFinal(){
+  showScreen("final");
+  const sorted = [...state.teams].sort((a, b) => b.score - a.score);
+  const max = sorted[0].score;
+  const winners = sorted.filter(t => t.score === max);
+  $("winnerText").textContent = winners.length > 1
+    ? "Ничья! Победили: " + winners.map(w => "«" + w.name + "»").join(" и ")
+    : "Победила команда «" + winners[0].name + "»!";
+  const list = $("finalList");
+  list.innerHTML = "";
+  sorted.forEach(t => {
+    const r = document.createElement("div");
+    r.className = "frow" + (t.score === max ? " win" : "");
+    const n = document.createElement("span"); n.textContent = (t.score === max ? "🥇 " : "") + t.name;
+    const s = document.createElement("b"); s.textContent = t.score;
+    r.append(n, s);
+    list.appendChild(r);
+  });
+  confetti();
+}
+function confetti(){
+  const f = $("final");
+  f.querySelectorAll(".confetti").forEach(c => c.remove());
+  const sym = ["🎉", "⭐", "✨", "🔥", "🧲", "⚛️", "🌍", "🏅"];
+  for (let i = 0; i < 40; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.textContent = sym[i % sym.length];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDuration = 3 + Math.random() * 4 + "s";
+    c.style.animationDelay = Math.random() * 2 + "s";
+    f.appendChild(c);
+  }
+}
+$("newGameBtn").onclick = () => { state = null; clearSave(); $("continueBtn").hidden = true; showScreen("start"); };
+
+/* ================= ПРОЧЕЕ ================= */
+$("resetBtn").onclick = () => {
+  if (confirm("Сбросить игру? Все очки и открытые вопросы будут потеряны.")){
+    state = null; clearSave();
+    $("continueBtn").hidden = true;
+    showScreen("start");
+  }
+};
+$("fsBtn").onclick = () => {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  else document.exitFullscreen && document.exitFullscreen();
+};
+
+document.addEventListener("keydown", e => {
+  if (!current) return;
+  if (e.code === "Space"){ e.preventDefault(); $("pauseBtn").click(); }
+  else if (e.key === "Enter"){ e.preventDefault(); $("answer").classList.contains("show") ? closeQuestion(true) : showAnswer(); }
+  else if (e.key === "Escape"){ closeQuestion(false); }
+});
+
+renderInputs();
+if (state && state.teams){ $("continueBtn").hidden = false; }
+</script>
+</body>
+</html>
