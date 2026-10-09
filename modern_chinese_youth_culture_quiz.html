@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chinese Youth Slang Interactive Quiz</title>
+<style>
+:root{
+ --bg:#061c33;--bg2:#0a3152;--gold:#d9aa55;--gold2:#f2d18c;
+ --text:#fbf7ef;--muted:#b9c7d2;--green:#1a8d58;--red:#b34250;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;font-family:Arial,"Noto Sans","Microsoft YaHei",sans-serif;
+ color:var(--text);
+ background:
+ radial-gradient(circle at 12% 10%,rgba(217,170,85,.09),transparent 28%),
+ linear-gradient(145deg,#031321,#082b48 58%,#051a2e);
+}
+.shell{max-width:900px;margin:auto;padding:24px 14px 60px}
+.hero{
+ border:1px solid rgba(217,170,85,.75);border-radius:28px;padding:34px 30px;
+ background:linear-gradient(135deg,#0a2d4b,#051b30);
+ box-shadow:0 24px 70px rgba(0,0,0,.28)
+}
+.brand{font-size:13px;letter-spacing:.18em;color:var(--gold2);font-weight:800}
+h1{font-size:clamp(36px,6vw,62px);line-height:1;margin:14px 0 10px}
+h1 span{color:var(--gold)}
+.lead{font-size:17px;line-height:1.55;color:#dce5eb}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.badge{padding:9px 14px;border:1px solid rgba(217,170,85,.35);border-radius:999px;color:var(--gold2);background:rgba(217,170,85,.06);font-weight:700}
+.progress-wrap{margin:22px 0 16px}
+.progress-top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px;margin-bottom:8px}
+.progress{height:10px;border-radius:999px;background:#102c46;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#f2d18c);transition:.25s}
+.card{
+ margin-top:18px;padding:26px;border-radius:22px;border:1px solid rgba(217,170,85,.25);
+ background:linear-gradient(145deg,#0c2f4f,#071f37);box-shadow:0 12px 30px rgba(0,0,0,.16)
+}
+.qnum{color:var(--gold2);font-weight:800;font-size:14px;letter-spacing:.08em}
+.question{font-size:24px;font-weight:800;line-height:1.42;margin:10px 0 20px}
+.answers{display:grid;gap:12px}
+.answer{
+ width:100%;text-align:left;padding:15px 16px;border-radius:14px;cursor:pointer;
+ border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.035);
+ color:var(--text);font-size:16px;line-height:1.45;transition:.15s;
+}
+.answer:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px);background:rgba(217,170,85,.06)}
+.answer:disabled{cursor:default}
+.answer.correct{background:linear-gradient(135deg,#147a4a,#26ad6d);border-color:#74dca8;color:#fff}
+.answer.wrong{background:linear-gradient(135deg,#9f3948,#d55563);border-color:#ef9aa2;color:#fff}
+.answer.reveal{outline:2px solid rgba(242,209,140,.8);outline-offset:2px}
+.feedback{
+ display:none;margin-top:18px;padding:16px 17px;border-radius:14px;line-height:1.5;
+ border:1px solid rgba(217,170,85,.25);background:#081a2d;color:#e8eef2
+}
+.feedback.show{display:block}
+.feedback strong{color:var(--gold2)}
+.controls{display:flex;justify-content:flex-end;gap:12px;margin-top:18px;flex-wrap:wrap}
+.btn{
+ border:1px solid var(--gold);background:transparent;color:var(--gold2);
+ border-radius:999px;padding:12px 22px;font-weight:800;cursor:pointer
+}
+.btn.primary{background:linear-gradient(135deg,#d4a44d,#f0cd83);color:#061c33;border-color:#f0cd83}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.result{
+ display:none;margin-top:20px;padding:30px;border-radius:22px;border:1px solid rgba(217,170,85,.55);
+ background:linear-gradient(135deg,#0b3152,#071d33);text-align:center
+}
+.result.show{display:block}
+.score{font-size:56px;font-weight:900;color:var(--gold2);margin:8px 0}
+.result p{color:#dce5eb;line-height:1.5}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+@media(max-width:600px){
+ .shell{padding:10px 8px 40px} .hero{padding:26px 18px} .card{padding:20px 14px}
+ .question{font-size:19px} .answer{font-size:15px;padding:14px}
+ .controls{justify-content:stretch} .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ · ЛЕКЦИЯ</div>
+    <h1>内卷 · 躺平 · 摸鱼 — <span>интерактивный тест</span></h1>
+    <div class="lead">24 вопроса по лекции «Гонка, пауза и маленький побег». Теперь с JavaScript: ответы перемешиваются при каждом прохождении, результат считается автоматически.</div>
+    <div class="stats">
+      <div class="badge">24 вопроса</div>
+      <div class="badge">случайный порядок ответов</div>
+      <div class="badge">итоговый результат</div>
+    </div>
+  </section>
+
+  <div class="progress-wrap">
+    <div class="progress-top"><span id="progressText">Вопрос 1 из 24</span><span id="scoreText">Баллы: 0</span></div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  </div>
+
+  <section class="card" id="quizCard">
+    <div class="qnum" id="qnum"></div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="controls">
+      <button class="btn primary" id="nextBtn" disabled>Следующий вопрос</button>
+    </div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="qnum">РЕЗУЛЬТАТ</div>
+    <div class="score" id="finalScore"></div>
+    <p id="finalText"></p>
+    <button class="btn primary" id="restartBtn">Пройти ещё раз</button>
+  </section>
+
+  <div class="footer">Китайский с носителями · 内卷 / 躺平 / 摸鱼</div>
+</div>
+
+<script>
+const QUESTIONS = [{"q": "Что лучше всего передаёт 内卷 (nèijuǎn)?", "a": "изнуряющая гонка и гиперконкуренция", "opts": ["полный отказ от работы", "короткий перерыв на работе", "удачный карьерный скачок"], "exp": "В лекции 内卷 объясняется как гонка, где все делают больше, а результат почти не меняется."}, {"q": "Как в лекции описана жизненная линия одного дня?", "a": "гонка → усталость → пауза", "opts": ["пауза → отпуск → увольнение", "учёба → сон → праздник", "работа → успех → повышение"], "exp": "Слайд «Один день — три состояния» связывает 内卷, 摸鱼 и 躺平 в одну линию."}, {"q": "Что означает 摸鱼 (mōyú) в контексте лекции?", "a": "немного отвлекаться на работе / делать микро-паузу", "opts": ["уволиться с работы", "полностью отказаться от обязанностей", "соревноваться сильнее коллег"], "exp": "摸鱼 здесь — небольшой побег или пауза, а не полный отказ от работы."}, {"q": "Что означает 躺平 (tǎngpíng)?", "a": "выйти из постоянной гонки и отказаться от бесконечного соревнования", "opts": ["работать сверхурочно", "стать лучшим сотрудником", "просто проспать весь день"], "exp": "Лекция подчёркивает: 躺平 — реакция на давление, а не просто бытовая лень."}, {"q": "Какой пример в лекции показывает 内卷 в учёбе?", "a": "задали 5 страниц, но кто-то пишет 8, другой 12, и планка растёт", "opts": ["студент сделал ровно 5 страниц", "студент отменил домашнее задание", "все договорились писать меньше"], "exp": "Так показана академическая гонка: формально задание не меняется, но психологическая планка повышается."}, {"q": "Как переводится 太卷了！ (Tài juǎn le!)?", "a": "Слишком уж всё превратилось в гонку!", "opts": ["Я хочу немного отдохнуть!", "Хватит отвлекаться!", "Сегодня я не работаю!"], "exp": "太卷了 — реакция на слишком сильную конкуренцию."}, {"q": "Что выражает 我卷不动了 (Wǒ juǎn bu dòng le)?", "a": "Я больше не вывожу эту гонку.", "opts": ["Я выиграл эту гонку.", "Я хочу работать сверхурочно.", "Я сегодня ничего не планирую."], "exp": "Фраза звучит устало и самоиронично."}, {"q": "Кого в лекции называют 卷王 (juǎnwáng)?", "a": "человека, который старается и соревнуется больше всех", "opts": ["человека, который постоянно отдыхает", "человека, который ушёл с работы", "человека, который не любит учиться"], "exp": "卷王 — «король гонки», тот, кто всегда делает больше всех."}, {"q": "Почему 躺平 не стоит просто переводить как «лень»?", "a": "это чаще реакция на давление и желание выйти из постоянной конкуренции", "opts": ["потому что это термин только про сон", "потому что это исключительно про отпуск", "потому что это слово означает карьерный рост"], "exp": "Лекция противопоставляет бытовую лень и 躺平 по причине и интонации."}, {"q": "Где, по лекции, может проявляться настроение 躺平?", "a": "работа, жильё, брак и потребление", "opts": ["только спорт", "только школьные экзамены", "только путешествия"], "exp": "Слайд о сферах давления называет работу, жильё, брак и потребление."}, {"q": "Что означает 我想躺平 (Wǒ xiǎng tǎngpíng)?", "a": "Я хочу выйти из гонки и немного отдохнуть.", "opts": ["Я хочу стать самым сильным конкурентом.", "Я хочу поработать сверхурочно.", "Я хочу проверить телефон на минуту."], "exp": "Это усталое признание желания выйти из гонки."}, {"q": "Что означает 我不想卷了 (Wǒ bù xiǎng juǎn le)?", "a": "Я больше не хочу гнаться.", "opts": ["Я больше не хочу отдыхать.", "Я не хочу пить кофе.", "Я больше не хочу пользоваться телефоном."], "exp": "Фраза прямо связывает отказ от дальнейшей гонки со словом 卷."}, {"q": "Что из перечисленного в лекции приводится как пример 摸鱼?", "a": "листать телефон", "opts": ["писать отчёт ночью", "приходить раньше всех", "делать в два раза больше задания"], "exp": "刷手机 — один из самых узнаваемых примеров 摸鱼."}, {"q": "Что ещё может считаться 摸鱼?", "a": "пара минут болтать с коллегой", "opts": ["уволиться без предупреждения", "отказаться от работы навсегда", "сдать экзамен лучше всех"], "exp": "Лекция относит к 摸鱼 короткие микро-паузы: телефон, разговор, кофе, «залипнуть»."}, {"q": "Как переводится 我在摸鱼 (Wǒ zài mōyú)?", "a": "Я сейчас немного отвлекаюсь на работе.", "opts": ["Я увольняюсь.", "Я участвую в гонке.", "Я хочу купить рыбу."], "exp": "В живой речи фраза часто используется с улыбкой и самоиронией."}, {"q": "Что значит 别摸鱼了！ (Bié mōyú le!)?", "a": "Хватит филонить / отвлекаться!", "opts": ["Не перерабатывай!", "Не сдавайся!", "Не соревнуйся!"], "exp": "别…了 — прекращение действия; здесь: хватит 摸鱼."}, {"q": "Что означает 打工人 (dǎgōngrén) в материалах лекции?", "a": "работяга / работающий человек, часто самоиронично", "opts": ["начальник компании", "безработный", "человек, который выиграл конкурс"], "exp": "打工人 используется как самоироничное обозначение работающего человека."}, {"q": "Что означает 摆烂 (bǎilàn)?", "a": "махнуть рукой и пустить всё на самотёк", "opts": ["ненадолго отвлечься", "стать «королём гонки»", "работать сверхурочно"], "exp": "В лекции 摆烂 описано как более сильное ощущение сдачи позиций."}, {"q": "Какое слово соответствует логике «Боюсь отстать»?", "a": "内卷", "opts": ["躺平", "摸鱼", "摆烂"], "exp": "В финальном сравнении 内卷 связано с конкуренцией, страхом и давлением."}, {"q": "Какое слово соответствует логике «Не хочу участвовать»?", "a": "躺平", "opts": ["内卷", "摸鱼", "卷王"], "exp": "躺平 — усталость и нежелание продолжать постоянное соревнование."}, {"q": "Какое слово соответствует логике «Сделаю паузу»?", "a": "摸鱼", "opts": ["内卷", "躺平", "加班"], "exp": "摸鱼 — маленький побег или короткий перерыв."}, {"q": "Какая последовательность лучше всего подходит ситуации: утром все соревнуются, днём человек листает телефон, вечером хочет выйти из гонки?", "a": "内卷 → 摸鱼 → 躺平", "opts": ["躺平 → 内卷 → 摸鱼", "摸鱼 → 躺平 → 内卷", "内卷 → 躺平 → 摸鱼"], "exp": "Это та же жизненная линия, которую показывает лекция: гонка, затем маленькая пауза и желание выйти из гонки."}, {"q": "Какой смысл лекция предлагает видеть в этом сленге?", "a": "не только ситуацию, но и эмоцию, усталость, шутку и самоиронию", "opts": ["только буквальное значение иероглифов", "только официальную деловую лексику", "только грамматические правила"], "exp": "Отдельный слайд называет сленг «картой эмоций»."}, {"q": "Как лучше относиться к этим словам по подсказке в раздатке?", "a": "понимать их тон и ситуацию употребления, а не использовать как формальную письменную лексику", "opts": ["обязательно использовать в официальных письмах", "заучивать только буквальный перевод", "использовать только на экзамене"], "exp": "В раздатке прямо указано: важно понимать тон и контекст; это не формальная письменная лексика."}];
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let order = [];
+let idx = 0;
+let score = 0;
+let answered = false;
+
+const qnum = document.getElementById('qnum');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const feedbackEl = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const bar = document.getElementById('bar');
+const progressText = document.getElementById('progressText');
+const scoreText = document.getElementById('scoreText');
+const quizCard = document.getElementById('quizCard');
+const result = document.getElementById('result');
+const finalScore = document.getElementById('finalScore');
+const finalText = document.getElementById('finalText');
+const restartBtn = document.getElementById('restartBtn');
+
+function startQuiz(){
+  order = QUESTIONS.map((q,i)=>({...q,id:i}));
+  idx = 0;
+  score = 0;
+  answered = false;
+  quizCard.style.display = 'block';
+  result.classList.remove('show');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  answered = false;
+  nextBtn.disabled = true;
+  feedbackEl.className = 'feedback';
+  feedbackEl.innerHTML = '';
+  answersEl.innerHTML = '';
+
+  const q = order[idx];
+  qnum.textContent = `ВОПРОС ${idx+1}`;
+  questionEl.textContent = q.q;
+
+  const opts = shuffle([q.a, ...q.opts]);
+  opts.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'answer';
+    btn.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+    btn.addEventListener('click',()=>chooseAnswer(btn,opt,q));
+    answersEl.appendChild(btn);
+  });
+
+  progressText.textContent = `Вопрос ${idx+1} из ${order.length}`;
+  scoreText.textContent = `Баллы: ${score}`;
+  bar.style.width = `${(idx/order.length)*100}%`;
+}
+
+function chooseAnswer(btn,opt,q){
+  if(answered) return;
+  answered = true;
+
+  const all = [...answersEl.querySelectorAll('.answer')];
+  all.forEach(b=>b.disabled=true);
+
+  if(opt === q.a){
+    score++;
+    btn.classList.add('correct');
+    feedbackEl.innerHTML = `<strong>Верно.</strong> ${q.exp}`;
+  } else {
+    btn.classList.add('wrong');
+    all.forEach(b=>{
+      const text = b.textContent.replace(/^[A-D]\.\s*/,'');
+      if(text === q.a){
+        b.classList.add('correct','reveal');
+      }
+    });
+    feedbackEl.innerHTML = `<strong>Неверно.</strong> Правильный ответ: <b>${q.a}</b><br>${q.exp}`;
+  }
+
+  feedbackEl.classList.add('show');
+  scoreText.textContent = `Баллы: ${score}`;
+  bar.style.width = `${((idx+1)/order.length)*100}%`;
+  nextBtn.disabled = false;
+  nextBtn.textContent = (idx === order.length-1) ? 'Показать результат' : 'Следующий вопрос';
+}
+
+nextBtn.addEventListener('click',()=>{
+  if(!answered) return;
+  if(idx < order.length-1){
+    idx++;
+    renderQuestion();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    finishQuiz();
+  }
+});
+
+function finishQuiz(){
+  quizCard.style.display = 'none';
+  result.classList.add('show');
+  finalScore.textContent = `${score} / ${order.length}`;
+  const pct = Math.round(score/order.length*100);
+
+  let msg;
+  if(pct >= 90) msg = 'Отлично: вы хорошо различаете 内卷, 躺平 и 摸鱼 и понимаете их оттенки.';
+  else if(pct >= 70) msg = 'Хороший результат. Основные значения понятны, но несколько оттенков ещё стоит повторить.';
+  else if(pct >= 50) msg = 'База уже есть. Полезно ещё раз пройти карточки по живым фразам и ситуациям.';
+  else msg = 'Стоит ещё раз повторить основные три слова и их эмоциональную логику, а затем пройти тест снова.';
+
+  finalText.textContent = `${pct}%. ${msg}`;
+  bar.style.width = '100%';
+  progressText.textContent = 'Тест завершён';
+  scoreText.textContent = `Баллы: ${score}`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+restartBtn.addEventListener('click',()=>{
+  startQuiz();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+startQuiz();
+</script>
+</body>
+</html>
