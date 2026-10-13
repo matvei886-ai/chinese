@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Богом забытое место — по-китайски</title>
+<style>
+  :root{
+    --bg:#0f1b2d; --bg2:#16273f; --card:#1d3352; --card2:#24406a;
+    --ink:#eef4ff; --muted:#9db2d3; --accent:#7fd3ff; --gold:#ffd66b;
+    --ok:#3ddc97; --bad:#ff6b7a; --line:rgba(255,255,255,.12);
+    --hz:"Noto Serif SC","Songti SC","SimSun","Noto Sans SC","Microsoft YaHei",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);min-height:100vh;
+    background:radial-gradient(ellipse at 50% 0%,#24406a 0%,var(--bg) 60%) fixed;overflow-x:hidden}
+  button{font:inherit;cursor:pointer;border:none;color:inherit}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 48px;position:relative;z-index:1}
+  h1{font-size:clamp(26px,5vw,40px);text-align:center;line-height:1.15}
+  h1 small{display:block;font-size:.5em;color:var(--muted);font-weight:500;margin-top:8px}
+  .hz{font-family:var(--hz)}
+  .screen{display:none;animation:in .35s ease both}
+  .screen.on{display:block}
+  @keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* snow */
+  .snow{position:fixed;top:-20px;color:#fff;opacity:.6;pointer-events:none;animation:fall linear infinite;z-index:0}
+  @keyframes fall{to{transform:translateY(110vh) translateX(40px)}}
+
+  /* menu */
+  .menu{display:grid;gap:14px;margin-top:28px}
+  .mbtn{background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:18px;
+    padding:18px 20px;text-align:left;display:flex;gap:16px;align-items:center;transition:transform .15s,border-color .2s}
+  .mbtn:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .mbtn .ic{font-size:34px}
+  .mbtn b{font-size:20px;display:block}
+  .mbtn span{color:var(--muted);font-size:15px}
+  .ru{margin-top:22px;background:rgba(255,255,255,.05);border:1px dashed var(--line);border-radius:16px;padding:14px 18px;color:var(--muted);font-size:15px;line-height:1.6}
+  .ru b{color:var(--ink)}
+
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+  .back{background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-size:15px}
+  .pill{background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-size:15px;color:var(--muted)}
+  .pill b{color:var(--gold)}
+
+  /* learn */
+  .flip{perspective:1200px;height:340px;cursor:pointer}
+  .flip .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+  .flip.turn .in{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;
+    background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;gap:10px}
+  .face.b{transform:rotateY(180deg)}
+  .big{font-size:clamp(44px,11vw,76px);letter-spacing:.05em}
+  .big.long{font-size:clamp(30px,7.5vw,54px)}
+  .py{color:var(--accent);font-size:22px}
+  .tag{font-size:13px;padding:4px 10px;border-radius:20px;background:rgba(127,211,255,.15);color:var(--accent)}
+  .tag.col{background:rgba(255,214,107,.15);color:var(--gold)}
+  .lit{color:var(--muted);font-size:17px}
+  .mean{font-size:24px;font-weight:700}
+  .hint{color:var(--muted);font-size:14px;margin-top:6px}
+  .row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+  .btn{background:linear-gradient(180deg,#8fdcff,#4fb4ea);color:#0b2440;font-weight:800;padding:12px 22px;border-radius:14px;font-size:17px;transition:transform .1s,filter .2s}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.97)}
+  .btn.g{background:rgba(255,255,255,.1);color:var(--ink);font-weight:600}
+  .say{background:rgba(255,255,255,.1);border-radius:50%;width:44px;height:44px;font-size:20px}
+  .dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+  .dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.2)}
+  .dots i.on{background:var(--accent)}
+
+  /* quiz */
+  .prog{height:8px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden;margin-bottom:18px}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .3s}
+  .qbox{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:22px;padding:22px;text-align:center}
+  .qtype{color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+  .qtext{font-size:22px;font-weight:700;margin-top:10px;line-height:1.4}
+  .qtext .big{display:block;margin-top:6px}
+  .opts{display:grid;gap:10px;margin-top:18px}
+  .opt{background:rgba(255,255,255,.07);border:2px solid transparent;border-radius:14px;padding:14px 16px;font-size:18px;text-align:left;transition:background .2s,border-color .2s}
+  .opt:hover:not(:disabled){background:rgba(255,255,255,.13)}
+  .opt.hzopt{font-family:var(--hz);font-size:26px;text-align:center}
+  .opt.ok{border-color:var(--ok);background:rgba(61,220,151,.15)}
+  .opt.no{border-color:var(--bad);background:rgba(255,107,122,.15);animation:shake .4s}
+  .opt:disabled{cursor:default}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .expl{display:none;margin-top:16px;padding:14px;border-radius:14px;background:rgba(0,0,0,.25);font-size:16px;line-height:1.5;text-align:left}
+  .expl.on{display:block;animation:in .3s both}
+
+  /* match */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tile{background:linear-gradient(160deg,var(--card),var(--card2));border:2px solid var(--line);border-radius:14px;
+    min-height:76px;padding:10px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:16px;transition:.2s}
+  .tile.hzt{font-family:var(--hz);font-size:clamp(20px,5vw,28px)}
+  .tile.sel{border-color:var(--gold);transform:scale(1.03)}
+  .tile.done{opacity:0;pointer-events:none;transform:scale(.8)}
+  .tile.no{border-color:var(--bad);animation:shake .4s}
+
+  /* result */
+  .res{text-align:center;padding:30px 10px}
+  .res .em{font-size:80px}
+  .res h2{font-size:32px;margin:10px 0}
+  .res p{color:var(--muted);font-size:18px}
+  .fix{margin-top:12px;font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- MENU -->
+  <section id="menu" class="screen on">
+    <h1>❄️ «Богом забытое место» 🌟<small>Как сказать по-китайски «у чёрта на рогах»</small></h1>
+    <div class="menu">
+      <button class="mbtn" data-go="learn"><div class="ic">📖</div><div><b>Учить</b><span>6 карточек: иероглифы, пиньинь, перевод</span></div></button>
+      <button class="mbtn" data-go="quiz"><div class="ic">❓</div><div><b>Викторина</b><span>12 вопросов разных типов</span></div></button>
+      <button class="mbtn" data-go="match"><div class="ic">🧩</div><div><b>Найди пару</b><span>Соедини выражение и значение</span></div></button>
+    </div>
+    <div class="ru">По-русски говорят: <b>у чёрта на рогах</b>, <b>за тридевять земель</b>, <b>куда не ступала нога человека</b>, <b>куда Макар телят не гонял</b>. А по-китайски есть 5 книжных идиом-чэнъюев и одно разговорное выражение.</div>
+  </section>
+
+  <!-- LEARN -->
+  <section id="learn" class="screen">
+    <div class="top"><button class="back" data-go="menu">← Меню</button><div class="pill" id="lCount"></div></div>
+    <div class="flip" id="flip"><div class="in">
+      <div class="face a"><span class="tag" id="lTag"></span><div class="big hz" id="lHz"></div><div class="hint">нажми, чтобы перевернуть</div></div>
+      <div class="face b"><div class="py" id="lPy"></div><div class="mean" id="lMean"></div><div class="lit" id="lLit"></div></div>
+    </div></div>
+    <div class="row">
+      <button class="btn g" id="prev">◀</button>
+      <button class="say" id="lSay" title="Прослушать">🔊</button>
+      <button class="btn g" id="next">▶</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen">
+    <div class="top"><button class="back" data-go="menu">← Меню</button><div class="pill">Очки: <b id="qScore">0</b></div></div>
+    <div class="prog"><i id="qProg"></i></div>
+    <div class="qbox">
+      <div class="qtype" id="qType"></div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="expl" id="qExpl"></div>
+      <div class="row"><button class="btn" id="qNext" hidden>Дальше →</button></div>
+    </div>
+  </section>
+
+  <!-- MATCH -->
+  <section id="match" class="screen">
+    <div class="top"><button class="back" data-go="menu">← Меню</button><div class="pill">Ошибки: <b id="mErr">0</b></div></div>
+    <div class="grid" id="mGrid"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen">
+    <div class="res">
+      <div class="em" id="rEm"></div>
+      <h2 id="rTitle"></h2>
+      <p id="rText"></p>
+      <div class="row">
+        <button class="btn" id="rAgain">Ещё раз</button>
+        <button class="btn g" data-go="menu">В меню</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="fix">Пиньинь сверен со словарём: 人迹罕至 — rénjì <b>hǎn</b>zhì, 寸草不生 — <b>cùn</b>cǎo bù shēng, 鸟不拉屎 — niǎo bù <b>lā</b>shǐ.</div>
+</div>
+
+<script>
+const W = [
+  { hz:"人迹罕至", py:"rénjì hǎnzhì", mean:"куда редко ступает нога человека", lit:"следы людей редко доходят", reg:"идиома", key:"нога человека" },
+  { hz:"寸草不生", py:"cùncǎo bù shēng", mean:"где не растёт трава", lit:"не растёт даже травинка в цунь (≈3 см)", reg:"идиома", key:"трава" },
+  { hz:"荒无人烟", py:"huāng wú rén yān", mean:"безлюдный, пустынный", lit:"пустынно, нет дыма от человеческого очага", reg:"идиома", key:"дым очага" },
+  { hz:"荒郊野外", py:"huāngjiāo yěwài", mean:"глушь, безлюдные дикие места", lit:"пустынные пригороды и дикие поля", reg:"идиома", key:"дикие поля" },
+  { hz:"穷乡僻壤", py:"qióngxiāng pìrǎng", mean:"захолустная деревня, отдалённые места", lit:"бедная деревня, отдалённая земля", reg:"идиома", key:"захолустье" },
+  { hz:"鸟不拉屎的地方", py:"niǎo bù lāshǐ de dìfang", mean:"глухомань, «мухосранск»", lit:"место, где даже птицы не гадят", reg:"разговорное", key:"птицы" }
+];
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let lastMode = "quiz";
+
+function go(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+  if (id === "learn") showCard(0);
+  if (id === "quiz") startQuiz();
+  if (id === "match") startMatch();
+  window.scrollTo(0, 0);
+}
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
+
+function speak(t){
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t); u.lang = "zh-CN"; u.rate = .8;
+    const v = speechSynthesis.getVoices().find(v => /zh/i.test(v.lang)); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- LEARN ---------- */
+let li = 0;
+function showCard(i){
+  li = (i + W.length) % W.length;
+  const w = W[li];
+  $("flip").classList.remove("turn");
+  setTimeout(() => {
+    $("lHz").textContent = w.hz;
+    $("lHz").classList.toggle("long", w.hz.length > 4);
+    $("lTag").textContent = w.reg === "идиома" ? "成语 · книжное" : "口语 · разговорное";
+    $("lTag").className = "tag" + (w.reg === "идиома" ? "" : " col");
+    $("lPy").textContent = w.py;
+    $("lMean").textContent = w.mean;
+    $("lLit").textContent = "досл.: " + w.lit;
+  }, 150);
+  $("lCount").textContent = (li + 1) + " / " + W.length;
+  $("dots").innerHTML = W.map((_, k) => `<i class="${k === li ? "on" : ""}"></i>`).join("");
+}
+$("flip").onclick = () => $("flip").classList.toggle("turn");
+$("prev").onclick = () => showCard(li - 1);
+$("next").onclick = () => showCard(li + 1);
+$("lSay").onclick = () => speak(W[li].hz);
+
+/* ---------- QUIZ ---------- */
+function makeQuestions(){
+  const qs = [];
+  const pick = (w, f) => shuffle([w, ...shuffle(W.filter(x => x !== w)).slice(0, 3)]).map(f);
+  const order = shuffle(W);
+  // 1) иероглифы → значение
+  order.slice(0, 3).forEach(w => qs.push({ type:"Что значит?", text:`<span class="big hz long">${w.hz}</span>`,
+    opts: pick(w, x => x.mean), ans: w.mean, hz:false, ex:`${w.hz} (${w.py}) — ${w.mean}. Досл.: ${w.lit}.` }));
+  // 2) значение → иероглифы
+  order.slice(3, 6).forEach(w => qs.push({ type:"Выбери выражение", text:`«${w.mean}»`,
+    opts: pick(w, x => x.hz), ans: w.hz, hz:true, ex:`${w.hz} — ${w.py}.` }));
+  // 3) пиньинь → иероглифы
+  shuffle(W).slice(0, 2).forEach(w => qs.push({ type:"Какие иероглифы?", text:`<span class="py">${w.py}</span>`,
+    opts: pick(w, x => x.hz), ans: w.hz, hz:true, ex:`${w.py} = ${w.hz} — ${w.mean}.` }));
+  // 4) специальные
+  qs.push({ type:"Подумай", text:"Какое выражение — разговорное, а не книжная идиома из 4 иероглифов?",
+    opts: shuffle(shuffle(W.slice(0, 5)).slice(0, 3).map(x => x.hz).concat(W[5].hz)), ans: W[5].hz, hz:true,
+    ex:"鸟不拉屎的地方 — разговорное, грубоватое, как «мухосранск». Остальные — чэнъюи (成语)." });
+  qs.push({ type:"Досл. перевод", text:"В каком выражении упоминается <b>дым от очага</b>?",
+    opts: shuffle(["荒无人烟","荒郊野外","寸草不生","人迹罕至"]), ans:"荒无人烟", hz:true,
+    ex:"烟 (yān) — дым. 荒无人烟 — пустынно, нет человеческого дыма (жилья)." });
+  qs.push({ type:"Русский аналог", text:"«Куда не ступала нога человека» ближе всего к…",
+    opts: shuffle(["人迹罕至","穷乡僻壤","鸟不拉屎的地方","荒郊野外"]), ans:"人迹罕至", hz:true,
+    ex:"人迹 — следы человека, 罕至 — редко доходят. Почти дословное совпадение!" });
+  qs.push({ type:"Иероглиф", text:"Что значит 寸 в выражении 寸草不生?",
+    opts: shuffle(["цунь — мера длины (≈3 см)","трава","деревня","дикий"]), ans:"цунь — мера длины (≈3 см)", hz:false,
+    ex:"寸草 — травинка длиной в цунь, т.е. «ни травинки». 寸草不生 — голое, бесплодное место." });
+  return shuffle(qs);
+}
+let Q = [], qi = 0, score = 0;
+function startQuiz(){ lastMode = "quiz"; Q = makeQuestions(); qi = 0; score = 0; $("qScore").textContent = 0; showQ(); }
+function showQ(){
+  const q = Q[qi];
+  $("qProg").style.width = (qi / Q.length * 100) + "%";
+  $("qType").textContent = `Вопрос ${qi + 1} из ${Q.length} · ${q.type}`;
+  $("qText").innerHTML = q.text;
+  $("qExpl").className = "expl"; $("qNext").hidden = true;
+  const box = $("qOpts"); box.innerHTML = "";
+  q.opts.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt" + (q.hz ? " hzopt" : ""); b.textContent = o;
+    b.onclick = () => answer(b, o === q.ans);
+    box.appendChild(b);
+  });
+}
+function answer(b, ok){
+  const q = Q[qi];
+  [...$("qOpts").children].forEach(x => { x.disabled = true; if (x.textContent === q.ans) x.classList.add("ok"); });
+  if (!ok) b.classList.add("no"); else { score++; $("qScore").textContent = score; }
+  $("qExpl").innerHTML = (ok ? "✅ Верно! " : "❌ Не совсем. ") + q.ex;
+  $("qExpl").className = "expl on";
+  $("qNext").hidden = false;
+  const m = q.ex.match(/[一-鿿]+/); if (m) speak(m[0]);
+}
+$("qNext").onclick = () => { qi++; qi < Q.length ? showQ() : finish(score, Q.length); };
+
+/* ---------- MATCH ---------- */
+let sel = null, left = 0, errs = 0;
+function startMatch(){
+  lastMode = "match"; errs = 0; $("mErr").textContent = 0; sel = null;
+  const tiles = shuffle(W.flatMap((w, i) => [{ t:w.hz, id:i, hz:true }, { t:w.mean, id:i, hz:false }]));
+  left = W.length;
+  const g = $("mGrid"); g.innerHTML = "";
+  tiles.forEach(o => {
+    const d = document.createElement("button");
+    d.className = "tile" + (o.hz ? " hzt" : ""); d.textContent = o.t; d.dataset.id = o.id; d.dataset.hz = o.hz;
+    d.onclick = () => tap(d);
+    g.appendChild(d);
+  });
+}
+function tap(d){
+  if (d === sel){ d.classList.remove("sel"); sel = null; return; }
+  if (!sel){ sel = d; d.classList.add("sel"); if (d.dataset.hz === "true") speak(d.textContent); return; }
+  if (sel.dataset.id === d.dataset.id && sel.dataset.hz !== d.dataset.hz){
+    [sel, d].forEach(x => { x.classList.remove("sel"); x.classList.add("done"); });
+    sel = null; left--;
+    if (!left) setTimeout(() => finish(W.length, W.length + errs, true), 500);
+  } else {
+    errs++; $("mErr").textContent = errs;
+    [sel, d].forEach(x => { x.classList.add("no"); setTimeout(() => x.classList.remove("no", "sel"), 400); });
+    sel = null;
+  }
+}
+
+/* ---------- RESULT ---------- */
+function finish(a, b, isMatch){
+  go("result");
+  const pct = a / b;
+  $("rEm").textContent = pct === 1 ? "🏆" : pct >= .7 ? "🌟" : "❄️";
+  $("rTitle").textContent = isMatch ? "Все пары найдены!" : `${a} из ${b}`;
+  $("rText").textContent = isMatch
+    ? (b - a === 0 ? "Без единой ошибки — 太棒了!" : `Ошибок: ${b - a}. Попробуй ещё раз без ошибок!`)
+    : (pct === 1 ? "Идеально! 太棒了!" : pct >= .7 ? "Отлично! Почти всё знаешь." : "Повтори карточки и попробуй снова.");
+}
+$("rAgain").onclick = () => go(lastMode);
+
+/* ---------- SNOW ---------- */
+for (let i = 0; i < 18; i++){
+  const s = document.createElement("div");
+  s.className = "snow"; s.textContent = i % 5 ? "❄" : "✦";
+  s.style.left = Math.random() * 100 + "vw";
+  s.style.fontSize = 8 + Math.random() * 14 + "px";
+  s.style.animationDuration = 8 + Math.random() * 10 + "s";
+  s.style.animationDelay = -Math.random() * 15 + "s";
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
