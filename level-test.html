@@ -1,0 +1,229 @@
+<title>Тест уровня китайского</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap">
+<style>
+/* Layout: one calm reading column; each question is a row with the hanzi set large, answers as wrapping chips; a result panel at the end. */
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --fg:#17201d; --muted:#5b6a65; --line:#dbe3e0;
+  --accent:#1d6b58; --accent-soft:#e3f0ec; --mark:#b3392f; --ok:#1d6b58;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-han:"Noto Serif SC","Songti SC","SimSun",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111614; --surface:#18201d; --fg:#e4ebe8; --muted:#97a6a1; --line:#2b3632;
+  --accent:#5cc0a3; --accent-soft:#1d2e29; --mark:#e07a6f; --ok:#5cc0a3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111614; --surface:#18201d; --fg:#e4ebe8; --muted:#97a6a1; --line:#2b3632;
+  --accent:#5cc0a3; --accent-soft:#1d2e29; --mark:#e07a6f; --ok:#5cc0a3; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:32px 64px;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:10px}
+.seal{font-family:var(--f-han);font-size:15px;color:var(--mark);letter-spacing:.2em}
+h1{font-size:clamp(26px,5vw,34px);line-height:1.15;margin:0;text-wrap:balance;font-weight:700}
+.lead{color:var(--muted);margin:0;max-width:62ch}
+.facts{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:14px;margin:0;padding:0;list-style:none}
+.facts b{color:var(--fg);font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:600}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);max-width:420px;width:100%}
+.field input:focus-visible,button:focus-visible,.opt input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+section.part{display:flex;flex-direction:column;gap:14px}
+.part h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:600;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.text{font-family:var(--f-han);font-size:21px;line-height:1.9;background:var(--accent-soft);border-radius:10px;padding:14px 16px;margin:0}
+fieldset.q{border:0;margin:0;padding:14px 0;display:flex;flex-direction:column;gap:10px;border-bottom:1px dashed var(--line);min-width:0}
+fieldset.q:last-child{border-bottom:0}
+legend{padding:0;display:flex;gap:12px;align-items:baseline;width:100%}
+.num{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;min-width:1.6em}
+.prompt{font-family:var(--f-han);font-size:23px;line-height:1.5}
+.prompt.ru{font-family:var(--f-body);font-size:17px}
+.prompt .gap{display:inline-block;min-width:2.2em;border-bottom:2px solid var(--mark);margin:0 .15em}
+.opts{display:flex;flex-wrap:wrap;gap:8px;padding-left:calc(1.6em + 12px)}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt span{display:inline-block;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font-family:var(--f-han);font-size:19px;transition:border-color .15s,background .15s}
+.opt span.ru{font-family:var(--f-body);font-size:15px}
+.opt span.idk{font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.opt input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--fg);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt span:hover{border-color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+button{font:inherit;font-weight:600;border-radius:8px;padding:11px 20px;cursor:pointer;border:1px solid var(--accent)}
+.primary{background:var(--accent);color:var(--surface)}
+.ghost{background:transparent;color:var(--accent)}
+.warn{color:var(--mark);font-size:14px;margin:0}
+.result{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.score{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.score .big{font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted)}
+.verdict{font-size:20px;font-weight:700;margin:0;color:var(--accent)}
+.verdict.low{color:var(--mark)}
+.result p{margin:0;max-width:62ch}
+.bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.bar{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.bar .lbl{display:flex;justify-content:space-between;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fill{height:100%;background:var(--accent)}
+.copybox{width:100%;font:13px/1.5 ui-monospace,Menlo,monospace;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);resize:vertical;min-height:110px}
+.small{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="seal">汉语 · 水平测试</div>
+    <h1>Тест на уровень: китайский язык</h1>
+    <p class="lead">Короткий тест, чтобы подобрать вам группу по уровню. Отвечайте сами, без словаря и переводчика. Если не знаете ответ, выберите «Не знаю», так результат будет точнее.</p>
+    <ul class="facts"><li><b>24</b> вопроса</li><li>около <b>10–15</b> минут</li><li>вопросы становятся сложнее к концу</li></ul>
+  </header>
+
+  <div class="field">
+    <label for="name">Ваше имя или ник в Telegram</label>
+    <input id="name" type="text" autocomplete="name" placeholder="Например, Анна @anna_cn">
+  </div>
+
+  <form id="test" novalidate></form>
+
+  <div class="actions">
+    <button class="primary" id="check" type="button">Узнать результат</button>
+    <p class="warn" id="warn" hidden></p>
+  </div>
+
+  <section class="result" id="result" hidden aria-live="polite"></section>
+</div>
+
+<script>
+const IDK = "Не знаю";
+const parts = [
+  { title: "Часть 1", key: "p1", qs: [
+    {p:"我<i></i>学生。", o:["有","是","在","很"], c:1},
+    {p:"我买了三<i></i>书。", o:["本","个","张","件"], c:0},
+    {p:"Что значит слово «明天»?", ru:true, o:["вчера","сегодня","завтра","послезавтра"], c:2, oru:true},
+    {p:"我<i></i>喜欢喝咖啡，我喜欢喝茶。", o:["很","没","别","不"], c:3},
+    {p:"你是中国人<i></i>？", o:["的","吗","了","在"], c:1},
+    {p:"他在医院工作，他是<i></i>。", o:["老师","司机","医生","学生"], c:2},
+    {p:"我<i></i>北京大学学习汉语。", o:["在","是","给","和"], c:0},
+    {p:"这件衣服太<i></i>了，我不买。", o:["漂亮","贵","新","好看"], c:1},
+  ]},
+  { title: "Часть 2", key: "p2", qs: [
+    {p:"我比他<i></i>两岁。", o:["多","很","大","太"], c:2},
+    {p:"你<i></i>过长城吗？", o:["在","是","有","去"], c:3},
+    {p:"他汉语说<i></i>很好。", o:["得","的","地","了"], c:0},
+    {p:"我<i></i>吃完饭，就去学校了。", o:["也","一","都","还"], c:1},
+    {p:"外面下雨了，你<i></i>带伞吧。", o:["因为","所以","最好","但是"], c:2},
+    {p:"虽然很累，<i></i>他还是去上课了。", o:["因为","但是","如果","所以"], c:1},
+    {p:"请把书<i></i>给我。", o:["看","读","写","拿"], c:3},
+    {p:"我的手机<i></i>弟弟弄坏了。", o:["被","把","对","从"], c:0},
+  ]},
+  { title: "Часть 3", key: "p3", qs: [
+    {p:"他<i></i>没来，<i></i>没打电话。", o:["因为…所以","虽然…但是","既…也","如果…就"], c:2},
+    {p:"只要你努力，<i></i>能学好汉语。", o:["才","就","都","也"], c:1},
+    {p:"这本书我看了<i></i>遍。", o:["二","双","第二","两"], c:3},
+    {p:"他说得太快了，我听<i></i>懂。", o:["得","了","不","没"], c:2},
+  ]},
+  { title: "Часть 4. Чтение", key: "p4", qs: [
+    {text:"小王每天早上七点起床，七点半吃早饭，八点坐地铁去公司。他的公司离家不远，坐地铁只要二十分钟。"},
+    {p:"小王几点到公司？", o:["七点半","八点","八点二十","九点"], c:2},
+    {p:"小王怎么去公司？", o:["开车","坐地铁","走路","坐出租车"], c:1},
+    {text:"上个周末我本来想和朋友去爬山，可是那天突然下大雨，我们只好在家看电影。虽然没去成，但是我们玩得也很开心。"},
+    {p:"他们为什么没去爬山？", o:["朋友病了","太累了","下大雨了","没有时间"], c:2},
+    {p:"他们周末过得怎么样？", o:["很开心","很无聊","很累","很生气"], c:0},
+  ]},
+];
+
+const form = document.getElementById("test");
+let n = 0;
+const all = [];
+for (const part of parts) {
+  const sec = document.createElement("section");
+  sec.className = "part";
+  sec.innerHTML = `<h2>${part.title}</h2>`;
+  for (const q of part.qs) {
+    if (q.text) { const t = document.createElement("p"); t.className = "text"; t.lang = "zh"; t.textContent = q.text; sec.appendChild(t); continue; }
+    n++;
+    const id = "q" + n;
+    q.id = id; q.part = part.key; all.push(q);
+    const fs = document.createElement("fieldset");
+    fs.className = "q";
+    const prompt = q.p.replace(/<i><\/i>/g, '<span class="gap" aria-label="пропуск"></span>');
+    fs.innerHTML = `<legend><span class="num">${n}</span><span class="prompt${q.ru ? " ru" : ""}" ${q.ru ? "" : 'lang="zh"'}>${prompt}</span></legend>`;
+    const opts = document.createElement("div");
+    opts.className = "opts";
+    [...q.o, IDK].forEach((label, i) => {
+      const isIdk = i === q.o.length;
+      const oid = `${id}_${i}`;
+      const l = document.createElement("label");
+      l.className = "opt";
+      l.innerHTML = `<input type="radio" name="${id}" id="${oid}" value="${isIdk ? -1 : i}"><span class="${isIdk ? "idk" : (q.oru ? "ru" : "")}" ${isIdk || q.oru ? "" : 'lang="zh"'}></span>`;
+      l.querySelector("span").textContent = label;
+      opts.appendChild(l);
+    });
+    fs.appendChild(opts);
+    sec.appendChild(fs);
+  }
+  form.appendChild(sec);
+}
+
+const levels = [
+  { min: 0,  name: "Пока рано для группы уровня 2", low: true,
+    text: "Базу стоит ещё укрепить. Мы предложим индивидуальные занятия или группу начального уровня, когда она откроется." },
+  { min: 10, name: "Группа уровня 2",
+    text: "Вы знаете основы и готовы к систематическим занятиям по учебнику уровня 2." },
+  { min: 16, name: "Группа уровня 3",
+    text: "Базовая грамматика у вас уверенная. Вам подойдёт группа, которая занимается по учебнику уровня 3." },
+  { min: 21, name: "Уровень 3 или выше",
+    text: "Сильный результат. Преподаватель уточнит уровень в коротком разговоре: возможно, вам подойдёт группа уровня 3 или занятия посложнее." },
+];
+const partNames = { p1: "Часть 1", p2: "Часть 2", p3: "Часть 3", p4: "Чтение" };
+
+function check() {
+  const warn = document.getElementById("warn");
+  const unanswered = all.filter(q => !form.querySelector(`input[name="${q.id}"]:checked`));
+  if (unanswered.length) {
+    warn.textContent = `Осталось без ответа: ${unanswered.length}. Отметьте их или выберите «Не знаю». Первый пропущенный — вопрос ${unanswered[0].id.slice(1)}.`;
+    warn.hidden = false;
+    document.querySelector(`input[name="${unanswered[0].id}"]`).closest("fieldset").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  warn.hidden = true;
+  const by = { p1: [0, 0], p2: [0, 0], p3: [0, 0], p4: [0, 0] };
+  let total = 0;
+  for (const q of all) {
+    const v = +form.querySelector(`input[name="${q.id}"]:checked`).value;
+    by[q.part][1]++;
+    if (v === q.c) { by[q.part][0]++; total++; }
+  }
+  const lv = [...levels].reverse().find(l => total >= l.min);
+  const name = document.getElementById("name").value.trim() || "Без имени";
+  const lines = Object.keys(by).map(k => `${partNames[k]}: ${by[k][0]}/${by[k][1]}`).join(" · ");
+  const summary = `Тест на уровень китайского\nИмя: ${name}\nРезультат: ${total} из ${all.length}\n${lines}\nРекомендация: ${lv.name}`;
+  const r = document.getElementById("result");
+  r.innerHTML = `
+    <div class="score"><span class="big">${total}</span><span class="of">из ${all.length} правильных</span></div>
+    <p class="verdict${lv.low ? " low" : ""}">${lv.name}</p>
+    <p>${lv.text}</p>
+    <div class="bars">${Object.keys(by).map(k => `
+      <div class="bar"><div class="lbl"><span>${partNames[k]}</span><span>${by[k][0]}/${by[k][1]}</span></div>
+      <div class="track"><div class="fill" style="width:${by[k][1] ? by[k][0] / by[k][1] * 100 : 0}%"></div></div></div>`).join("")}
+    </div>
+    <p><b>Что дальше:</b> скопируйте результат и отправьте его нам в Telegram. Окончательно уровень подтвердит преподаватель после короткого разговора на 5–10 минут.</p>
+    <textarea class="copybox" id="copytext" readonly aria-label="Результат для отправки">${summary}</textarea>
+    <div class="actions">
+      <button class="primary" id="copy" type="button">Скопировать результат</button>
+      <button class="ghost" id="again" type="button">Пройти заново</button>
+      <span class="small" id="copied" aria-live="polite"></span>
+    </div>`;
+  r.hidden = false;
+  r.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("copy").onclick = async () => {
+    const ta = document.getElementById("copytext");
+    const msg = document.getElementById("copied");
+    try { await navigator.clipboard.writeText(ta.value); msg.textContent = "Скопировано"; }
+    catch { ta.focus(); ta.select(); msg.textContent = "Текст выделен, скопируйте его вручную"; }
+  };
+  document.getElementById("again").onclick = () => {
+    form.reset(); r.hidden = true; r.innerHTML = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+}
+document.getElementById("check").addEventListener("click", check);
+</script>
