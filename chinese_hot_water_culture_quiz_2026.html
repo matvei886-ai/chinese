@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chinese Hot Water Culture - Interactive Exercises</title>
+<style>
+:root{--navy:#061c33;--navy2:#0a3558;--gold:#d9aa55;--gold2:#f1d18a;--cream:#fbf7ef;--muted:#b9c7d2;--green:#168755;--green2:#2db877;--red:#a83f4c;--red2:#d85a67}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,"Noto Sans","Microsoft YaHei",sans-serif;color:var(--cream);background:radial-gradient(circle at 10% 8%,rgba(217,170,85,.09),transparent 27%),linear-gradient(145deg,#031321,#082b48 58%,#051a2e)}
+.wrap{max-width:960px;margin:auto;padding:26px 14px 70px}
+.hero{padding:38px 32px 32px;border-radius:28px;border:1px solid rgba(217,170,85,.75);background:linear-gradient(135deg,#0a2d4b,#051b30);box-shadow:0 25px 70px rgba(0,0,0,.28)}
+.brand{font-size:13px;letter-spacing:.18em;color:var(--gold2);font-weight:800}
+h1{font-size:clamp(38px,6vw,64px);line-height:1;margin:15px 0 12px} h1 span{color:var(--gold)}
+.lead{font-size:17px;line-height:1.55;color:#dce5eb;max-width:880px}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.mode{padding:16px 12px;border-radius:16px;border:1px solid rgba(217,170,85,.35);background:#0a2c49;color:#e8eef2;cursor:pointer;text-align:center;font-weight:800;line-height:1.35}
+.mode:hover,.mode.active{background:linear-gradient(135deg,#d4a44d,#f0cd83);color:#061c33;border-color:#f0cd83}
+.progressTop{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px;margin:13px 2px 8px}
+.progress{height:10px;border-radius:999px;background:#102c46;overflow:hidden;border:1px solid rgba(255,255,255,.08)} .bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#f2d18c);transition:.25s}
+.card{margin-top:18px;padding:26px;border-radius:22px;border:1px solid rgba(217,170,85,.25);background:linear-gradient(145deg,#0c2f4f,#071f37);box-shadow:0 12px 30px rgba(0,0,0,.16)}
+.kicker{color:var(--gold2);font-size:13px;font-weight:800;letter-spacing:.08em} .question{font-size:24px;font-weight:800;line-height:1.42;margin:10px 0 20px}
+.answers{display:grid;gap:12px} .answer{width:100%;text-align:left;padding:15px 16px;border-radius:14px;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.035);color:var(--cream);font-size:16px;line-height:1.45;transition:.15s}
+.answer:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px);background:rgba(217,170,85,.06)} .answer:disabled{cursor:default}
+.answer.correct{background:linear-gradient(135deg,var(--green),var(--green2));border-color:#75dbaa;color:#fff} .answer.wrong{background:linear-gradient(135deg,var(--red),var(--red2));border-color:#ef9aa2;color:#fff} .answer.reveal{outline:2px solid rgba(242,209,140,.8);outline-offset:2px}
+.feedback{display:none;margin-top:18px;padding:16px 17px;border-radius:14px;line-height:1.55;border:1px solid rgba(217,170,85,.25);background:#081a2d;color:#e8eef2} .feedback.show{display:block} .feedback strong{color:var(--gold2)}
+.controls{display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap} .btn{border:1px solid var(--gold);background:transparent;color:var(--gold2);border-radius:999px;padding:12px 22px;font-weight:800;cursor:pointer} .btn.primary{background:linear-gradient(135deg,#d4a44d,#f0cd83);color:#061c33;border-color:#f0cd83} .btn:disabled{opacity:.45;cursor:not-allowed}
+.result{display:none;margin-top:20px;padding:30px;border-radius:22px;border:1px solid rgba(217,170,85,.55);background:linear-gradient(135deg,#0b3152,#071d33);text-align:center} .result.show{display:block} .score{font-size:56px;font-weight:900;color:var(--gold2);margin:8px 0} .result p{color:#dce5eb;line-height:1.55}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+@media(max-width:720px){.menu{grid-template-columns:1fr}.wrap{padding:10px 8px 44px}.hero{padding:27px 18px}.card{padding:20px 14px}.question{font-size:19px}.answer{font-size:15px;padding:14px}.controls{justify-content:stretch}.btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ · ЛЕКЦИЯ</div>
+<h1>一杯热水里的中国文化 — <span>упражнения</span></h1>
+<div class="lead">Три интерактивных блока по лекции «Почему китайцы любят горячую воду?»: понимание содержания, китайская лексика и бытовые ситуации. Варианты ответов перемешиваются при каждом прохождении.</div>
+</section>
+
+<div class="menu" id="menu"></div>
+
+<div id="quizArea" style="display:none">
+  <div class="progressTop"><span id="progressText"></span><span id="scoreText"></span></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <section class="card">
+    <div class="kicker" id="kicker"></div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="controls">
+      <button class="btn" id="menuBtn">К разделам</button>
+      <button class="btn primary" id="nextBtn" disabled>Следующий вопрос</button>
+    </div>
+  </section>
+</div>
+
+<section class="result" id="result">
+  <div class="kicker">РЕЗУЛЬТАТ РАЗДЕЛА</div>
+  <div class="score" id="finalScore"></div>
+  <p id="finalText"></p>
+  <div class="controls" style="justify-content:center">
+    <button class="btn" id="backBtn">К разделам</button>
+    <button class="btn primary" id="restartBtn">Пройти ещё раз</button>
+  </div>
+</section>
+
+<div class="footer">Китайский с носителями · 热水 / 养生 / 保温杯 / 朋克养生</div>
+</div>
+
+<script>
+const SETS = [{"id": "lecture", "title": "Понимание лекции", "subtitle": "История, традиции и современная жизнь", "questions": [{"q": "О чём прежде всего эта лекция?", "a": "О культурной привычке, её истории и современном значении", "wrong": ["О доказательстве, что холодная вода вредна", "О лечении всех болезней горячей водой", "Только о китайской медицине"], "exp": "В начале лекции специально подчёркивается: это культурная, а не медицинская лекция."}, {"q": "Какие три «ключа» используются для объяснения привычки пить тёплую воду?", "a": "История, традиционные представления о теле и современная жизнь", "wrong": ["Климат, политика и спорт", "Чай, кофе и молоко", "Север, юг и запад Китая"], "exp": "Лекция рассматривает три слоя: историю, традиционные представления и современную повседневность."}, {"q": "Почему кипячение воды исторически имело практический смысл?", "a": "Оно помогает уничтожать опасные микроорганизмы", "wrong": ["Оно делает воду сладкой", "Оно удаляет любые химические загрязнения", "Оно превращает воду в лекарство"], "exp": "Кипячение может снижать микробиологический риск, но не является универсальным способом очистки от всего."}, {"q": "Что важно помнить о кипячёной воде?", "a": "Её можно вскипятить и затем дать ей остыть", "wrong": ["Её обязательно пить прямо кипящей", "Она всегда должна быть выше 90 °C", "Она считается холодной водой"], "exp": "В лекции различаются кипячение воды и привычка пить тёплую воду."}, {"q": "Что помогло сделать привычку пить кипячёную воду массовой в XX веке?", "a": "Гигиенические кампании, школы и изменения водоснабжения", "wrong": ["Только чайные церемонии", "Популярность кофе со льдом", "Мода на спортивные бутылки"], "exp": "Лекция подчёркивает роль общественной гигиены и повседневных институтов."}, {"q": "Какую роль термос сыграл в этой культуре?", "a": "Позволил сохранять тепло и переносить привычку в дом, общежитие и на работу", "wrong": ["Полностью заменил чай", "Сделал холодные напитки невозможными", "Использовался только в больницах"], "exp": "Термос стал удобным бытовым предметом, который поддерживал уже существующую привычку."}, {"q": "Что может означать фраза 多喝热水 в реальном общении?", "a": "Искреннюю заботу, шаблонный совет или повод для шутки", "wrong": ["Только медицинский диагноз", "Только приказ в ресторане", "Только просьбу вскипятить воду"], "exp": "Контекст меняет оттенок: фраза может быть заботой, автоматическим советом или юмором."}, {"q": "Как лекция объясняет инь и ян?", "a": "Как взаимосвязанные стороны, где важен баланс, а не победа одной над другой", "wrong": ["Ян всегда хорошее, инь всегда плохое", "Это точные медицинские показатели", "Это обозначения горячей и холодной воды"], "exp": "В презентации специально отвергается схема «ян = хорошо, инь = плохо»."}, {"q": "Если еду называют «согревающей» или «охлаждающей», что это означает в лекции?", "a": "Это традиционный культурный язык, а не измерение температуры продукта", "wrong": ["Еда обязательно горячая или замороженная", "Это современный лабораторный диагноз", "Это означает калорийность продукта"], "exp": "Такие слова описываются как традиционная классификация, которую не следует смешивать с современной медициной."}, {"q": "Все ли китайцы избегают холодных напитков?", "a": "Нет, привычки различаются: популярны и айс-кофе, и холодный чай", "wrong": ["Да, это строгое правило для всех", "Только дети могут пить холодное", "Холодные напитки существуют только на юге"], "exp": "Одна из главных идей лекции — не превращать распространённую привычку в стереотип про каждого человека."}, {"q": "Что лекция говорит о тёплом питье при простуде?", "a": "Оно может быть приятным и помогать пить жидкость, но не заменяет лечение", "wrong": ["Оно убивает любые вирусы внутри организма", "Оно всегда эффективнее лекарств", "При простуде пить воду не нужно"], "exp": "Комфорт и забота отделяются от обещаний вылечить заболевание."}, {"q": "Какой главный вывод звучит в финале лекции?", "a": "Понимать культурный смысл привычки важнее, чем объявлять одно правило правильным для всех", "wrong": ["Все должны перейти только на горячую воду", "Холодные напитки нужно полностью исключить", "Термос — главный символ Китая"], "exp": "Финал подчёркивает историю, заботу, современный юмор и разнообразие личных привычек."}]}, {"id": "vocab", "title": "Китайская лексика", "subtitle": "Слова и фразы из раздатки", "questions": [{"q": "Что означает 热水 (rè shuǐ)?", "a": "горячая / тёплая вода", "wrong": ["кипячёная вода как факт кипячения", "ледяная вода", "чай с годжи"], "exp": "热水 — горячая или тёплая вода; конкретная температура зависит от контекста."}, {"q": "Что означает 开水 (kāi shuǐ)?", "a": "кипячёная вода / кипяток", "wrong": ["вода со льдом", "минеральная вода", "тёплый чай"], "exp": "开水 описывает воду, которую вскипятили; после остывания она не обязана оставаться горячей."}, {"q": "Как перевести 多喝热水 (duō hē rè shuǐ)?", "a": "Пей больше тёплой воды.", "wrong": ["Не пей воду.", "Налей мне холодной воды.", "Пей только чай."], "exp": "Это одна из центральных фраз лекции и культурный мем."}, {"q": "Что означает 保温杯 (bǎowēn bēi)?", "a": "термокружка / термос", "wrong": ["чайник", "стеклянный стакан", "миска для супа"], "exp": "保温杯 — ёмкость, которая сохраняет температуру напитка."}, {"q": "Что означает 枸杞 (gǒuqǐ)?", "a": "ягоды годжи", "wrong": ["красные финики", "имбирь", "хризантема"], "exp": "Годжи часто появляются в образе «термоса для оздоровления»."}, {"q": "Что означает 红枣 (hóngzǎo)?", "a": "красные финики / плоды ююбы", "wrong": ["ягоды годжи", "красный чай", "сушёный имбирь"], "exp": "红枣 — плоды ююбы, которые могут добавлять в напитки и блюда."}, {"q": "Что означает 泡脚 (pào jiǎo)?", "a": "делать тёплую ванночку для ног", "wrong": ["пить чай перед сном", "делать гимнастику", "греть руки"], "exp": "В лекции это уютный вечерний ритуал, а не замена медицинской помощи."}, {"q": "Что означает 体质 (tǐzhì) в контексте лекции?", "a": "особенности организма / «конституция»", "wrong": ["температура воды", "вид термоса", "спортивное упражнение"], "exp": "Слово используется при обсуждении традиционных представлений об индивидуальных особенностях организма."}, {"q": "Что означает 养生 (yǎngshēng)?", "a": "забота о здоровье / оздоровление", "wrong": ["болезнь", "горячая вода", "зимний сезон"], "exp": "В материалах это прежде всего культурное понятие, а не конкретная медицинская рекомендация."}, {"q": "Что означает 朋克养生 (péngkè yǎngshēng)?", "a": "ироничное «панк-оздоровление»", "wrong": ["традиционная чайная церемония", "лечение горячей водой", "название термоса"], "exp": "Так шутливо называют сочетание неидеального образа жизни с маленькими «здоровыми» ритуалами."}]}, {"id": "situations", "title": "Ситуации и фразы", "subtitle": "Выберите наиболее подходящую реплику или смысл", "questions": [{"q": "Вы хотите спросить друга, какую воду он предпочитает. Что сказать?", "a": "你想喝热水还是凉水？", "wrong": ["我带了保温杯。", "晚上我喜欢泡脚。", "别喝太烫的水。"], "exp": "Nǐ xiǎng hē rè shuǐ háishi liáng shuǐ? — «Ты хочешь тёплую или прохладную воду?»"}, {"q": "Вы не хотите ничего ледяного. Какая фраза подходит?", "a": "我不想喝冰的。", "wrong": ["多喝热水。", "我想泡一杯枸杞茶。", "我带了保温杯。"], "exp": "Wǒ bù xiǎng hē bīng de. — «Я не хочу ничего ледяного»."}, {"q": "Вы пришли на работу со своим термосом. Что можно сказать?", "a": "我带了保温杯。", "wrong": ["我不想喝冰的。", "晚上我喜欢泡脚。", "别喝太烫的水。"], "exp": "Wǒ dài le bǎowēn bēi. — «Я взял(а) с собой термос»."}, {"q": "Вы хотите заварить чай с годжи. Какая фраза подходит?", "a": "我想泡一杯枸杞茶。", "wrong": ["你想喝热水还是凉水？", "我一边熬夜，一边养生。", "多喝热水。"], "exp": "Wǒ xiǎng pào yì bēi gǒuqǐ chá. — «Я хочу заварить чашку чая с годжи»."}, {"q": "Как сказать «По вечерам я люблю делать ванночку для ног»?", "a": "晚上我喜欢泡脚。", "wrong": ["晚上我喜欢喝冰的。", "我带了保温杯。", "别喝太烫的水。"], "exp": "Wǎnshang wǒ xǐhuan pào jiǎo."}, {"q": "Напиток обжигающе горячий. Какая фраза лучше всего подходит?", "a": "别喝太烫的水。", "wrong": ["多喝热水。", "我想泡一杯枸杞茶。", "我不想喝冰的。"], "exp": "Bié hē tài tàng de shuǐ. — «Не пей слишком горячую воду»."}, {"q": "Человек лёг спать в два часа ночи, но пьёт чай с годжи и шутит о здоровье. Какой термин лучше всего подходит?", "a": "朋克养生", "wrong": ["体质", "开水", "保温杯"], "exp": "Это классический пример «панк-оздоровления»: противоречие между образом жизни и маленьким полезным ритуалом."}, {"q": "Какая фраза лучше всего передаёт самоиронию «Я одновременно не сплю до ночи и забочусь о здоровье»?", "a": "我一边熬夜，一边养生。", "wrong": ["我不想喝冰的。", "你想喝热水还是凉水？", "晚上我喜欢泡脚。"], "exp": "Wǒ yìbiān áoyè, yìbiān yǎngshēng. — характерная фраза для темы 朋克养生."}]}];
+const menu = document.getElementById('menu');
+const quizArea = document.getElementById('quizArea');
+const result = document.getElementById('result');
+const qEl = document.getElementById('question');
+const aEl = document.getElementById('answers');
+const fb = document.getElementById('feedback');
+const kicker = document.getElementById('kicker');
+const nextBtn = document.getElementById('nextBtn');
+const menuBtn = document.getElementById('menuBtn');
+const backBtn = document.getElementById('backBtn');
+const restartBtn = document.getElementById('restartBtn');
+const progressText = document.getElementById('progressText');
+const scoreText = document.getElementById('scoreText');
+const bar = document.getElementById('bar');
+const finalScore = document.getElementById('finalScore');
+const finalText = document.getElementById('finalText');
+
+let currentSet=null, index=0, score=0, answered=false, currentQuestions=[];
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildMenu(){
+  menu.innerHTML='';
+  SETS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='mode';
+    b.innerHTML=`${i+1}. ${s.title}<br><span style="font-weight:400;font-size:13px">${s.subtitle} · ${s.questions.length} вопросов</span>`;
+    b.onclick=()=>startSet(s.id);
+    menu.appendChild(b);
+  });
+}
+
+function startSet(id){
+  currentSet=SETS.find(s=>s.id===id);
+  currentQuestions=[...currentSet.questions];
+  index=0; score=0; answered=false;
+  menu.style.display='none'; result.classList.remove('show'); quizArea.style.display='block';
+  render();
+}
+
+function render(){
+  answered=false; nextBtn.disabled=true; nextBtn.textContent='Следующий вопрос';
+  fb.className='feedback'; fb.innerHTML=''; aEl.innerHTML='';
+  const q=currentQuestions[index];
+  kicker.textContent=`${currentSet.title.toUpperCase()} · ВОПРОС ${index+1}`;
+  qEl.textContent=q.q;
+  const opts=shuffle([q.a,...q.wrong]);
+  opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='answer';
+    b.innerHTML=`<b>${String.fromCharCode(65+i)}.</b> ${opt}`;
+    b.onclick=()=>choose(b,opt,q);
+    aEl.appendChild(b);
+  });
+  progressText.textContent=`Вопрос ${index+1} из ${currentQuestions.length}`;
+  scoreText.textContent=`Баллы: ${score}`;
+  bar.style.width=`${index/currentQuestions.length*100}%`;
+}
+
+function choose(btn,opt,q){
+  if(answered)return; answered=true;
+  const all=[...aEl.querySelectorAll('.answer')]; all.forEach(x=>x.disabled=true);
+  if(opt===q.a){
+    score++; btn.classList.add('correct');
+    fb.innerHTML=`<strong>Верно.</strong> ${q.exp}`;
+  } else {
+    btn.classList.add('wrong');
+    all.forEach(x=>{
+      const t=x.textContent.replace(/^[A-D]\.\s*/,'');
+      if(t===q.a)x.classList.add('correct','reveal');
+    });
+    fb.innerHTML=`<strong>Неверно.</strong> Правильный ответ: <b>${q.a}</b><br>${q.exp}`;
+  }
+  fb.classList.add('show'); scoreText.textContent=`Баллы: ${score}`;
+  bar.style.width=`${(index+1)/currentQuestions.length*100}%`;
+  nextBtn.disabled=false;
+  if(index===currentQuestions.length-1) nextBtn.textContent='Показать результат';
+}
+
+nextBtn.onclick=()=>{
+  if(!answered)return;
+  if(index<currentQuestions.length-1){index++;render();window.scrollTo({top:0,behavior:'smooth'});}
+  else finish();
+};
+
+function finish(){
+  quizArea.style.display='none'; result.classList.add('show');
+  const pct=Math.round(score/currentQuestions.length*100);
+  finalScore.textContent=`${score} / ${currentQuestions.length}`;
+  let msg='';
+  if(pct>=90) msg='Отлично! Вы очень хорошо запомнили лекцию и лексику.';
+  else if(pct>=70) msg='Хороший результат. Осталось повторить несколько деталей.';
+  else if(pct>=50) msg='Основные идеи уже понятны. Полезно ещё раз посмотреть карточки и пройти раздел повторно.';
+  else msg='Стоит повторить ключевые слова и основные идеи лекции, а затем попробовать ещё раз.';
+  finalText.textContent=`${pct}%. ${msg}`;
+  progressText.textContent='Раздел завершён'; scoreText.textContent=`Баллы: ${score}`; bar.style.width='100%';
+}
+
+function showMenu(){
+  quizArea.style.display='none'; result.classList.remove('show'); menu.style.display='grid'; window.scrollTo({top:0,behavior:'smooth'});
+}
+menuBtn.onclick=showMenu; backBtn.onclick=showMenu; restartBtn.onclick=()=>startSet(currentSet.id);
+buildMenu();
+</script>
+</body></html>
