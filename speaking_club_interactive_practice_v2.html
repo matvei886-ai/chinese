@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Speaking Club Interactive Practice V2</title>
+<style>
+:root{
+ --navy:#061c33;--navy2:#0a3558;--gold:#d9aa55;--gold2:#f1d18a;
+ --cream:#fbf7ef;--muted:#b9c7d2;--green:#178657;--green2:#2db877;
+ --red:#a83f4c;--red2:#d85a67;--panel:#0a2c49;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;font-family:Arial,"Noto Sans","Microsoft YaHei",sans-serif;
+ color:var(--cream);
+ background:radial-gradient(circle at 10% 8%,rgba(217,170,85,.08),transparent 27%),linear-gradient(145deg,#031321,#082b48 58%,#051a2e)
+}
+.wrap{max-width:1000px;margin:auto;padding:24px 14px 70px}
+.hero{
+ padding:36px 30px;border-radius:28px;border:1px solid rgba(217,170,85,.72);
+ background:linear-gradient(135deg,#0a2d4b,#051b30);box-shadow:0 25px 70px rgba(0,0,0,.28)
+}
+.brand{font-size:13px;letter-spacing:.18em;color:var(--gold2);font-weight:800}
+h1{font-size:clamp(36px,6vw,62px);line-height:1;margin:14px 0 12px}
+h1 span{color:var(--gold)}
+.lead{font-size:17px;line-height:1.55;color:#dce5eb;max-width:900px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.tab{
+ min-height:76px;padding:14px 12px;border-radius:16px;border:1px solid rgba(217,170,85,.34);
+ background:#0a2c49;color:#e4edf3;cursor:pointer;text-align:center;font-weight:800;line-height:1.35
+}
+.tab small{display:block;font-weight:500;font-size:12px;margin-top:5px;opacity:.86}
+.tab.active{background:linear-gradient(135deg,#d4a44d,#f0cd83);color:#061c33;border-color:#f0cd83}
+.panel{
+ padding:24px;border-radius:22px;border:1px solid rgba(217,170,85,.25);
+ background:linear-gradient(145deg,#0c2f4f,#071f37);box-shadow:0 12px 30px rgba(0,0,0,.16)
+}
+.topic{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.topic h2{font-size:28px;margin:0 0 5px}
+.topic p{margin:0;color:var(--muted)}
+.badge{padding:8px 12px;border:1px solid rgba(217,170,85,.35);border-radius:999px;color:var(--gold2);font-size:13px;font-weight:800}
+.progressTop{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px;margin:22px 2px 8px}
+.progress{height:10px;border-radius:999px;background:#102c46;overflow:hidden} .bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.25s}
+.task{margin-top:20px}
+.kicker{color:var(--gold2);font-size:13px;font-weight:800;letter-spacing:.08em}
+.prompt{font-size:23px;font-weight:800;line-height:1.45;margin:10px 0 16px}
+.dialogue{margin:0 0 16px;padding:14px 16px;border-left:4px solid var(--gold);background:rgba(217,170,85,.07);border-radius:10px;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice,.token,.matchBtn{
+ min-width:0;padding:14px 15px;border-radius:13px;border:1px solid rgba(255,255,255,.18);
+ background:rgba(255,255,255,.035);color:var(--cream);cursor:pointer;font-size:16px;line-height:1.45;
+}
+.choice:hover,.token:hover,.matchBtn:hover{border-color:var(--gold)}
+.choice.selected{outline:2px solid var(--gold);outline-offset:2px}
+.choice.correct,.matchBtn.matched{background:linear-gradient(135deg,var(--green),var(--green2));border-color:#7adbaa}
+.choice.wrong{background:linear-gradient(135deg,var(--red),var(--red2));border-color:#ef9aa2}
+.choice.reveal{outline:2px solid rgba(242,209,140,.8);outline-offset:2px}
+.actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px}
+.btn{
+ border:1px solid var(--gold);background:transparent;color:var(--gold2);border-radius:999px;
+ padding:12px 22px;font-weight:800;cursor:pointer
+}
+.btn.primary{background:linear-gradient(135deg,#d4a44d,#f0cd83);color:#061c33;border-color:#f0cd83}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.feedback{
+ display:none;margin-top:16px;padding:15px 16px;border-radius:13px;background:#081a2d;
+ border:1px solid rgba(217,170,85,.25);line-height:1.55
+}
+.feedback.show{display:block}
+.feedback strong{color:var(--gold2)}
+
+/* order */
+.orderZones{display:grid;gap:12px}
+.answerLine{
+ min-height:62px;padding:10px;border:1px dashed rgba(217,170,85,.55);border-radius:14px;
+ display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(0,0,0,.08)
+}
+.pool{display:flex;gap:8px;flex-wrap:wrap}
+.token.used{opacity:.35;pointer-events:none}
+.token.inAnswer{background:rgba(217,170,85,.12);border-color:var(--gold)}
+
+/* matching */
+.matchWrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.matchCol{display:grid;gap:10px}
+.matchBtn.active{outline:2px solid var(--gold);outline-offset:2px}
+.matchBtn.bad{background:linear-gradient(135deg,var(--red),var(--red2));border-color:#ef9aa2}
+
+/* result */
+.result{display:none;margin-top:18px;padding:28px;border-radius:20px;border:1px solid rgba(217,170,85,.55);background:linear-gradient(135deg,#0b3152,#071d33);text-align:center}
+.result.show{display:block}
+.score{font-size:56px;font-weight:900;color:var(--gold2);margin:8px 0}
+.result p{color:#dce5eb;line-height:1.55}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+@media(max-width:720px){
+ .tabs{grid-template-columns:1fr} .grid,.matchWrap{grid-template-columns:1fr}
+ .wrap{padding:10px 8px 44px} .hero{padding:27px 18px} .panel{padding:20px 14px}
+ .prompt{font-size:19px} .choice,.token,.matchBtn{font-size:15px}
+ .actions{justify-content:stretch} .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ · РАЗГОВОРНЫЕ КЛУБЫ</div>
+  <h1>Меньше вопросов — <span>больше интерактива</span></h1>
+  <div class="lead">Теперь по 7 заданий на уровень. Вместо длинного теста — разные форматы: выбор ответа, сборка фраз, множественный выбор, сопоставление и мини-ситуации.</div>
+</section>
+
+<nav class="tabs" id="tabs"></nav>
+
+<section class="panel">
+  <div class="topic">
+    <div>
+      <h2 id="title"></h2>
+      <p id="subtitle"></p>
+    </div>
+    <div class="badge" id="badge"></div>
+  </div>
+
+  <div class="progressTop"><span id="progressText"></span><span id="scoreText"></span></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="task" id="task"></div>
+  <div class="feedback" id="feedback"></div>
+
+  <div class="actions" id="actions">
+    <button class="btn" type="button" id="restartBtn">Начать вкладку заново</button>
+    <div>
+      <button class="btn" type="button" id="checkBtn">Проверить</button>
+      <button class="btn primary" type="button" id="nextBtn" disabled>Следующее задание</button>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="kicker">РЕЗУЛЬТАТ ВКЛАДКИ</div>
+    <div class="score" id="finalScore"></div>
+    <p id="finalText"></p>
+    <button class="btn primary" type="button" id="againBtn">Пройти ещё раз</button>
+  </div>
+</section>
+
+<div class="footer">Китайский с носителями · HSK1 / HSK2–3 / HSK4</div>
+</div>
+
+<script>
+const DATA = [{"id": "hsk1", "title": "HSK1", "topic": "动物园 · Зоопарк", "subtitle": "7 заданий: выбор, сборка фраз, множественный выбор и мини-диалог", "tasks": [{"type": "mcq", "prompt": "Как по-китайски «обезьяна»?", "options": ["猴子", "老虎", "大象", "鸟"], "answer": 0, "explain": "猴子 hóuzi — обезьяна."}, {"type": "mcq", "prompt": "Что означает 漂亮 (piàoliang)?", "options": ["красивый", "большой", "смотреть", "животное"], "answer": 0, "explain": "漂亮 — красивый."}, {"type": "order", "prompt": "Соберите фразу: «Это панда».", "tokens": ["熊猫", "这是", "。"], "answer": ["这是", "熊猫", "。"], "display_answer": "这是熊猫。 Zhè shì xióngmāo. — Это панда."}, {"type": "order", "prompt": "Соберите вопрос: «Тебе нравятся тигры?»", "tokens": ["吗", "老虎", "你", "喜欢", "？"], "answer": ["你", "喜欢", "老虎", "吗", "？"], "display_answer": "你喜欢老虎吗？ Nǐ xǐhuan lǎohǔ ma?"}, {"type": "multi", "prompt": "Выберите ВСЕ слова, которые обозначают животных.", "options": ["熊猫", "看", "大象", "猴子", "漂亮"], "answers": [0, 2, 3], "explain": "熊猫 — панда, 大象 — слон, 猴子 — обезьяна."}, {"type": "mcq", "prompt": "Как лучше ответить на вопрос 动物园有老虎吗？ если тигров нет?", "options": ["没有。", "有。", "我喜欢。", "这是。"], "answer": 0, "explain": "没有。Méiyǒu. — Нет / не имеется."}, {"type": "dialogue", "prompt": "Мини-диалог: выберите наиболее естественный ответ.", "line": "A: 你喜欢什么动物？", "options": ["我喜欢熊猫。", "这是动物园。", "没有。", "这个动物大吗？"], "answer": 0, "explain": "На вопрос «Какие животные тебе нравятся?» естественно ответить 我喜欢熊猫。"}]}, {"id": "hsk23", "title": "HSK2–3", "topic": "咖啡馆里见朋友 · Встреча в кафе", "subtitle": "7 заданий: кафе, порядок действий, предложения и мини-диалоги", "tasks": [{"type": "mcq", "prompt": "Что означает 推荐 (tuījiàn)?", "options": ["рекомендовать", "заказывать", "оплачивать счёт", "встречаться"], "answer": 0, "explain": "推荐 — рекомендовать."}, {"type": "match", "prompt": "Соедините слова с переводом.", "pairs": [["菜单", "меню"], ["甜点", "десерт"], ["聊天", "болтать"], ["买单", "оплатить счёт"]]}, {"type": "order", "prompt": "Соберите: «Сначала закажем напитки, потом поговорим».", "tokens": ["聊天", "我们", "。", "再", "饮料", "先", "点", "，"], "answer": ["我们", "先", "点", "饮料", "，", "再", "聊天", "。"], "display_answer": "我们先点饮料，再聊天。 Wǒmen xiān diǎn yǐnliào, zài liáotiān."}, {"type": "mcq", "prompt": "Как спросить «Ты будешь кофе или чай?»", "options": ["你喝咖啡还是茶？", "你要不要咖啡馆？", "你想咖啡和茶吗？", "咖啡还是你喝茶？"], "answer": 0, "explain": "A 还是 B? — вопрос выбора между двумя вариантами."}, {"type": "multi", "prompt": "Что можно сделать в кафе? Выберите ВСЕ подходящие варианты.", "options": ["点饮料", "聊天", "买单", "去动物园", "看菜单"], "answers": [0, 1, 2, 4], "explain": "点饮料, 聊天, 买单, 看菜单 — всё это естественные действия в кафе."}, {"type": "dialogue", "prompt": "Выберите лучший ответ в диалоге.", "line": "A: 要不要一起喝咖啡？", "options": ["好啊！", "今天谁买单？", "这是菜单。", "我几点见面？"], "answer": 0, "explain": "好啊！ — естественное согласие на предложение."}, {"type": "order", "prompt": "Соберите вопрос: «Кто сегодня платит?»", "tokens": ["买单", "今天", "谁", "？"], "answer": ["今天", "谁", "买单", "？"], "display_answer": "今天谁买单？ Jīntiān shéi mǎidān?"}]}, {"id": "hsk4", "title": "HSK4", "topic": "友谊如何结束 · Как заканчивается дружба", "subtitle": "7 заданий: оттенки лексики, сопоставление выражений и ситуации", "tasks": [{"type": "match", "prompt": "Соедините ключевые слова с переводом.", "pairs": [["疏远", "отдаляться"], ["误会", "недоразумение"], ["原谅", "прощать"], ["信任", "доверие"]]}, {"type": "mcq", "prompt": "Что означает 渐渐疏远 (jiànjiàn shūyuǎn)?", "options": ["постепенно отдаляться", "резко поссориться", "снова помириться", "поддерживать связь"], "answer": 0, "explain": "渐渐疏远 — постепенно отдаляться."}, {"type": "multi", "prompt": "Какие выражения связаны с восстановлением отношений? Выберите ВСЕ.", "options": ["主动道歉", "重归于好", "冰释前嫌", "一刀两断", "和解"], "answers": [0, 1, 2, 4], "explain": "主动道歉, 重归于好, 冰释前嫌 и 和解 связаны с извинением и примирением."}, {"type": "mcq", "prompt": "Какое выражение означает «полностью и резко прекратить отношения»?", "options": ["一刀两断", "好聚好散", "顺其自然", "保持联系"], "answer": 0, "explain": "一刀两断 — резко и окончательно разорвать отношения."}, {"type": "match", "prompt": "Сопоставьте выражение и ситуацию.", "pairs": [["无话不谈", "друзья говорят обо всём без секретов"], ["无话可说", "людям больше не о чем говорить"], ["各奔东西", "каждый пошёл своей дорогой"], ["好聚好散", "расстались спокойно и достойно"]]}, {"type": "scenario", "prompt": "Ситуация: друзья долго не общались, но никто не ссорился; связь постепенно исчезла. Какое выражение подходит лучше всего?", "options": ["渐渐疏远", "爆发冲突", "主动道歉", "伤透了心"], "answer": 0, "explain": "渐渐疏远 — постепенно отдаляться, без обязательного конфликта."}, {"type": "scenario", "prompt": "Ситуация: после старой ссоры друзья отпустили обиды и снова помирились. Что подходит лучше всего?", "options": ["冰释前嫌", "形同陌路", "断了联系", "不辞而别"], "answer": 0, "explain": "冰释前嫌 — забыть старые обиды и помириться."}]}];
+let tabIndex=0, taskIndex=0, score=0, solved=false, state={};
+
+const tabsEl=document.getElementById('tabs');
+const titleEl=document.getElementById('title');
+const subtitleEl=document.getElementById('subtitle');
+const badgeEl=document.getElementById('badge');
+const progressText=document.getElementById('progressText');
+const scoreText=document.getElementById('scoreText');
+const bar=document.getElementById('bar');
+const taskEl=document.getElementById('task');
+const feedback=document.getElementById('feedback');
+const checkBtn=document.getElementById('checkBtn');
+const nextBtn=document.getElementById('nextBtn');
+const restartBtn=document.getElementById('restartBtn');
+const result=document.getElementById('result');
+const finalScore=document.getElementById('finalScore');
+const finalText=document.getElementById('finalText');
+const againBtn=document.getElementById('againBtn');
+const actions=document.getElementById('actions');
+
+function shuffle(a){
+  const x=[...a];
+  for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}
+  return x;
+}
+
+function buildTabs(){
+  tabsEl.innerHTML='';
+  DATA.forEach((t,i)=>{
+    const b=document.createElement('button'); b.type='button';
+    b.className='tab'+(i===tabIndex?' active':'');
+    b.innerHTML=`${t.title}<small>${t.topic}</small>`;
+    b.addEventListener('click',()=>{tabIndex=i;buildTabs();startTab();});
+    tabsEl.appendChild(b);
+  });
+}
+
+function startTab(){
+  taskIndex=0;score=0;solved=false;state={};
+  result.classList.remove('show');actions.style.display='flex';
+  const t=DATA[tabIndex];
+  titleEl.textContent=`${t.title} · ${t.topic}`;
+  subtitleEl.textContent=t.subtitle;
+  badgeEl.textContent=`${t.tasks.length} заданий`;
+  renderTask();
+}
+
+function commonTop(task){
+  taskEl.innerHTML=`<div class="kicker">ЗАДАНИЕ ${taskIndex+1} ИЗ ${DATA[tabIndex].tasks.length}</div><div class="prompt">${task.prompt}</div>`;
+  feedback.className='feedback';feedback.innerHTML='';
+  solved=false;nextBtn.disabled=true;checkBtn.disabled=false;
+  const total=DATA[tabIndex].tasks.length;
+  progressText.textContent=`Задание ${taskIndex+1} из ${total}`;
+  scoreText.textContent=`Баллы: ${score}`;
+  bar.style.width=`${taskIndex/total*100}%`;
+}
+
+function renderTask(){
+  const task=DATA[tabIndex].tasks[taskIndex];
+  commonTop(task);
+  state={};
+
+  if(task.type==='mcq'||task.type==='dialogue'||task.type==='scenario') renderSingle(task);
+  else if(task.type==='multi') renderMulti(task);
+  else if(task.type==='order') renderOrder(task);
+  else if(task.type==='match') renderMatch(task);
+}
+
+function renderSingle(task){
+  if(task.line) taskEl.insertAdjacentHTML('beforeend',`<div class="dialogue">${task.line}</div>`);
+  const entries=task.options.map((text,i)=>({text,orig:i}));
+  const mixed=shuffle(entries);
+  const grid=document.createElement('div');grid.className='grid';
+  mixed.forEach((o)=>{
+    const b=document.createElement('button');b.type='button';b.className='choice';b.textContent=o.text;
+    b.dataset.orig=o.orig;
+    b.addEventListener('click',()=>{
+      if(solved)return;
+      grid.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');state.selected=Number(b.dataset.orig);
+    });
+    grid.appendChild(b);
+  });
+  taskEl.appendChild(grid);
+}
+
+function renderMulti(task){
+  const grid=document.createElement('div');grid.className='grid';
+  const entries=task.options.map((text,i)=>({text,orig:i}));
+  shuffle(entries).forEach(o=>{
+    const b=document.createElement('button');b.type='button';b.className='choice';b.textContent=o.text;b.dataset.orig=o.orig;
+    b.addEventListener('click',()=>{if(!solved)b.classList.toggle('selected')});
+    grid.appendChild(b);
+  });
+  taskEl.appendChild(grid);
+  taskEl.insertAdjacentHTML('beforeend','<div style="color:var(--muted);font-size:13px;margin-top:10px">Можно выбрать несколько вариантов.</div>');
+}
+
+function renderOrder(task){
+  state.order=[];
+  const wrap=document.createElement('div');wrap.className='orderZones';
+  const answer=document.createElement('div');answer.className='answerLine';answer.id='answerLine';
+  const pool=document.createElement('div');pool.className='pool';
+  shuffle(task.tokens).forEach((tok,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='token';b.textContent=tok;
+    b.addEventListener('click',()=>{
+      if(solved||b.classList.contains('used'))return;
+      state.order.push(tok);b.classList.add('used');
+      const t=document.createElement('button');t.type='button';t.className='token inAnswer';t.textContent=tok;
+      t.addEventListener('click',()=>{
+        if(solved)return;
+        const idx=[...answer.children].indexOf(t);
+        state.order.splice(idx,1);t.remove();b.classList.remove('used');
+      });
+      answer.appendChild(t);
+    });
+    pool.appendChild(b);
+  });
+  wrap.appendChild(answer);wrap.appendChild(pool);taskEl.appendChild(wrap);
+  taskEl.insertAdjacentHTML('beforeend','<div style="color:var(--muted);font-size:13px;margin-top:10px">Нажимайте слова по порядку. Чтобы убрать слово из ответа, нажмите на него ещё раз.</div>');
+}
+
+function renderMatch(task){
+  const left=task.pairs.map((p,i)=>({text:p[0],i}));
+  const right=shuffle(task.pairs.map((p,i)=>({text:p[1],i})));
+  state.matches=0;state.left=null;state.right=null;
+  const wrap=document.createElement('div');wrap.className='matchWrap';
+  const lc=document.createElement('div');lc.className='matchCol';
+  const rc=document.createElement('div');rc.className='matchCol';
+
+  left.forEach(o=>{
+    const b=document.createElement('button');b.type='button';b.className='matchBtn';b.textContent=o.text;b.dataset.i=o.i;
+    b.addEventListener('click',()=>selectMatch('left',b,lc,rc,task));
+    lc.appendChild(b);
+  });
+  right.forEach(o=>{
+    const b=document.createElement('button');b.type='button';b.className='matchBtn';b.textContent=o.text;b.dataset.i=o.i;
+    b.addEventListener('click',()=>selectMatch('right',b,lc,rc,task));
+    rc.appendChild(b);
+  });
+  wrap.appendChild(lc);wrap.appendChild(rc);taskEl.appendChild(wrap);
+  taskEl.insertAdjacentHTML('beforeend','<div style="color:var(--muted);font-size:13px;margin-top:10px">Нажмите слово слева, затем его перевод справа.</div>');
+  checkBtn.disabled=true;
+}
+
+function selectMatch(side,btn,lc,rc,task){
+  if(solved||btn.classList.contains('matched'))return;
+  const col=side==='left'?lc:rc;
+  col.querySelectorAll('.matchBtn').forEach(x=>{if(!x.classList.contains('matched'))x.classList.remove('active')});
+  btn.classList.add('active');
+  state[side]=btn;
+
+  if(state.left&&state.right){
+    const ok=state.left.dataset.i===state.right.dataset.i;
+    if(ok){
+      state.left.classList.remove('active');state.right.classList.remove('active');
+      state.left.classList.add('matched');state.right.classList.add('matched');
+      state.left.disabled=true;state.right.disabled=true;state.matches++;
+      if(state.matches===task.pairs.length){
+        solved=true;score++;scoreText.textContent=`Баллы: ${score}`;
+        feedback.innerHTML='<strong>Отлично!</strong> Все пары сопоставлены правильно.';
+        feedback.classList.add('show');nextBtn.disabled=false;
+        updateProgress();
+      }
+    }else{
+      const l=state.left,r=state.right;
+      l.classList.add('bad');r.classList.add('bad');
+      setTimeout(()=>{l.classList.remove('bad','active');r.classList.remove('bad','active')},450);
+    }
+    state.left=null;state.right=null;
+  }
+}
+
+function checkTask(){
+  if(solved)return;
+  const task=DATA[tabIndex].tasks[taskIndex];
+  let ok=false;
+
+  if(task.type==='mcq'||task.type==='dialogue'||task.type==='scenario'){
+    if(state.selected===undefined){showNeed();return}
+    ok=state.selected===task.answer;
+    const buttons=taskEl.querySelectorAll('.choice');
+    buttons.forEach(b=>{
+      const n=Number(b.dataset.orig);
+      if(n===task.answer)b.classList.add('correct','reveal');
+      if(n===state.selected&&n!==task.answer)b.classList.add('wrong');
+      b.disabled=true;
+    });
+  }
+  else if(task.type==='multi'){
+    const selected=[...taskEl.querySelectorAll('.choice.selected')].map(b=>Number(b.dataset.orig)).sort((a,b)=>a-b);
+    if(!selected.length){showNeed();return}
+    const ans=[...task.answers].sort((a,b)=>a-b);
+    ok=selected.length===ans.length&&selected.every((v,i)=>v===ans[i]);
+    taskEl.querySelectorAll('.choice').forEach(b=>{
+      const n=Number(b.dataset.orig);
+      if(ans.includes(n))b.classList.add('correct','reveal');
+      if(selected.includes(n)&&!ans.includes(n))b.classList.add('wrong');
+      b.disabled=true;
+    });
+  }
+  else if(task.type==='order'){
+    if(!state.order.length){showNeed();return}
+    ok=state.order.length===task.answer.length&&state.order.every((v,i)=>v===task.answer[i]);
+    taskEl.querySelectorAll('.token').forEach(b=>b.disabled=true);
+  }
+
+  solved=true;
+  if(ok)score++;
+  scoreText.textContent=`Баллы: ${score}`;
+  feedback.innerHTML=ok
+    ? `<strong>Верно.</strong> ${task.explain||task.display_answer||''}`
+    : `<strong>Пока не так.</strong> ${task.explain||task.display_answer||''}`;
+  feedback.classList.add('show');
+  nextBtn.disabled=false;checkBtn.disabled=true;updateProgress();
+}
+
+function showNeed(){
+  feedback.innerHTML='<strong>Сначала выполните задание.</strong>';
+  feedback.classList.add('show');
+}
+
+function updateProgress(){
+  const total=DATA[tabIndex].tasks.length;
+  bar.style.width=`${(taskIndex+1)/total*100}%`;
+}
+
+function nextTask(){
+  if(!solved)return;
+  const total=DATA[tabIndex].tasks.length;
+  if(taskIndex<total-1){taskIndex++;renderTask();}
+  else finish();
+}
+
+function finish(){
+  taskEl.innerHTML='';feedback.className='feedback';actions.style.display='none';result.classList.add('show');
+  const total=DATA[tabIndex].tasks.length;const pct=Math.round(score/total*100);
+  finalScore.textContent=`${score} / ${total}`;
+  let msg=pct>=85?'Отлично! Материал этой вкладки хорошо усвоен.'
+    :pct>=60?'Хороший результат. Повторите несколько выражений и попробуйте ещё раз.'
+    :'Полезно ещё раз пройти лексику и интерактивные задания.';
+  finalText.textContent=`${pct}%. ${msg}`;
+  progressText.textContent='Вкладка завершена';scoreText.textContent=`Баллы: ${score}`;bar.style.width='100%';
+}
+
+checkBtn.addEventListener('click',checkTask);
+nextBtn.addEventListener('click',nextTask);
+restartBtn.addEventListener('click',startTab);
+againBtn.addEventListener('click',()=>{result.classList.remove('show');actions.style.display='flex';startTab();});
+
+buildTabs();
+startTab();
+</script>
+</body>
+</html>
