@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HSK — интерактивная практика</title>
+<style>
+:root{--navy:#071a2d;--navy2:#0d2b47;--gold:#d8ae57;--gold2:#f0d48b;--bg:#f5f1e9;--card:#fff;--ok:#18845a;--bad:#c54747;--muted:#68707c}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans SC",sans-serif;background:linear-gradient(#efe7d8,#f7f8fa 360px);color:#172235}
+.hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:32px 16px 28px;border-bottom:4px solid var(--gold)}
+.inner,.wrap{max-width:1060px;margin:auto}.brand{font-size:13px;letter-spacing:.16em;color:var(--gold2);font-weight:800;text-transform:uppercase}h1{font-size:clamp(30px,5vw,50px);margin:8px 0}.hero p{color:#d8e1ea;max-width:760px;line-height:1.5}.wrap{padding:16px 14px 50px}
+.tabs{display:flex;gap:8px;overflow:auto;position:sticky;top:0;background:rgba(245,241,233,.95);backdrop-filter:blur(8px);padding:9px 0 12px;z-index:20}.tab{white-space:nowrap;border:1.5px solid #ccd2d8;border-radius:999px;background:#fff;color:var(--navy);padding:10px 14px;font-weight:800;cursor:pointer}.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.panel{display:none}.panel.active{display:block}.levelHead,.card{background:#fff;border:1px solid #e4ded3;border-radius:20px;box-shadow:0 9px 25px rgba(10,30,50,.07)}.levelHead{padding:18px 20px;margin:8px 0 12px}.levelHead h2{margin:0 0 5px}.levelHead p{margin:0;color:var(--muted);line-height:1.5}.note{margin-top:10px;background:#fff8e7;border:1px solid #ead8a9;border-radius:13px;padding:11px 13px;font-size:13px;color:#5b4924}
+.progressWrap{position:sticky;top:57px;background:rgba(245,241,233,.96);padding:8px 0 10px;z-index:10}.progressRow{display:flex;justify-content:space-between;font-size:13px;font-weight:800}.bar{height:9px;background:#e1e5e8;border-radius:99px;overflow:hidden;margin-top:6px}.bar>div{height:100%;background:linear-gradient(90deg,var(--gold),#f1d078);width:0;transition:.2s}
+.card{padding:20px;margin:13px 0}.qnum{font-size:12px;color:#8d6d2d;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.qtitle{font-size:20px;font-weight:900;margin:7px 0}.hint,.py{color:var(--muted);font-size:14px}.cn{font-size:25px;font-weight:800;margin:8px 0 2px}.ru{font-size:15px;color:#3d4652;margin-bottom:10px}.opts{display:grid;gap:9px;margin-top:11px}.opt,.token,.btn{font:inherit;border:1.5px solid #d0d5db;background:#fff;border-radius:13px;padding:11px 13px;cursor:pointer;text-align:left;transition:.15s}.opt:hover,.token:hover{border-color:var(--gold);transform:translateY(-1px)}.opt.selected{border-color:#9b792f;background:#fff7dd}.opt.correct{border-color:var(--ok);background:#ebf8f1;color:#126943}.opt.wrong{border-color:var(--bad);background:#fff0f0;color:#9c3030}.opt:disabled{cursor:default;transform:none}.btn{display:inline-block;background:var(--navy);color:#fff;border:none;font-weight:800;text-align:center;margin-top:10px}.btn.secondary{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}.btn.gold{background:var(--gold);color:#172235}.feedback{display:none;margin-top:12px;padding:11px 13px;border-radius:13px;line-height:1.5}.feedback.show{display:block}.feedback.ok{background:#edf8f2;color:#126943}.feedback.bad{background:#fff0f0;color:#9d3030}
+.answerzone,.tokens{display:flex;gap:7px;flex-wrap:wrap;min-height:48px;padding:9px;border-radius:13px}.answerzone{border:2px dashed #d3d8de;margin-bottom:9px}.tokens{background:#f5f7f9}.token{padding:8px 11px}.token.used{opacity:.3;pointer-events:none}.result{display:none;text-align:center;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border:2px solid var(--gold);border-radius:22px;padding:26px 18px;margin:18px 0}.result.show{display:block}.score{font-size:50px;color:var(--gold2);font-weight:900}.small{font-size:12px;letter-spacing:.12em;color:#cad5df;font-weight:800}.footer{text-align:center;color:#777f89;font-size:12px;margin-top:26px}@media(max-width:650px){.card{padding:17px}.qtitle{font-size:18px}.cn{font-size:22px}}
+</style>
+</head><body>
+<header class="hero"><div class="inner"><div class="brand">Китайский с носителями</div><h1>Интерактивная практика HSK</h1><p>4 уровня на отдельных вкладках. При каждом новом варианте меняются выбранные задания и порядок ответов.</p></div></header>
+<main class="wrap"><nav class="tabs" id="tabs"></nav><div id="panels"></div><div class="footer">КИТАЙСКИЙ С НОСИТЕЛЯМИ</div></main>
+<script>
+const LEVELS=[
+{id:'hsk1',tab:'HSK1 · 买水果',title:'HSK1 — 买水果 · Покупка фруктов',desc:'Фрукты, цена за 斤, 想买什么, 我要 / 给我, 贵 / 便宜.',pick:10,bank:[
+{t:'choice',q:'Что означает 水果?',cn:'水果',py:'shuǐguǒ',o:['фрукты','магазин','цена','килограмм'],a:0,e:'水果 shuǐguǒ — фрукты.'},
+{t:'choice',q:'Выбери правильный перевод',cn:'苹果',py:'píngguǒ',o:['яблоко','банан','виноград','арбуз'],a:0,e:'苹果 píngguǒ — яблоко.'},
+{t:'choice',q:'Как сказать «арбуз»?',o:['西瓜','葡萄','橙子','香蕉'],a:0,e:'西瓜 xīguā — арбуз.'},
+{t:'choice',q:'Что означает 斤?',o:['500 граммов','1 килограмм','одна штука','цена'],a:0,e:'斤 jīn — китайская мера веса, примерно 500 г.'},
+{t:'choice',q:'Выбери правильный вопрос',hint:'«Что ты хочешь купить?»',o:['你想买什么？','你买多少钱？','你有几斤？','这个贵吗？'],a:0,e:'你想买什么？ — Что ты хочешь купить?'},
+{t:'choice',q:'Как ответить: «Я хочу купить яблоки»?',o:['我想买苹果。','我要苹果多少钱？','苹果很想买。','我苹果买什么？'],a:0,e:'想 + 买 + предмет: 我想买苹果。'},
+{t:'choice',q:'Как спросить цену за один 斤?',cn:'苹果 ______？',o:['多少钱一斤','想买什么','几个苹果','太贵了'],a:0,e:'苹果多少钱一斤？'},
+{t:'choice',q:'Выбери правильный ответ на вопрос о цене',cn:'香蕉多少钱一斤？',o:['五块钱一斤。','我要香蕉。','香蕉很水果。','两斤多少钱。'],a:0,e:'Число + 块钱一斤.'},
+{t:'choice',q:'Как сказать «Мне нужно два 斤 яблок»?',o:['我要两斤苹果。','我两苹果斤要。','给我苹果两。','我想两斤。'],a:0,e:'我要两斤苹果。'},
+{t:'choice',q:'Как сказать продавцу «Дайте мне один арбуз»?',o:['给我一个西瓜。','我有一个西瓜。','西瓜一个多少钱。','我想给西瓜。'],a:0,e:'给我一个西瓜。'},
+{t:'choice',q:'Какое выражение значит «слишком дорого»?',o:['太贵了','很便宜','有一点儿','多少钱'],a:0,e:'太贵了！ — Слишком дорого!'},
+{t:'choice',q:'Как попросить сделать немного дешевле?',o:['便宜一点儿吧。','贵一点儿吧。','给我多少钱。','我想贵。'],a:0,e:'便宜一点儿吧。'},
+{t:'multi',q:'Выбери все фрукты',o:['苹果','香蕉','葡萄','贵','买'],a:[0,1,2],e:'苹果, 香蕉, 葡萄 — фрукты.'},
+{t:'build',q:'Собери фразу',hint:'«Мне нужно два апельсина.»',tokens:['我要','两个','橙子'],a:['我要','两个','橙子'],e:'我要两个橙子。'},
+{t:'build',q:'Собери вопрос',hint:'«Сколько стоит 斤 винограда?»',tokens:['葡萄','多少钱','一斤'],a:['葡萄','多少钱','一斤'],e:'葡萄多少钱一斤？'}]},
+{id:'market',tab:'HSK2–3 · 超市',title:'HSK2–3 — 去超市买东西 · Покупки в супермаркете',desc:'购物车, 收银台, 结账 и конструкции 除了…还…, 又…又…, 只要…就…, 越…越….',pick:11,bank:[
+{t:'choice',q:'Что означает 购物车?',o:['тележка для покупок','касса','скидка','килограмм'],a:0,e:'购物车 gòuwùchē — тележка.'},
+{t:'choice',q:'Как сказать «касса»?',o:['收银台','购物车','公斤','超市'],a:0,e:'收银台 shōuyíntái — касса.'},
+{t:'choice',q:'Что означает 打折?',o:['быть со скидкой','оплачивать','выбирать','быть свежим'],a:0,e:'打折 dǎzhé — быть со скидкой.'},
+{t:'choice',q:'Как сказать «оплачивать покупку»?',o:['结账','挑','打折','新鲜'],a:0,e:'结账 jiézhàng — оплачивать покупку.'},
+{t:'choice',q:'Выбери правильное продолжение',cn:'除了水果以外，______。',o:['我还要买牛奶','我又水果牛奶','我越买牛奶','我就水果'],a:0,e:'除了 A 以外，还 B.'},
+{t:'choice',q:'Какая конструкция означает «и…, и…»?',o:['又……又……','只要……就……','越……越……','除了……以外'],a:0,e:'又……又…… — два одновременных признака.'},
+{t:'choice',q:'Заполни фразу',cn:'这些苹果 ___ 大 ___ 新鲜。',o:['又 / 又','只要 / 就','越 / 越','除了 / 还'],a:0,e:'这些苹果又大又新鲜。'},
+{t:'choice',q:'Что означает 只要……，就……?',o:['достаточное условие → результат','хотя…, но…','чем…, тем…','кроме…, ещё…'],a:0,e:'只要…就… показывает достаточное условие.'},
+{t:'choice',q:'Выбери правильную фразу',hint:'«Если товар свежий, я куплю.»',o:['只要新鲜，我就会买。','又新鲜又买。','越新鲜我还买。','除了新鲜以外我买。'],a:0,e:'只要新鲜，我就会买。'},
+{t:'choice',q:'Какая конструкция означает «чем…, тем…»?',o:['越……越……','又……又……','虽然……但是……','如果……就……'],a:0,e:'越……越…… — чем…, тем…'},
+{t:'choice',q:'Заполни фразу',cn:'东西 ___ 便宜，我 ___ 想多买。',o:['越 / 越','又 / 又','只要 / 就','虽然 / 但是'],a:0,e:'东西越便宜，我越想多买。'},
+{t:'multi',q:'Выбери слова супермаркета',o:['购物车','收银台','结账','房东','押金'],a:[0,1,2],e:'购物车, 收银台, 结账 относятся к супермаркету.'},
+{t:'build',q:'Собери предложение',hint:'«Кроме фруктов, мне ещё нужно купить молоко.»',tokens:['除了水果以外','我还要','买牛奶'],a:['除了水果以外','我还要','买牛奶'],e:'除了水果以外，我还要买牛奶。'},
+{t:'build',q:'Собери предложение',hint:'«Этот хлеб и дешёвый, и вкусный.»',tokens:['这个面包','又便宜','又好吃'],a:['这个面包','又便宜','又好吃'],e:'这个面包又便宜又好吃。'}]},
+{id:'rent',tab:'HSK2–3 · 租房',title:'HSK2–3 — 租房子 · Аренда квартиры',desc:'房租, 押金, 房东, 家具 и конструкции 想 / 想要, 比, 虽然…但是…, 如果…就….',pick:11,bank:[
+{t:'choice',q:'Что означает 房租?',o:['арендная плата','залог','хозяин квартиры','мебель'],a:0,e:'房租 fángzū — арендная плата.'},
+{t:'choice',q:'Как сказать «залог, депозит»?',o:['押金','家具','附近','房东'],a:0,e:'押金 yājīn — залог, депозит.'},
+{t:'choice',q:'Что означает 房东?',o:['хозяин квартиры','арендатор','сосед','кассир'],a:0,e:'房东 fángdōng — хозяин квартиры.'},
+{t:'choice',q:'Как сказать «мебель»?',o:['家具','房租','搬家','合适'],a:0,e:'家具 jiājù — мебель.'},
+{t:'choice',q:'Как сказать «Я хочу снять квартиру»?',o:['我想租房子。','我想要租。','我比租房子。','我如果房子。'],a:0,e:'想 + глагол: 我想租房子。'},
+{t:'choice',q:'Как сказать «Я хочу квартиру с мебелью»?',o:['我想要一个有家具的房子。','我想一个家具租。','我比家具房子。','房子想要家具我。'],a:0,e:'想要 + существительное.'},
+{t:'choice',q:'Какая конструкция нужна для сравнения?',o:['A 比 B + прилагательное','虽然…但是…','如果…就…','想要 + 名词'],a:0,e:'A 比 B + 形容词 используется для сравнения.'},
+{t:'choice',q:'Выбери перевод',cn:'第二套房子比第一套安静得多。',o:['Вторая квартира намного тише первой.','Вторая квартира дороже первой.','Первая ближе второй.','Обе одинаковые.'],a:0,e:'比 + 安静得多 = намного тише.'},
+{t:'choice',q:'Заполни пропуски',cn:'___ 房租有点儿贵，___ 离地铁很近。',o:['虽然 / 但是','如果 / 就','越 / 越','又 / 又'],a:0,e:'虽然…但是… противопоставляет два факта.'},
+{t:'choice',q:'Как выразить решение при условии?',o:['如果房租合适，我就租。','虽然房租合适，但是租。','房租比合适租。','想要房租就。'],a:0,e:'如果 + условие, 就 + решение.'},
+{t:'choice',q:'Выбери логичный ответ',cn:'如果太远，______。',o:['我就不租','但是很近','我比房东','我想要押金'],a:0,e:'如果太远，我就不租。'},
+{t:'multi',q:'Выбери характеристики квартиры',o:['安静','方便','合适','押金','房东'],a:[0,1,2],e:'安静, 方便, 合适 — характеристики.'},
+{t:'build',q:'Собери предложение',hint:'«Хотя квартира небольшая, зато тихая.»',tokens:['虽然房子不大','但是','很安静'],a:['虽然房子不大','但是','很安静'],e:'虽然房子不大，但是很安静。'},
+{t:'build',q:'Собери предложение',hint:'«Если цена подходит, я сниму эту квартиру.»',tokens:['如果房租合适','我就租','这个房子'],a:['如果房租合适','我就租','这个房子'],e:'如果房租合适，我就租这个房子。'}]},
+{id:'hsk45',tab:'HSK4–5 · 告别仪式',title:'HSK4–5 — 告别仪式 · Прощание и память',desc:'Лексика и выражения о прощании, памяти, уважении, последней воле и отношении к жизни.',pick:12,bank:[
+{t:'choice',q:'Что означает 葬礼?',o:['похороны; похоронная церемония','воспоминание','последняя воля','утешение'],a:0,e:'葬礼 zànglǐ — похороны.'},
+{t:'choice',q:'Как сказать «последняя воля»?',o:['遗愿','仪式','眼泪','生命'],a:0,e:'遗愿 yíyuàn — последняя воля.'},
+{t:'choice',q:'Что означает 怀念?',o:['вспоминать с теплотой; скучать','плакать','уважать','принимать'],a:0,e:'怀念 huáiniàn — вспоминать с теплотой.'},
+{t:'choice',q:'Как сказать «уважать»?',o:['尊重','安慰','接受','面对'],a:0,e:'尊重 zūnzhòng — уважать.'},
+{t:'choice',q:'Что означает 珍惜当下?',o:['ценить настоящий момент','вспоминать прошлое','скрывать печаль','проводить церемонию'],a:0,e:'珍惜当下 — ценить настоящий момент.'},
+{t:'choice',q:'Выбери перевод',cn:'笑着送别',py:'xiàozhe sòngbié',o:['провожать с улыбкой','плакать навзрыд','прощаться молча','избегать церемонии'],a:0,e:'笑着送别 — провожать с улыбкой.'},
+{t:'choice',q:'Что означает 给家人留下安慰?',o:['оставить родным чувство утешения','дать семье деньги','скрыть последнюю волю','не говорить о смерти'],a:0,e:'给家人留下安慰 — оставить родным чувство утешения.'},
+{t:'choice',q:'Как понять 看淡生死?',o:['спокойно относиться к жизни и смерти','бояться смерти','говорить только о жизни','избегать воспоминаний'],a:0,e:'看淡生死 — спокойно относиться к жизни и смерти.'},
+{t:'choice',q:'Что означает 笑中带泪?',o:['улыбаться сквозь слёзы','улыбаться без причины','громко плакать','скрывать лицо'],a:0,e:'笑中带泪 — улыбаться сквозь слёзы.'},
+{t:'choice',q:'Выбери значение 人生无常',o:['жизнь непредсказуема','жизнь очень длинная','нужно всегда улыбаться','прощание всегда грустное'],a:0,e:'人生无常 — жизнь непредсказуема.'},
+{t:'choice',q:'Как перевести 睹物思人?',o:['увидеть вещь и вспомнить человека','оставить вещь человеку','подарить памятный предмет','забыть прошлое'],a:0,e:'睹物思人 — увидеть вещь и вспомнить человека.'},
+{t:'choice',q:'Что выражает 向死而生?',o:['осознавая смерть, жить полнее','жить только прошлым','готовить похороны заранее','не думать о будущем'],a:0,e:'向死而生 — осознавая смерть, жить полнее.'},
+{t:'multi',q:'Выбери выражения, связанные с памятью',o:['缅怀故人','回忆往事','留下美好的回忆','收银台','房租'],a:[0,1,2],e:'Первые три выражения относятся к памяти.'},
+{t:'multi',q:'Выбери слова эмоциональной реакции',o:['悲伤','眼泪','笑容','押金','公斤'],a:[0,1,2],e:'悲伤, 眼泪, 笑容 — эмоциональная сфера.'},
+{t:'choice',q:'Какой вариант лучше отражает тему дискуссии?',o:['Нужно учитывать и волю умершего, и чувства семьи.','На похоронах всегда нужно только плакать.','Смех всегда означает неуважение.','Есть только один правильный формат церемонии.'],a:0,e:'Материал предлагает обсуждать разные способы прощания и точки зрения.'},
+{t:'choice',q:'Что значит 好好告别?',o:['достойно и искренне попрощаться','быстро уйти','избежать разговора','оставить подарок'],a:0,e:'好好告别 — достойно и искренне попрощаться.'},
+{t:'build',q:'Собери выражение',hint:'«уважать последнюю волю умершего»',tokens:['尊重','逝者的','遗愿'],a:['尊重','逝者的','遗愿'],e:'尊重逝者的遗愿。'},
+{t:'build',q:'Собери выражение',hint:'«оставить тёплые воспоминания»',tokens:['留下','美好的','回忆'],a:['留下','美好的','回忆'],e:'留下美好的回忆。'}]}
+];
+const state={};
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function init(l){state[l.id]={tasks:shuffle(l.bank.map(clone)).slice(0,l.pick),score:0,done:0,locked:{},build:{}}}
+function buildUI(){LEVELS.forEach(init);tabs.innerHTML=LEVELS.map((l,i)=>`<button class="tab ${i?'':'active'}" data-id="${l.id}" onclick="switchTab('${l.id}')">${l.tab}</button>`).join('');panels.innerHTML=LEVELS.map((l,i)=>`<section class="panel ${i?'':'active'}" id="panel-${l.id}"><div class="levelHead"><h2>${l.title}</h2><p>${l.desc}</p><div class="note">Нажмите «Новый вариант», чтобы получить другой набор заданий и новый порядок ответов.</div></div><div class="progressWrap"><div class="progressRow"><span id="prog-${l.id}">0 / ${l.pick}</span><span id="score-${l.id}">Баллы: 0</span></div><div class="bar"><div id="bar-${l.id}"></div></div></div><div id="quiz-${l.id}"></div><div class="result" id="res-${l.id}"><div class="small">РЕЗУЛЬТАТ</div><div class="score" id="final-${l.id}"></div><p id="msg-${l.id}"></p><button class="btn gold" onclick="restart('${l.id}')">Новый вариант</button></div></section>`).join('');LEVELS.forEach(render)}
+function switchTab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.id===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='panel-'+id));window.scrollTo({top:document.querySelector('.tabs').offsetTop,behavior:'smooth'})}
+function render(l){let s=state[l.id],root=document.getElementById('quiz-'+l.id);root.innerHTML='';s.tasks.forEach((t,i)=>{let c=document.createElement('div');c.className='card';c.id=`${l.id}-q${i}`;let h=`<div class="qnum">Задание ${i+1}</div><div class="qtitle">${t.q}</div>`;if(t.hint)h+=`<div class="hint">${t.hint}</div>`;if(t.cn)h+=`<div class="cn">${t.cn}</div>`;if(t.py)h+=`<div class="py">${t.py}</div>`;if(t.ru)h+=`<div class="ru">${t.ru}</div>`;if(t.t==='choice')h+=choice(l.id,i,t);if(t.t==='multi')h+=multi(l.id,i,t);if(t.t==='build')h+=build(l.id,i,t);h+=`<div class="feedback" id="${l.id}-fb${i}"></div>`;c.innerHTML=h;root.appendChild(c)});update(l.id)}
+function choice(id,i,t){return `<div class="opts">${shuffle(t.o.map((x,idx)=>({x,idx}))).map(o=>`<button class="opt" data-real="${o.idx}" onclick="answer('${id}',${i},this,${o.idx})">${o.x}</button>`).join('')}</div>`}
+function multi(id,i,t){return `<div class="opts" id="${id}-multi${i}">${shuffle(t.o.map((x,idx)=>({x,idx}))).map(o=>`<button class="opt" data-real="${o.idx}" onclick="this.classList.toggle('selected')">${o.x}</button>`).join('')}</div><button class="btn" onclick="checkMulti('${id}',${i})">Проверить</button>`}
+function build(id,i,t){state[id].build[i]=[];return `<div class="answerzone" id="${id}-zone${i}"></div><div class="tokens">${shuffle(t.tokens).map(x=>`<button class="token" data-token="${x}" onclick="addToken('${id}',${i},this)">${x}</button>`).join('')}</div><button class="btn" onclick="checkBuild('${id}',${i})">Проверить</button><button class="btn secondary" onclick="resetBuild('${id}',${i})">Сбросить</button>`}
+function fb(id,i,ok,e){let x=document.getElementById(`${id}-fb${i}`);x.className=`feedback show ${ok?'ok':'bad'}`;x.innerHTML=(ok?'✅ <b>Верно.</b> ':'❌ <b>Не совсем.</b> ')+e}
+function finish(id,i,ok){let s=state[id];if(s.locked[i])return;s.locked[i]=1;s.done++;if(ok)s.score++;update(id);if(s.done===s.tasks.length)result(id)}
+function answer(id,i,b,r){let s=state[id],t=s.tasks[i];if(s.locked[i])return;document.querySelectorAll(`#${id}-q${i} .opt`).forEach(x=>{x.disabled=true;if(+x.dataset.real===t.a)x.classList.add('correct')});let ok=r===t.a;if(!ok)b.classList.add('wrong');fb(id,i,ok,t.e);finish(id,i,ok)}
+function checkMulti(id,i){let s=state[id],t=s.tasks[i];if(s.locked[i])return;let sel=[...document.querySelectorAll(`#${id}-multi${i} .opt.selected`)].map(x=>+x.dataset.real).sort((a,b)=>a-b),ans=[...t.a].sort((a,b)=>a-b),ok=JSON.stringify(sel)===JSON.stringify(ans);document.querySelectorAll(`#${id}-multi${i} .opt`).forEach(x=>{x.disabled=true;let r=+x.dataset.real;if(ans.includes(r))x.classList.add('correct');else if(sel.includes(r))x.classList.add('wrong')});fb(id,i,ok,t.e);finish(id,i,ok)}
+function addToken(id,i,b){let s=state[id];if(s.locked[i]||b.classList.contains('used'))return;b.classList.add('used');let o={token:b.dataset.token,btn:b};s.build[i].push(o);let c=document.createElement('button');c.className='token';c.textContent=o.token;c.onclick=()=>{if(s.locked[i])return;s.build[i]=s.build[i].filter(x=>x!==o);b.classList.remove('used');c.remove()};document.getElementById(`${id}-zone${i}`).appendChild(c)}
+function resetBuild(id,i){let s=state[id];if(s.locked[i])return;s.build[i].forEach(x=>x.btn.classList.remove('used'));s.build[i]=[];document.getElementById(`${id}-zone${i}`).innerHTML=''}
+function checkBuild(id,i){let s=state[id],t=s.tasks[i];if(s.locked[i])return;let ok=JSON.stringify(s.build[i].map(x=>x.token))===JSON.stringify(t.a);fb(id,i,ok,t.e);finish(id,i,ok)}
+function update(id){let s=state[id];document.getElementById('prog-'+id).textContent=`${s.done} / ${s.tasks.length}`;document.getElementById('score-'+id).textContent=`Баллы: ${s.score}`;document.getElementById('bar-'+id).style.width=(s.done/s.tasks.length*100)+'%'}
+function result(id){let s=state[id],r=document.getElementById('res-'+id);r.classList.add('show');document.getElementById('final-'+id).textContent=`${s.score}/${s.tasks.length}`;let p=s.score/s.tasks.length;document.getElementById('msg-'+id).textContent=p>=.9?'Отлично! Материал освоен уверенно.':p>=.7?'Хорошо. Попробуйте ещё один вариант для закрепления.':'Пройдите ещё раз — новый вариант даст другие вопросы.';r.scrollIntoView({behavior:'smooth',block:'center'})}
+function restart(id){let l=LEVELS.find(x=>x.id===id);init(l);document.getElementById('res-'+id).classList.remove('show');render(l);document.getElementById('panel-'+id).scrollIntoView({behavior:'smooth',block:'start'})}
+buildUI();
+</script>
+</body></html>
