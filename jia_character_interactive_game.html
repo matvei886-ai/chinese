@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家 jiā — интерактивная игра</title>
+<style>
+:root{
+  --navy:#071a2d; --navy2:#0d2945; --gold:#d9ad55; --gold2:#f4d98b;
+  --cream:#fbf6ea; --card:#fff; --ink:#142237; --muted:#687386;
+  --ok:#15865b; --bad:#c84545; --line:#d9dee4; --soft:#f5f7f9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans SC",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 90% 0,rgba(217,173,85,.17),transparent 27%),
+    linear-gradient(180deg,#eee5d5 0,#f7f8fa 340px)
+}
+.hero{
+  padding:34px 18px 28px;color:#fff;
+  background:
+    radial-gradient(circle at 83% 25%,rgba(217,173,85,.16),transparent 22%),
+    linear-gradient(135deg,var(--navy),var(--navy2));
+  border-bottom:4px solid var(--gold)
+}
+.inner,.wrap{max-width:920px;margin:auto}
+.brand{font-size:12px;letter-spacing:.17em;color:var(--gold2);font-weight:900;text-transform:uppercase}
+h1{font-size:clamp(34px,7vw,60px);line-height:1;margin:10px 0 8px}
+.hero p{margin:0;color:#dae4ed;line-height:1.5;max-width:720px}
+.wrap{padding:18px 14px 48px}
+.intro{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px
+}
+.introCard{
+  background:#fff;border:1px solid #e4ddd1;border-radius:18px;padding:16px;
+  box-shadow:0 8px 24px rgba(12,30,48,.06)
+}
+.bigchar{font-size:52px;font-weight:900;color:var(--navy);line-height:1}
+.decomp{font-size:24px;font-weight:900;margin-top:7px}
+.decomp span{color:#9b7124}
+.introCard p{margin:7px 0 0;color:var(--muted);line-height:1.45;font-size:14px}
+.stats{
+  position:sticky;top:0;z-index:20;background:rgba(246,242,234,.94);backdrop-filter:blur(9px);
+  padding:9px 0 11px
+}
+.statrow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;font-size:13px;font-weight:900}
+.bar{height:9px;background:#e2e6ea;border-radius:999px;overflow:hidden;margin-top:7px}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#f2cf79);transition:.2s}
+.card{
+  background:#fff;border:1px solid #e1ddd5;border-radius:21px;padding:21px;margin:14px 0;
+  box-shadow:0 9px 27px rgba(17,35,53,.07)
+}
+.qnum{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8e6b2a}
+.qtitle{font-size:21px;font-weight:900;margin:7px 0 6px;line-height:1.3}
+.hint{font-size:14px;color:var(--muted);line-height:1.45;margin-bottom:11px}
+.cn{font-size:31px;font-weight:900;margin:10px 0 1px}
+.py{font-size:14px;color:#667085;margin-bottom:4px}
+.opts{display:grid;gap:9px;margin-top:12px}
+.opt,.token,.matchbtn,.btn{
+  font:inherit;border:1.5px solid #d0d5dd;background:#fff;border-radius:13px;
+  padding:11px 13px;cursor:pointer;transition:.15s;text-align:left
+}
+.opt:hover,.token:hover,.matchbtn:hover{border-color:var(--gold);transform:translateY(-1px)}
+.opt.selected{border-color:#9a752b;background:#fff7df}
+.opt.correct,.matchbtn.matched{border-color:var(--ok);background:#ebf8f1;color:#126943}
+.opt.wrong,.matchbtn.wrong{border-color:var(--bad);background:#fff0f0;color:#9c3030}
+.opt:disabled,.matchbtn:disabled{cursor:default;transform:none}
+.btn{display:inline-block;background:var(--navy);color:#fff;border:none;font-weight:900;text-align:center;margin-top:10px}
+.btn.secondary{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.feedback{display:none;margin-top:13px;padding:12px 14px;border-radius:13px;line-height:1.5}
+.feedback.show{display:block}.feedback.ok{background:#edf8f2;color:#126942}.feedback.bad{background:#fff0f0;color:#9d3030}
+.answerzone,.tokens{display:flex;gap:8px;flex-wrap:wrap;min-height:50px;padding:10px;border-radius:13px}
+.answerzone{border:2px dashed #d4d9df;background:#fff;margin-bottom:9px}.tokens{background:#f5f7f9}
+.token{padding:8px 12px}.token.used{opacity:.32;pointer-events:none}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px}
+.matchcol{display:grid;gap:8px}.matchbtn.active{border-color:var(--gold);background:#fff7df}
+.result{
+  display:none;text-align:center;background:linear-gradient(135deg,var(--navy),var(--navy2));
+  color:#fff;border:2px solid var(--gold);border-radius:22px;padding:29px 18px;margin-top:19px
+}
+.result.show{display:block}.score{font-size:54px;font-weight:900;color:var(--gold2);line-height:1}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.badge{padding:7px 10px;border:1px solid rgba(255,255,255,.28);border-radius:999px;font-size:13px}
+.footer{text-align:center;color:#7d838c;font-size:12px;margin-top:22px}
+@media(max-width:650px){
+  .intro{grid-template-columns:1fr}.card{padding:17px}.qtitle{font-size:18px}
+  .matchgrid{grid-template-columns:1fr}.statrow{grid-template-columns:1fr auto}.streak{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="inner">
+    <div class="brand">Китайский с носителями</div>
+    <h1>家 jiā</h1>
+    <p>Дом, свинья под крышей и целое «гнездо» китайских слов. Проверь, насколько хорошо ты увидел логику иероглифа.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <div class="introCard">
+      <div class="bigchar">家</div>
+      <div class="decomp"><span>宀</span> + 豕</div>
+      <p><b>宀 mián</b> — крыша · <b>豕 shǐ</b> — свинья</p>
+    </div>
+    <div class="introCard">
+      <div style="font-size:25px;font-weight:900">🎮 Как играть</div>
+      <p>Каждый запуск даёт вопросы в новом порядке, варианты ответов тоже перемешиваются. Есть серия правильных ответов и бонус за идеальное прохождение.</p>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="statrow">
+      <span id="progressText">0 / 16</span>
+      <span id="scoreText">⭐ 0</span>
+      <span class="streak" id="streakText">🔥 серия: 0</span>
+    </div>
+    <div class="bar"><div id="barFill"></div></div>
+  </section>
+
+  <div id="quiz"></div>
+
+  <section class="result" id="result">
+    <div style="font-size:12px;letter-spacing:.14em;color:#cad5df;font-weight:900">ФИНИШ</div>
+    <div class="score" id="finalScore">0/16</div>
+    <div class="badges" id="badges"></div>
+    <p id="finalMsg"></p>
+    <button class="btn" id="restartBtn" type="button">Сыграть ещё раз</button>
+  </section>
+
+  <div class="footer">КИТАЙСКИЙ С НОСИТЕЛЯМИ · 家 jiā</div>
+</main>
+
+<script>
+const BANK=[
+ {t:"choice",q:"Из каких двух частей состоит 家?",o:["宀 + 豕","女 + 子","口 + 木","人 + 山"],a:0,e:"家 состоит из 宀 «крыша» и 豕 «свинья»."},
+ {t:"choice",q:"Что означает 宀 mián?",cn:"宀",o:["крыша","свинья","человек","ворота"],a:0,e:"宀 mián — ключ «крыша». Он часто встречается в знаках, связанных с домом и помещением."},
+ {t:"choice",q:"Что означает 豕 shǐ?",cn:"豕",o:["свинья","дом","поле","крыша"],a:0,e:"豕 shǐ — старый знак «свинья»."},
+ {t:"choice",q:"Почему образ «свинья под крышей» мог означать дом?",o:["Свинья была важным домашним животным и признаком достатка","Все китайские дома строились в форме свиньи","Свинья означала только крышу","Это современная шутка без исторической логики"],a:0,e:"В логике поста свинья связана с домашним хозяйством и достатком: дом со свиньёй — обжитый дом."},
+ {t:"choice",q:"Какое слово означает «члены семьи»?",o:["家人","国家","专家","客人"],a:0,e:"家人 jiārén — члены семьи."},
+ {t:"choice",q:"Как сказать «вернуться домой»?",o:["回家","搬家","国家","大家"],a:0,e:"回家 huí jiā — вернуться домой."},
+ {t:"choice",q:"Что означает 国家?",cn:"国家",py:"guójiā",o:["государство","семья","эксперт","художник"],a:0,e:"国家 guójiā — государство."},
+ {t:"choice",q:"Что означает 大家?",cn:"大家",py:"dàjiā",o:["все","семья","переезжать","комната"],a:0,e:"大家 dàjiā — все."},
+ {t:"choice",q:"Как сказать «семья» в значении семейной ячейки?",o:["家庭","家人","回家","国家"],a:0,e:"家庭 jiātíng — семья как семейная ячейка, домашнее хозяйство."},
+ {t:"choice",q:"Как сказать «переезжать»?",o:["搬家","回家","作家","画家"],a:0,e:"搬家 bān jiā — переезжать."},
+ {t:"choice",q:"Что означает 专家?",cn:"专家",py:"zhuānjiā",o:["эксперт","писатель","гость","родственник"],a:0,e:"专家 zhuānjiā — эксперт."},
+ {t:"choice",q:"Какое слово означает «писатель»?",o:["作家","画家","专家","大家"],a:0,e:"作家 zuòjiā — писатель."},
+ {t:"choice",q:"Какое слово означает «художник»?",o:["画家","作家","国家","家庭"],a:0,e:"画家 huàjiā — художник."},
+ {t:"choice",q:"Что часто означает 家 в конце слова вроде 作家 / 画家 / 专家?",o:["человек, профессионально связанный с областью","здание","домашнее животное","направление движения"],a:0,e:"В таких словах 家 указывает на человека, «своего» в определённой области: специалиста или профессионала."},
+ {t:"multi",q:"Выбери все слова, в которых 家 связано непосредственно с домом или семьёй",o:["家人","回家","家庭","搬家","专家"],a:[0,1,2,3],e:"家人, 回家, 家庭, 搬家 прямо связаны с домом/семьёй. 专家 — это уже значение «специалист»."},
+ {t:"multi",q:"Выбери все слова, где 家 означает профессию или специалиста",o:["作家","画家","专家","大家","国家"],a:[0,1,2],e:"作家, 画家, 专家 — слова о человеке-профессионале."},
+ {t:"choice",q:"В каком иероглифе тоже есть ключ 宀?",o:["安","明","好","林"],a:0,e:"安 ān содержит 宀 сверху."},
+ {t:"choice",q:"Какой из этих знаков содержит 宀?",o:["字","好","看","吃"],a:0,e:"字 zì = 宀 + 子."},
+ {t:"multi",q:"Найди все иероглифы из поста с ключом 宀",o:["安","字","客","室","宿","好"],a:[0,1,2,3,4],e:"安, 字, 客, 室, 宿 содержат 宀."},
+ {t:"choice",q:"Что означает 安 ān в посте?",o:["покой","гость","комната","ночевать"],a:0,e:"安 ān — покой."},
+ {t:"choice",q:"Что означает 字 zì?",o:["иероглиф","комната","гость","крыша"],a:0,e:"字 zì — иероглиф."},
+ {t:"choice",q:"Что означает 客 kè?",o:["гость","эксперт","семья","свинья"],a:0,e:"客 kè — гость."},
+ {t:"choice",q:"Что означает 室 shì?",o:["комната","страна","домашнее животное","переезд"],a:0,e:"室 shì — комната."},
+ {t:"choice",q:"Что означает 宿 sù в посте?",o:["ночевать","рисовать","писать","возвращаться"],a:0,e:"宿 sù — ночевать."},
+ {t:"build",q:"Собери слово",hint:"«члены семьи»",tokens:["家","人"],a:["家","人"],e:"家人 jiārén — члены семьи."},
+ {t:"build",q:"Собери слово",hint:"«вернуться домой»",tokens:["回","家"],a:["回","家"],e:"回家 huí jiā — вернуться домой."},
+ {t:"build",q:"Собери слово",hint:"«писатель»",tokens:["作","家"],a:["作","家"],e:"作家 zuòjiā — писатель."},
+ {t:"build",q:"Собери слово",hint:"«художник»",tokens:["画","家"],a:["画","家"],e:"画家 huàjiā — художник."},
+ {t:"build",q:"Собери слово",hint:"«эксперт»",tokens:["专","家"],a:["专","家"],e:"专家 zhuānjiā — эксперт."},
+ {t:"match",q:"Соедини слово и значение",pairs:[["家人","члены семьи"],["回家","вернуться домой"],["搬家","переезжать"],["家庭","семья"]],e:"Все четыре слова используют 家 в прямой связи с домом или семьёй."},
+ {t:"match",q:"Соедини профессию и перевод",pairs:[["作家","писатель"],["画家","художник"],["专家","эксперт"]],e:"В этих словах 家 стоит в конце и обозначает специалиста."},
+ {t:"match",q:"Соедини иероглиф с переводом",pairs:[["安","покой"],["字","иероглиф"],["客","гость"],["室","комната"],["宿","ночевать"]],e:"У всех этих знаков в посте есть общий элемент 宀 — «крыша»."}
+];
+
+const TOTAL=16;
+let tasks=[],score=0,done=0,streak=0,bestStreak=0,locked={},buildState={},matchState={};
+
+function shuffle(arr){
+ const a=[...arr];
+ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ return a
+}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function prepare(){
+ const choices=shuffle(BANK.filter(x=>x.t==="choice").map(clone)).slice(0,9);
+ const multis=shuffle(BANK.filter(x=>x.t==="multi").map(clone)).slice(0,2);
+ const builds=shuffle(BANK.filter(x=>x.t==="build").map(clone)).slice(0,3);
+ const matches=shuffle(BANK.filter(x=>x.t==="match").map(clone)).slice(0,2);
+ tasks=shuffle([...choices,...multis,...builds,...matches]);
+ score=0;done=0;streak=0;bestStreak=0;locked={};buildState={};matchState={};
+}
+function render(){
+ const root=document.getElementById("quiz");root.innerHTML="";
+ tasks.forEach((t,i)=>{
+   const c=document.createElement("section");c.className="card";c.id="q"+i;
+   let h=`<div class="qnum">Задание ${i+1}</div><div class="qtitle">${t.q}</div>`;
+   if(t.hint)h+=`<div class="hint">${t.hint}</div>`;
+   if(t.cn)h+=`<div class="cn">${t.cn}</div>`;
+   if(t.py)h+=`<div class="py">${t.py}</div>`;
+   if(t.t==="choice")h+=choiceHTML(t,i);
+   if(t.t==="multi")h+=multiHTML(t,i);
+   if(t.t==="build")h+=buildHTML(t,i);
+   if(t.t==="match")h+=matchHTML(t,i);
+   h+=`<div class="feedback" id="fb${i}"></div>`;
+   c.innerHTML=h;root.appendChild(c)
+ });
+ document.getElementById("result").classList.remove("show");updateStats()
+}
+function choiceHTML(t,i){
+ const mixed=shuffle(t.o.map((x,idx)=>({x,idx})));
+ return `<div class="opts">${mixed.map(o=>`<button type="button" class="opt" data-real="${o.idx}">${o.x}</button>`).join("")}</div>`
+}
+function multiHTML(t,i){
+ const mixed=shuffle(t.o.map((x,idx)=>({x,idx})));
+ return `<div class="opts" id="multi${i}">${mixed.map(o=>`<button type="button" class="opt" data-real="${o.idx}">${o.x}</button>`).join("")}</div>
+ <button type="button" class="btn" data-check-multi="${i}">Проверить</button>`
+}
+function buildHTML(t,i){
+ buildState[i]=[];
+ return `<div class="answerzone" id="zone${i}"></div>
+ <div class="tokens" id="tokens${i}">${shuffle(t.tokens).map(x=>`<button type="button" class="token" data-token="${x}">${x}</button>`).join("")}</div>
+ <button type="button" class="btn" data-check-build="${i}">Проверить</button>
+ <button type="button" class="btn secondary" data-reset-build="${i}">Сбросить</button>`
+}
+function matchHTML(t,i){
+ matchState[i]={left:null,right:null,count:0,mistake:false};
+ const rights=shuffle(t.pairs.map((p,idx)=>({text:p[1],idx})));
+ return `<div class="matchgrid">
+ <div class="matchcol">${t.pairs.map((p,idx)=>`<button type="button" class="matchbtn" data-side="L" data-idx="${idx}">${p[0]}</button>`).join("")}</div>
+ <div class="matchcol">${rights.map(x=>`<button type="button" class="matchbtn" data-side="R" data-idx="${x.idx}">${x.text}</button>`).join("")}</div>
+ </div>`
+}
+function finish(i,ok){
+ if(locked[i])return;locked[i]=true;done++;
+ if(ok){score++;streak++;bestStreak=Math.max(bestStreak,streak)}else{streak=0}
+ updateStats();if(done===tasks.length)showResult()
+}
+function showFeedback(i,ok,text){
+ const f=document.getElementById("fb"+i);
+ f.className="feedback show "+(ok?"ok":"bad");
+ f.innerHTML=(ok?"✅ <b>Верно!</b> ":"❌ <b>Не совсем.</b> ")+text
+}
+function updateStats(){
+ document.getElementById("progressText").textContent=`${done} / ${tasks.length}`;
+ document.getElementById("scoreText").textContent=`⭐ ${score}`;
+ document.getElementById("streakText").textContent=`🔥 серия: ${streak}`;
+ document.getElementById("barFill").style.width=(done/tasks.length*100)+"%"
+}
+function showResult(){
+ const r=document.getElementById("result");r.classList.add("show");
+ document.getElementById("finalScore").textContent=`${score}/${tasks.length}`;
+ let badges=[];
+ if(score===tasks.length)badges.push("🏆 Идеально");
+ if(bestStreak>=5)badges.push(`🔥 серия ${bestStreak}`);
+ if(score>=13)badges.push("🗝 Знаток 家");
+ document.getElementById("badges").innerHTML=badges.map(x=>`<span class="badge">${x}</span>`).join("");
+ const p=score/tasks.length;
+ document.getElementById("finalMsg").textContent=p>=.9?"Отлично: ты видишь не только 家, но и логику его «семьи» слов и ключа 宀.":p>=.7?"Хорошо! Ещё один раунд поможет закрепить слова и быстрее узнавать 宀.":"Попробуй ещё раз: новый раунд перемешает вопросы и варианты.";
+ r.scrollIntoView({behavior:"smooth",block:"center"})
+}
+
+document.getElementById("quiz").addEventListener("click",e=>{
+ const btn=e.target.closest("button");if(!btn)return;
+ const card=btn.closest(".card");if(!card)return;
+ const i=Number(card.id.replace("q",""));const t=tasks[i];if(locked[i])return;
+
+ if(btn.classList.contains("opt")&&t.t==="choice"){
+   const real=Number(btn.dataset.real);
+   card.querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(Number(b.dataset.real)===t.a)b.classList.add("correct")});
+   const ok=real===t.a;if(!ok)btn.classList.add("wrong");showFeedback(i,ok,t.e);finish(i,ok)
+ }
+ if(btn.classList.contains("opt")&&t.t==="multi"){btn.classList.toggle("selected")}
+ if(btn.dataset.checkMulti!==undefined){
+   const ans=[...t.a].sort((a,b)=>a-b);
+   const sel=[...card.querySelectorAll(".opt.selected")].map(b=>Number(b.dataset.real)).sort((a,b)=>a-b);
+   const ok=JSON.stringify(ans)===JSON.stringify(sel);
+   card.querySelectorAll(".opt").forEach(b=>{b.disabled=true;const x=Number(b.dataset.real);if(ans.includes(x))b.classList.add("correct");else if(sel.includes(x))b.classList.add("wrong")});
+   showFeedback(i,ok,t.e);finish(i,ok)
+ }
+ if(btn.classList.contains("token")){
+   if(btn.classList.contains("used"))return;
+   btn.classList.add("used");const tok=btn.dataset.token;buildState[i].push({tok,btn});
+   const chip=document.createElement("button");chip.type="button";chip.className="token";chip.textContent=tok;
+   chip.addEventListener("click",()=>{if(locked[i])return;const ix=buildState[i].findIndex(x=>x.btn===btn);if(ix>=0)buildState[i].splice(ix,1);btn.classList.remove("used");chip.remove()});
+   document.getElementById("zone"+i).appendChild(chip)
+ }
+ if(btn.dataset.resetBuild!==undefined){
+   buildState[i].forEach(x=>x.btn.classList.remove("used"));buildState[i]=[];document.getElementById("zone"+i).innerHTML=""
+ }
+ if(btn.dataset.checkBuild!==undefined){
+   const got=buildState[i].map(x=>x.tok);const ok=JSON.stringify(got)===JSON.stringify(t.a);
+   showFeedback(i,ok,t.e);finish(i,ok)
+ }
+ if(btn.classList.contains("matchbtn")){
+   const st=matchState[i],side=btn.dataset.side,idx=Number(btn.dataset.idx);
+   if(btn.classList.contains("matched"))return;
+   card.querySelectorAll(".matchbtn").forEach(x=>{if(!x.classList.contains("matched"))x.classList.remove("active")});
+   if(side==="L")st.left={idx,btn};else st.right={idx,btn};btn.classList.add("active");
+   if(st.left&&st.right){
+     if(st.left.idx===st.right.idx){
+       st.left.btn.classList.remove("active");st.right.btn.classList.remove("active");
+       st.left.btn.classList.add("matched");st.right.btn.classList.add("matched");st.count++;
+       st.left=null;st.right=null;
+       if(st.count===t.pairs.length){showFeedback(i,!st.mistake,t.e);finish(i,!st.mistake)}
+     }else{
+       st.mistake=true;const l=st.left.btn,r=st.right.btn;l.classList.add("wrong");r.classList.add("wrong");
+       setTimeout(()=>{l.classList.remove("wrong","active");r.classList.remove("wrong","active")},450);
+       st.left=null;st.right=null
+     }
+   }
+ }
+});
+
+document.getElementById("restartBtn").addEventListener("click",()=>{prepare();render();window.scrollTo({top:0,behavior:"smooth"})});
+prepare();render();
+</script>
+</body>
+</html>
