@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HSK Interactive Practice by Topic</title>
+<style>
+:root{--n:#071a2d;--n2:#0d2945;--g:#d9ad55;--g2:#f2d58a;--ok:#16845a;--bad:#c84646;--paper:#f6f1e7}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans SC",sans-serif;background:linear-gradient(180deg,#ece4d6,#f7f8fa 380px);color:#172337}
+header{background:linear-gradient(135deg,var(--n),var(--n2));color:#fff;border-bottom:4px solid var(--g);padding:32px 18px 26px}.inner,main{max-width:960px;margin:auto}.brand{color:var(--g2);font-size:12px;font-weight:900;letter-spacing:.15em}h1{font-size:clamp(30px,5vw,48px);margin:8px 0}header p{color:#d7e1ea;margin:0}
+main{padding:10px 14px 45px}.tabs{display:flex;gap:8px;overflow:auto;position:sticky;top:0;z-index:20;background:#f6f1e7f2;padding:10px 0}.tab{border:1.5px solid #ccd4dc;background:#fff;color:var(--n);border-radius:999px;padding:11px 15px;font-weight:800;white-space:nowrap;cursor:pointer}.tab.active{background:var(--n);color:#fff;border-color:var(--n)}
+.panel{display:none}.panel.active{display:block}.head,.card{background:#fff;border:1px solid #e2ddd5;border-radius:18px;padding:18px;margin:12px 0}.head h2{margin:0 0 5px}.head p{margin:0;color:#687586}
+.progress{position:sticky;top:62px;background:#f6f1e7f2;padding:9px 0;z-index:10}.prow{display:flex;justify-content:space-between;font-size:13px;font-weight:800}.bar{height:9px;background:#dfe4e8;border-radius:99px;overflow:hidden;margin-top:7px}.bar div{height:100%;width:0;background:var(--g)}
+.num{font-size:12px;color:#8d6a2a;font-weight:800}.q{font-size:20px;font-weight:800;margin:7px 0 11px}.opts{display:grid;gap:8px}.opt,.token{border:1.5px solid #cfd5dc;background:#fff;border-radius:12px;padding:11px;text-align:left;font:inherit;cursor:pointer}.opt.sel{background:#fff7df;border-color:#9a762c}.opt.good{background:#eaf7f0;border-color:var(--ok);color:#126943}.opt.bad{background:#fff0f0;border-color:var(--bad);color:#9d3030}
+.btn{border:0;background:var(--n);color:#fff;border-radius:12px;padding:10px 14px;font-weight:800;margin-top:9px;cursor:pointer}.btn.alt{background:#fff;color:var(--n);border:1.5px solid var(--n);margin-left:5px}.zone,.tokens{display:flex;gap:8px;flex-wrap:wrap;min-height:48px;padding:9px;border-radius:12px}.zone{border:2px dashed #d3d9df;margin-bottom:8px}.tokens{background:#f4f6f8}.token.used{opacity:.3;pointer-events:none}.zone .token{background:#fff8e8;border-color:#d5b361}.fb{display:none;padding:11px;border-radius:12px;margin-top:10px}.fb.show{display:block}.fb.ok{background:#eaf7f0;color:#126943}.fb.no{background:#fff0f0;color:#9d3030}
+.result{display:none;background:linear-gradient(135deg,var(--n),var(--n2));color:#fff;border:2px solid var(--g);border-radius:20px;padding:24px;text-align:center;margin:16px 0}.result.show{display:block}.score{font-size:48px;color:var(--g2);font-weight:900}
+</style></head>
+<body>
+<header><div class="inner"><div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ</div><h1>Интерактивная практика HSK</h1><p>Каждая тема — на отдельной вкладке. Вопросы и ответы перемешиваются при новом прохождении.</p></div></header>
+<main><div class="tabs" id="tabs"></div><div id="panels"></div></main>
+<script>
+const LEVELS=[{"id": "hsk1", "tab": "HSK1 · 我的家人", "title": "HSK1 — 我的家人", "subtitle": "Семья, хобби, профессии и базовые модели.", "tasks": [{"type": "choice", "q": "Что означает 家人 jiārén?", "options": ["члены семьи", "работа", "спорт", "юрист"], "answer": "члены семьи", "exp": "家人 jiārén — члены семьи."}, {"type": "choice", "q": "Как сказать «Это мой папа»?", "options": ["这是我的爸爸。", "我家有爸爸。", "爸爸喜欢看电影。", "我的爸爸是工作。"], "answer": "这是我的爸爸。", "exp": "Модель: 这是 + 我的 + член семьи."}, {"type": "choice", "q": "Как спросить «Сколько человек в твоей семье?»", "options": ["你家有几口人？", "他们是谁？", "你喜欢做什么？", "你是做什么工作的？"], "answer": "你家有几口人？", "exp": "你家有几口人？ — Сколько человек в твоей семье?"}, {"type": "order", "q": "Соберите: «Мой папа любит смотреть кино».", "tokens": ["我的爸爸", "喜欢", "看电影"], "answer": ["我的爸爸", "喜欢", "看电影"], "exp": "我的爸爸喜欢看电影。"}, {"type": "multi", "q": "Выберите все профессии.", "options": ["护士", "律师", "画画", "运动"], "answers": ["护士", "律师"], "exp": "护士 — медсестра; 律师 — юрист."}, {"type": "choice", "q": "Какое слово означает «рисовать»?", "options": ["画画", "看书", "工作", "运动"], "answer": "画画", "exp": "画画 huàhuà — рисовать."}, {"type": "order", "q": "Соберите: «В моей семье 3 человека: папа, мама и я».", "tokens": ["我家有3口人，", "爸爸、妈妈", "和我"], "answer": ["我家有3口人，", "爸爸、妈妈", "和我"], "exp": "我家有3口人，爸爸、妈妈和我。"}]}, {"id": "payment", "tab": "HSK2–3 · 手机付款", "title": "HSK2–3 — 手机付款就可以", "subtitle": "Телефон, способы оплаты, QR-коды и конструкция 就可以.", "tasks": [{"type": "choice", "q": "Что означает 二维码 èrwéimǎ?", "options": ["QR-код", "банковская карта", "наличные", "телефон"], "answer": "QR-код", "exp": "二维码 èrwéimǎ — QR-код."}, {"type": "choice", "q": "Как сказать «Я плачу телефоном»?", "options": ["我用手机付款。", "我没有手机。", "我用现金扫码。", "我一般付款手机。"], "answer": "我用手机付款。", "exp": "用 + способ + 付款: 我用手机付款。"}, {"type": "order", "q": "Соберите: «Достаточно отсканировать QR-код».", "tokens": ["扫一下二维码", "就可以了"], "answer": ["扫一下二维码", "就可以了"], "exp": "扫一下二维码就可以了。"}, {"type": "choice", "q": "Что подходит: 我没有现金，______？", "options": ["怎么办", "最喜欢", "为了什么", "看重什么"], "answer": "怎么办", "exp": "没有 + 东西 + 怎么办？ — Что делать, если чего-то нет?"}, {"type": "multi", "q": "Выберите способы оплаты из темы.", "options": ["银行卡", "微信支付", "支付宝", "看电影"], "answers": ["银行卡", "微信支付", "支付宝"], "exp": "银行卡 — банковская карта; 微信支付 — WeChat Pay; 支付宝 — Alipay."}, {"type": "choice", "q": "Как спросить «Можно оплатить телефоном?»", "options": ["可以用手机付款吗？", "手机付款怎么办？", "你没有手机吗？", "一般用现金吗？"], "answer": "可以用手机付款吗？", "exp": "可以用手机付款吗？ — Можно оплатить телефоном?"}, {"type": "choice", "q": "Что означает 扫码 sǎomǎ?", "options": ["сканировать код", "платить наличными", "брать с собой", "оплачивать картой"], "answer": "сканировать код", "exp": "扫码 sǎomǎ — сканировать код."}, {"type": "order", "q": "Соберите ответ: «Ничего страшного, можно телефоном».", "tokens": ["没关系，", "可以用手机"], "answer": ["没关系，", "可以用手机"], "exp": "没关系，可以用手机。"}]}, {"id": "clothes", "tab": "HSK2–3 · 舒适还是美丽", "title": "HSK2–3 — 要舒适还是要美丽", "subtitle": "Одежда, комфорт, красота, выбор и конструкции 为了 / 愿意 / 最.", "tasks": [{"type": "choice", "q": "Что означает 合适 héshì?", "options": ["подходящий", "красивый", "удобный", "цвет"], "answer": "подходящий", "exp": "合适 héshì — подходящий."}, {"type": "choice", "q": "Как сказать «Больше всего я люблю синий цвет»?", "options": ["我最喜欢蓝色。", "我为了蓝色。", "我愿意蓝色。", "蓝色的时候最。"], "answer": "我最喜欢蓝色。", "exp": "最 + глагол/прилагательное: 我最喜欢蓝色。"}, {"type": "order", "q": "Соберите: «Ради комфорта я покупаю эти туфли».", "tokens": ["为了舒服，", "我买", "这双鞋"], "answer": ["为了舒服，", "我买", "这双鞋"], "exp": "为了舒服，我买这双鞋。"}, {"type": "multi", "q": "Какие слова относятся к одежде?", "options": ["衬衫", "裙子", "外套", "支付宝"], "answers": ["衬衫", "裙子", "外套"], "exp": "衬衫 — рубашка; 裙子 — юбка; 外套 — верхняя одежда."}, {"type": "choice", "q": "Что означает 愿意 yuànyì?", "options": ["быть готовым что-то сделать", "больше всего", "во время", "подходить по размеру"], "answer": "быть готовым что-то сделать", "exp": "愿意 + глагол — быть готовым что-то сделать."}, {"type": "choice", "q": "Что подходит: 为了好看，你______不舒服吗？", "options": ["愿意", "扫码", "付款", "有"], "answer": "愿意", "exp": "为了好看，你愿意不舒服吗？ — Ради красоты готов(а) терпеть неудобство?"}, {"type": "choice", "q": "Как спросить «Что для тебя важнее всего при покупке одежды?»", "options": ["你买衣服的时候最看重什么？", "你最喜欢什么手机？", "你用什么付款？", "你家有几口人？"], "answer": "你买衣服的时候最看重什么？", "exp": "……的时候 + 最看重什么？"}, {"type": "order", "q": "Соберите: «На занятия я люблю надевать удобную одежду».", "tokens": ["上课的时候，", "我喜欢穿", "舒服的衣服"], "answer": ["上课的时候，", "我喜欢穿", "舒服的衣服"], "exp": "上课的时候，我喜欢穿舒服的衣服。"}]}, {"id": "hsk4", "tab": "HSK4 · 金钱辩论", "title": "HSK4 — 钱是不是万恶之源", "subtitle": "Деньги, богатство, ответственность, мораль и аргументация.", "tasks": [{"type": "choice", "q": "Что означает 万恶之源 wàn è zhī yuán?", "options": ["источник всех зол", "разумно тратить деньги", "финансовое давление", "богатство"], "answer": "источник всех зол", "exp": "万恶之源 — источник всех зол."}, {"type": "choice", "q": "Какое слово означает «жадность / жадный»?", "options": ["贪心", "公平", "责任", "自由"], "answer": "贪心", "exp": "贪心 tānxīn — жадный; жадность."}, {"type": "choice", "q": "Что означает 被金钱诱惑?", "options": ["поддаться денежному соблазну", "разумно распоряжаться деньгами", "усердно зарабатывать", "помогать другим деньгами"], "answer": "поддаться денежному соблазну", "exp": "被金钱诱惑 — поддаться денежному соблазну."}, {"type": "multi", "q": "Выберите выражения с негативным отношением к деньгам.", "options": ["见钱眼开", "唯利是图", "利欲熏心", "合理使用金钱"], "answers": ["见钱眼开", "唯利是图", "利欲熏心"], "exp": "合理使用金钱 — «разумно распоряжаться деньгами»."}, {"type": "choice", "q": "Как понять 金钱是把双刃剑?", "options": ["у денег есть польза и опасность", "деньги — источник всех зол", "за деньги можно купить счастье", "богатство всегда опасно"], "answer": "у денег есть польза и опасность", "exp": "金钱是把双刃剑 — деньги подобны обоюдоострому мечу."}, {"type": "order", "q": "Соберите: «Счастье нельзя купить за деньги».", "tokens": ["钱", "买不到", "幸福"], "answer": ["钱", "买不到", "幸福"], "exp": "钱买不到幸福。"}, {"type": "choice", "q": "Какое выражение означает «богатство нужно получать честным путём»?", "options": ["君子爱财，取之有道", "有钱能使鬼推磨", "挥金如土", "视钱如命"], "answer": "君子爱财，取之有道", "exp": "君子爱财，取之有道 — богатство нужно получать честным путём."}, {"type": "multi", "q": "Какие шаги рекомендуются для ответа в дебатах?", "options": ["выбрать позицию", "объяснить причины", "привести пример", "ответить на другую точку зрения", "просто назвать тему"], "answers": ["выбрать позицию", "объяснить причины", "привести пример", "ответить на другую точку зрения"], "exp": "Позиция + причины + пример + ответ на другую точку зрения."}]}], state={};
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function boot(){
+ const tabs=document.getElementById('tabs'),panels=document.getElementById('panels');
+ tabs.innerHTML=LEVELS.map((l,i)=>`<button type="button" class="tab ${i?'':'active'}" data-id="${l.id}">${l.tab}</button>`).join('');
+ panels.innerHTML=LEVELS.map((l,i)=>`<section class="panel ${i?'':'active'}" id="p-${l.id}">
+ <div class="head"><h2>${l.title}</h2><p>${l.subtitle}</p></div>
+ <div class="progress"><div class="prow"><span id="pr-${l.id}"></span><span id="pt-${l.id}"></span></div><div class="bar"><div id="bar-${l.id}"></div></div></div>
+ <div id="q-${l.id}"></div>
+ <div class="result" id="r-${l.id}"><div class="score" id="rs-${l.id}"></div><p id="rm-${l.id}"></p><button type="button" class="btn" data-restart="${l.id}">Новый вариант</button></div>
+ </section>`).join('');
+ LEVELS.forEach(reset); bind();
+}
+function reset(l){
+ state[l.id]={done:0,score:0,locked:{},order:{},tasks:sh(l.tasks)};
+ document.getElementById('r-'+l.id).classList.remove('show');render(l);update(l.id);
+}
+function render(l){
+ const s=state[l.id],root=document.getElementById('q-'+l.id);root.innerHTML='';
+ s.tasks.forEach((t,i)=>{
+   const c=document.createElement('div');c.className='card';c.id=`${l.id}-q${i}`;
+   let h=`<div class="num">ЗАДАНИЕ ${i+1}</div><div class="q">${t.q}</div>`;
+   if(t.type==='choice'||t.type==='multi'){
+     const opts=sh(t.options);
+     h+=`<div class="opts">${opts.map(o=>`<button type="button" class="opt"></button>`).join('')}</div>`;
+     if(t.type==='multi')h+=`<button type="button" class="btn checkm">Проверить</button>`;
+     c.innerHTML=h+`<div class="fb" id="f-${l.id}-${i}"></div>`;
+     [...c.querySelectorAll('.opt')].forEach((b,k)=>{b.textContent=opts[k];b.dataset.v=opts[k]});
+   } else {
+     const toks=sh(t.tokens);s.order[i]=[];
+     h+=`<div class="zone" id="z-${l.id}-${i}"></div><div class="tokens">${toks.map(x=>`<button type="button" class="token"></button>`).join('')}</div><button type="button" class="btn checko">Проверить</button><button type="button" class="btn alt reseto">Сбросить</button>`;
+     c.innerHTML=h+`<div class="fb" id="f-${l.id}-${i}"></div>`;
+     [...c.querySelectorAll('.token')].forEach((b,k)=>{b.textContent=toks[k];b.dataset.v=toks[k]});
+   }
+   root.appendChild(c);
+ });
+}
+function fb(id,i,ok,text){let f=document.getElementById(`f-${id}-${i}`);f.className='fb show '+(ok?'ok':'no');f.innerHTML=(ok?'✅ Верно. ':'❌ Не совсем. ')+text}
+function finish(id,i,ok){let s=state[id];if(s.locked[i])return;s.locked[i]=1;s.done++;if(ok)s.score++;update(id)}
+function update(id){
+ let l=LEVELS.find(x=>x.id===id),s=state[id];
+ document.getElementById('pr-'+id).textContent=`${s.done} / ${l.tasks.length}`;
+ document.getElementById('pt-'+id).textContent=`${s.score} баллов`;
+ document.getElementById('bar-'+id).style.width=(s.done/l.tasks.length*100)+'%';
+ if(s.done===l.tasks.length){
+  let r=document.getElementById('r-'+id);r.classList.add('show');
+  document.getElementById('rs-'+id).textContent=`${s.score} / ${l.tasks.length}`;
+  document.getElementById('rm-'+id).textContent=s.score/l.tasks.length>=.8?'Отлично!':s.score/l.tasks.length>=.6?'Хорошо. Пройдите ещё раз для закрепления.':'Попробуйте ещё раз — порядок изменится.';
+ }
+}
+function bind(){
+ document.getElementById('tabs').onclick=e=>{
+  let b=e.target.closest('.tab');if(!b)return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='p-'+b.dataset.id));
+ };
+ document.getElementById('panels').onclick=e=>{
+  let b=e.target.closest('button');if(!b)return;
+  if(b.dataset.restart){reset(LEVELS.find(x=>x.id===b.dataset.restart));return}
+  let c=b.closest('.card');if(!c)return;let m=c.id.match(/^(.+)-q(\d+)$/);if(!m)return;
+  let id=m[1],i=+m[2],s=state[id],t=s.tasks[i];if(s.locked[i])return;
+  if(b.classList.contains('opt')&&t.type==='choice'){let ok=b.dataset.v===t.answer;c.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.dataset.v===t.answer)x.classList.add('good')});if(!ok)b.classList.add('bad');fb(id,i,ok,t.exp);finish(id,i,ok);return}
+  if(b.classList.contains('opt')&&t.type==='multi'){b.classList.toggle('sel');return}
+  if(b.classList.contains('checkm')){let got=[...c.querySelectorAll('.opt.sel')].map(x=>x.dataset.v).sort(),ans=[...t.answers].sort(),ok=JSON.stringify(got)===JSON.stringify(ans);c.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(ans.includes(x.dataset.v))x.classList.add('good');else if(got.includes(x.dataset.v))x.classList.add('bad')});fb(id,i,ok,t.exp);finish(id,i,ok);return}
+  if(b.classList.contains('token')){if(b.classList.contains('used'))return;b.classList.add('used');s.order[i].push({v:b.dataset.v,src:b});let chip=document.createElement('button');chip.type='button';chip.className='token';chip.textContent=b.dataset.v;chip.onclick=()=>{if(s.locked[i])return;let k=s.order[i].findIndex(x=>x.src===b);if(k>=0)s.order[i].splice(k,1);b.classList.remove('used');chip.remove()};document.getElementById(`z-${id}-${i}`).appendChild(chip);return}
+  if(b.classList.contains('reseto')){s.order[i].forEach(x=>x.src.classList.remove('used'));s.order[i]=[];document.getElementById(`z-${id}-${i}`).innerHTML='';return}
+  if(b.classList.contains('checko')){let got=s.order[i].map(x=>x.v),ok=JSON.stringify(got)===JSON.stringify(t.answer);fb(id,i,ok,t.exp);finish(id,i,ok)}
+ };
+}
+boot();
+</script></body></html>
