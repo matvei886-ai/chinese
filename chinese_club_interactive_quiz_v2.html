@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chinese Club Interactive Quiz</title>
+<style>
+:root{--navy:#071a2d;--navy2:#0d2945;--gold:#d9ad55;--gold2:#f2d58a;--paper:#f6f1e7;--ok:#16845a;--bad:#c84646}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans SC",sans-serif;background:linear-gradient(#ece5d8,#f8f9fb 390px);color:#172337}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-bottom:4px solid var(--gold);padding:30px 18px}
+.inner,main{max-width:980px;margin:auto}.brand{color:var(--gold2);font-size:12px;font-weight:900;letter-spacing:.15em}
+h1{font-size:clamp(29px,5vw,48px);margin:8px 0 6px}header p{margin:0;color:#d5e0e9}
+main{padding:10px 14px 45px}
+.tabs{display:flex;gap:8px;overflow:auto;position:sticky;top:0;background:rgba(246,241,231,.97);padding:10px 0;z-index:30}
+.tab{border:1px solid #cbd3db;background:#fff;color:var(--navy);border-radius:999px;padding:11px 15px;font:inherit;font-weight:800;white-space:nowrap;cursor:pointer}
+.tab.active{background:var(--navy);color:#fff}
+.panel{display:none}.panel.active{display:block}
+.head,.card{background:#fff;border:1px solid #e1ddd5;border-radius:18px;padding:18px;margin:12px 0}
+.head h2{margin:0 0 5px}.head p{margin:0;color:#6c7785}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn{border:0;background:var(--navy);color:#fff;border-radius:11px;padding:10px 14px;font:inherit;font-weight:800;cursor:pointer}
+.btn.alt{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.progress{position:sticky;top:64px;background:rgba(246,241,231,.97);padding:9px 0;z-index:20}
+.prow{display:flex;justify-content:space-between;font-size:13px;font-weight:800}
+.bar{height:9px;background:#dfe4e8;border-radius:99px;overflow:hidden;margin-top:7px}.bar div{height:100%;width:0;background:var(--gold);transition:.2s}
+.num{font-size:12px;color:#8c692c;font-weight:800}.q{font-size:20px;font-weight:800;line-height:1.4;margin:7px 0 12px}
+.opts{display:grid;gap:8px}.opt,.token,.match{border:1.5px solid #cfd6dd;background:#fff;border-radius:12px;padding:11px 13px;font:inherit;text-align:left;cursor:pointer}
+.opt.sel,.match.sel{background:#fff6dc;border-color:#9a762c}.opt.good,.match.done{background:#eaf7f0;border-color:var(--ok);color:#126943}.opt.bad,.match.wrong{background:#fff0f0;border-color:var(--bad);color:#9d3030}
+.zone,.tokens{display:flex;flex-wrap:wrap;gap:8px;min-height:50px;padding:9px;border-radius:12px}.zone{border:2px dashed #cfd6dd;margin-bottom:8px}.tokens{background:#f4f6f8}.token.used{opacity:.3;pointer-events:none}.zone .token{background:#fff7df;border-color:#d5b362}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.col{display:grid;gap:8px}
+.fb{display:none;margin-top:11px;padding:11px 13px;border-radius:12px}.fb.show{display:block}.fb.ok{background:#eaf7f0;color:#126943}.fb.no{background:#fff0f0;color:#9d3030}
+.result{display:none;text-align:center;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border:2px solid var(--gold);border-radius:20px;padding:24px;margin:18px 0}.result.show{display:block}.score{font-size:48px;color:var(--gold2);font-weight:900}
+@media(max-width:600px){.matchgrid{grid-template-columns:1fr}.card{padding:16px}.q{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <div class="brand">КИТАЙСКИЙ С НОСИТЕЛЯМИ</div>
+    <h1>Интерактив по разговорным клубам</h1>
+    <p>4 темы · по 5 заданий · ответы и порядок упражнений перемешиваются.</p>
+  </div>
+</header>
+
+<main>
+  <nav class="tabs" id="tabs"></nav>
+  <div id="panels"></div>
+</main>
+
+<script>
+const TOPICS = [{"id": "fruit", "tab": "HSK1 · 买水果", "title": "HSK1 — 在商店买水果", "subtitle": "Фрукты, цена, количество и короткий диалог в магазине.", "tasks": [{"type": "match", "q": "Соедините фрукт с переводом.", "pairs": [["苹果", "яблоко"], ["香蕉", "банан"], ["葡萄", "виноград"], ["草莓", "клубника"]], "exp": "苹果 — яблоко; 香蕉 — банан; 葡萄 — виноград; 草莓 — клубника."}, {"type": "choice", "q": "Как спросить: «Сколько стоят яблоки за 500 г?»", "options": ["苹果多少钱一斤？", "这个多少钱？", "我要一斤苹果。", "还有香蕉吗？"], "answer": "苹果多少钱一斤？", "exp": "多少钱一斤？ = «Сколько стоит за 500 г?»"}, {"type": "order", "q": "Соберите: «Я хочу купить два апельсина».", "tokens": ["我想买", "两个", "橙子"], "answer": ["我想买", "两个", "橙子"], "exp": "我想买两个橙子。"}, {"type": "multi", "q": "Что можно сказать продавцу во время покупки?", "options": ["我要一斤苹果。", "还有香蕉吗？", "那我还要一斤香蕉。", "我喜欢吃草莓。"], "answers": ["我要一斤苹果。", "还有香蕉吗？", "那我还要一斤香蕉。"], "exp": "Первые три фразы используются непосредственно в ситуации покупки."}, {"type": "choice", "q": "Яблоки — 10 元/斤, бананы — 8 元/斤. Вы берёте по 一斤 каждого. Сколько всего?", "options": ["18 块钱", "10 块钱", "8 块钱", "20 块钱"], "answer": "18 块钱", "exp": "10 + 8 = 18. 一共十八块钱。"}]}, {"id": "travel", "tab": "HSK2–3 · 旅行", "title": "HSK2–3 — 旅行的时候，你最看重什么？", "subtitle": "Путешествие, гостиница, сравнение и выбор.", "tasks": [{"type": "match", "q": "Соедините слово с переводом.", "pairs": [["假期", "отпуск / каникулы"], ["宾馆", "гостиница"], ["司机", "водитель"], ["满意", "довольный"]], "exp": "Это ключевая лексика темы путешествий."}, {"type": "choice", "q": "Как сказать: «Эта гостиница отличается от прошлой»?", "options": ["这家宾馆跟上次那家不一样。", "这家宾馆跟上次那家一样大。", "我哪儿都不想去。", "除了北京以外，我还想去上海。"], "answer": "这家宾馆跟上次那家不一样。", "exp": "A 跟 B 不一样 = A отличается от B."}, {"type": "order", "q": "Соберите: «Кроме Пекина, я ещё хочу поехать в Шанхай».", "tokens": ["除了北京以外，", "我还想去", "上海"], "answer": ["除了北京以外，", "我还想去", "上海"], "exp": "除了 A 以外，还 B = кроме A, ещё B."}, {"type": "multi", "q": "Выберите правильные модели со значением «никуда / ничего / ни одного».", "options": ["我哪儿都不想去。", "我什么也不想做。", "一个商店也没有。", "我还想去上海。"], "answers": ["我哪儿都不想去。", "我什么也不想做。", "一个商店也没有。"], "exp": "……也 / 都 + 不 / 没 выражает «никто / ничего / никуда / ни одного»."}, {"type": "choice", "q": "Отель A ближе, но маленький и дороже; B дальше, но большой и тихий. Какая фраза лучше начинает сравнение?", "options": ["宾馆A跟宾馆B不一样。", "今天太累了，我什么也不想做。", "除了坐飞机以外，也可以坐高铁。", "我哪儿都不想去。"], "answer": "宾馆A跟宾馆B不一样。", "exp": "Для сравнения двух гостиниц подходит A 跟 B 不一样."}]}, {"id": "shopping", "tab": "HSK2–3 · 网购", "title": "HSK2–3 — 网上买东西还是去商店？", "subtitle": "Онлайн-покупки, магазин и аргументация.", "tasks": [{"type": "match", "q": "Соедините слово с переводом.", "pairs": [["下单", "оформить заказ"], ["退货", "вернуть товар"], ["评价", "отзыв / оценка"], ["试穿", "примерять одежду"]], "exp": "Это ключевая лексика темы онлайн- и офлайн-покупок."}, {"type": "choice", "q": "Как спросить: «Ты предпочитаешь онлайн-покупки или магазин?»", "options": ["你喜欢网购还是去商店？", "你一般在哪里买衣服？", "如果质量不好，你怎么办？", "网上购物比去商店更方便。"], "answer": "你喜欢网购还是去商店？", "exp": "A 还是 B？ — выбор между двумя вариантами."}, {"type": "order", "q": "Соберите: «Поскольку удобно, я люблю онлайн-покупки».", "tokens": ["因为很方便，", "所以", "我喜欢网购"], "answer": ["因为很方便，", "所以", "我喜欢网购"], "exp": "因为……所以…… = потому что…, поэтому…"}, {"type": "multi", "q": "Какие фразы поддерживают идею «онлайн удобно, но магазин полезен для одежды»?", "options": ["网上购物比去商店更方便。", "虽然网购方便，但是我喜欢试穿。", "如果买衣服，我更喜欢去商店。", "我经常在网上买书。"], "answers": ["网上购物比去商店更方便。", "虽然网购方便，但是我喜欢试穿。", "如果买衣服，我更喜欢去商店。"], "exp": "Эти фразы сравнивают способы покупки или объясняют выбор магазина для одежды."}, {"type": "choice", "q": "Вы получили одежду плохого качества. Какая реакция соответствует теме?", "options": ["如果质量不好，我就退货。", "我想先看评价，再下单。", "网上有时候更便宜。", "我觉得网购很方便。"], "answer": "如果质量不好，我就退货。", "exp": "如果……就……: если качество плохое, я верну товар."}]}, {"id": "life", "tab": "HSK4–5 · 死亡时间", "title": "HSK4–5 — 假如你能看到自己的死亡时间", "subtitle": "Выбор, неизвестность, ответственность и смысл жизни.", "tasks": [{"type": "match", "q": "Соедините слово с переводом.", "pairs": [["倒计时", "обратный отсчёт"], ["命运", "судьба"], ["珍惜", "ценить / беречь"], ["遗憾", "сожаление"]], "exp": "Это ключевые слова дискуссии о времени и отношении к жизни."}, {"type": "choice", "q": "Что означает 活在当下 huó zài dāngxià?", "options": ["жить настоящим", "готовиться заранее", "положиться на судьбу", "хранить тайну"], "answer": "жить настоящим", "exp": "活在当下 — жить настоящим, текущим моментом."}, {"type": "order", "q": "Соберите: «Посвятить время семье».", "tokens": ["把时间", "留给", "家人"], "answer": ["把时间", "留给", "家人"], "exp": "把时间留给家人 — посвятить время семье."}, {"type": "multi", "q": "Какие выражения связаны с идеей ценить ограниченное время и жить полнее?", "options": ["争分夺秒", "向死而生", "珍惜每一天", "度日如年"], "answers": ["争分夺秒", "向死而生", "珍惜每一天"], "exp": "争分夺秒 — дорожить каждой минутой; 向死而生 — осознавая смерть, жить полнее; 珍惜每一天 — ценить каждый день."}, {"type": "choice", "q": "Какой вопрос означает: «Может ли неизвестность иногда защищать человека?»", "options": ["未知有时候是不是一种保护？为什么？", "你会把这件事告诉谁？", "你最想完成哪三件事？", "医生有权告诉一个人这种信息吗？"], "answer": "未知有时候是不是一种保护？为什么？", "exp": "Это вопрос из блока о возможных минусах знания точного времени."}]}];
+const STATE = {};
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function getTopic(id){
+  return TOPICS.find(t => t.id === id);
+}
+
+function boot(){
+  const tabsEl = document.getElementById('tabs');
+  const panelsEl = document.getElementById('panels');
+
+  tabsEl.innerHTML = TOPICS.map((t,i) =>
+    `<button type="button" class="tab ${i===0?'active':''}" data-id="${t.id}">${t.tab}</button>`
+  ).join('');
+
+  panelsEl.innerHTML = TOPICS.map((t,i) => `
+    <section class="panel ${i===0?'active':''}" id="panel-${t.id}">
+      <div class="head">
+        <h2>${t.title}</h2>
+        <p>${t.subtitle}</p>
+        <div class="tools">
+          <span>5 коротких заданий</span>
+          <button type="button" class="btn" data-restart="${t.id}">Новый вариант</button>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="prow">
+          <span id="progress-${t.id}">0 / 5</span>
+          <span id="points-${t.id}">0 баллов</span>
+        </div>
+        <div class="bar"><div id="bar-${t.id}"></div></div>
+      </div>
+
+      <div id="quiz-${t.id}"></div>
+
+      <div class="result" id="result-${t.id}">
+        <div class="score" id="score-${t.id}"></div>
+        <p id="message-${t.id}"></p>
+        <button type="button" class="btn" data-restart="${t.id}">Пройти ещё раз</button>
+      </div>
+    </section>
+  `).join('');
+
+  TOPICS.forEach(resetTopic);
+  bindEvents();
+}
+
+function resetTopic(topic){
+  STATE[topic.id] = {
+    tasks: shuffle(topic.tasks),
+    done: 0,
+    score: 0,
+    locked: {},
+    order: {},
+    match: {}
+  };
+  document.getElementById(`result-${topic.id}`).classList.remove('show');
+  renderTopic(topic);
+  updateProgress(topic.id);
+}
+
+function renderTopic(topic){
+  const st = STATE[topic.id];
+  const root = document.getElementById(`quiz-${topic.id}`);
+  root.innerHTML = '';
+
+  st.tasks.forEach((task,index) => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.topic = topic.id;
+    card.dataset.index = String(index);
+
+    let html = `<div class="num">ЗАДАНИЕ ${index+1}</div><div class="q">${task.q}</div>`;
+
+    if(task.type === 'choice'){
+      const options = shuffle(task.options);
+      html += `<div class="opts">${options.map(o => `<button type="button" class="opt" data-value="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('')}</div>`;
+    }
+
+    if(task.type === 'multi'){
+      const options = shuffle(task.options);
+      html += `<div class="opts">${options.map(o => `<button type="button" class="opt" data-value="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('')}</div>`;
+      html += `<button type="button" class="btn multi-check">Проверить</button>`;
+    }
+
+    if(task.type === 'order'){
+      const tokens = shuffle(task.tokens);
+      st.order[index] = [];
+      html += `<div class="zone" id="zone-${topic.id}-${index}"></div>`;
+      html += `<div class="tokens">${tokens.map(o => `<button type="button" class="token" data-value="${escapeHtml(o)}">${escapeHtml(o)}</button>`).join('')}</div>`;
+      html += `<button type="button" class="btn order-check">Проверить</button> `;
+      html += `<button type="button" class="btn alt order-reset">Сбросить</button>`;
+    }
+
+    if(task.type === 'match'){
+      const left = shuffle(task.pairs.map(p => p[0]));
+      const right = shuffle(task.pairs.map(p => p[1]));
+      st.match[index] = { left:null, right:null, matched:0, mistakes:0 };
+      html += `<div class="matchgrid">
+        <div class="col">${left.map(v => `<button type="button" class="match match-left" data-value="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}</div>
+        <div class="col">${right.map(v => `<button type="button" class="match match-right" data-value="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}</div>
+      </div>`;
+    }
+
+    html += `<div class="fb" id="feedback-${topic.id}-${index}"></div>`;
+    card.innerHTML = html;
+    root.appendChild(card);
+  });
+}
+
+function escapeHtml(value){
+  return String(value)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function showFeedback(topicId,index,ok,text){
+  const el = document.getElementById(`feedback-${topicId}-${index}`);
+  el.className = `fb show ${ok?'ok':'no'}`;
+  el.innerHTML = `${ok?'✅':'❌'} ${text}`;
+}
+
+function finishTask(topicId,index,ok){
+  const st = STATE[topicId];
+  if(st.locked[index]) return;
+  st.locked[index] = true;
+  st.done += 1;
+  if(ok) st.score += 1;
+  updateProgress(topicId);
+}
+
+function updateProgress(topicId){
+  const st = STATE[topicId];
+  document.getElementById(`progress-${topicId}`).textContent = `${st.done} / 5`;
+  document.getElementById(`points-${topicId}`).textContent = `${st.score} баллов`;
+  document.getElementById(`bar-${topicId}`).style.width = `${st.done*20}%`;
+
+  if(st.done === 5){
+    const result = document.getElementById(`result-${topicId}`);
+    result.classList.add('show');
+    document.getElementById(`score-${topicId}`).textContent = `${st.score} / 5`;
+    document.getElementById(`message-${topicId}`).textContent =
+      st.score === 5 ? 'Отлично! Все задания выполнены без ошибок.' :
+      st.score >= 3 ? 'Хорошо! Пройдите ещё раз — порядок изменится.' :
+      'Ещё один раунд поможет закрепить материал.';
+  }
+}
+
+function expectedMatch(task,left){
+  const pair = task.pairs.find(p => p[0] === left);
+  return pair ? pair[1] : null;
+}
+
+function bindEvents(){
+  const tabsEl = document.getElementById('tabs');
+  const panelsEl = document.getElementById('panels');
+
+  tabsEl.addEventListener('click', e => {
+    const btn = e.target.closest('.tab');
+    if(!btn) return;
+
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === btn));
+    document.querySelectorAll('.panel').forEach(x => {
+      x.classList.toggle('active', x.id === `panel-${btn.dataset.id}`);
+    });
+  });
+
+  panelsEl.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+
+    if(btn.dataset.restart){
+      const topic = getTopic(btn.dataset.restart);
+      if(topic) resetTopic(topic);
+      return;
+    }
+
+    const card = btn.closest('.card');
+    if(!card) return;
+
+    const topicId = card.dataset.topic;
+    const index = Number(card.dataset.index);
+    const st = STATE[topicId];
+    const task = st.tasks[index];
+
+    if(st.locked[index]) return;
+
+    if(btn.classList.contains('opt') && task.type === 'choice'){
+      const ok = btn.dataset.value === task.answer;
+      card.querySelectorAll('.opt').forEach(o => {
+        o.disabled = true;
+        if(o.dataset.value === task.answer) o.classList.add('good');
+      });
+      if(!ok) btn.classList.add('bad');
+      showFeedback(topicId,index,ok,task.exp);
+      finishTask(topicId,index,ok);
+      return;
+    }
+
+    if(btn.classList.contains('opt') && task.type === 'multi'){
+      btn.classList.toggle('sel');
+      return;
+    }
+
+    if(btn.classList.contains('multi-check')){
+      const selected = [...card.querySelectorAll('.opt.sel')].map(o => o.dataset.value).sort();
+      const correct = [...task.answers].sort();
+      const ok = JSON.stringify(selected) === JSON.stringify(correct);
+
+      card.querySelectorAll('.opt').forEach(o => {
+        o.disabled = true;
+        if(correct.includes(o.dataset.value)) o.classList.add('good');
+        else if(selected.includes(o.dataset.value)) o.classList.add('bad');
+      });
+
+      showFeedback(topicId,index,ok,task.exp);
+      finishTask(topicId,index,ok);
+      return;
+    }
+
+    if(btn.classList.contains('token')){
+      if(btn.classList.contains('used')) return;
+
+      btn.classList.add('used');
+      const rec = { value:btn.dataset.value, source:btn };
+      st.order[index].push(rec);
+
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'token';
+      chip.textContent = rec.value;
+
+      chip.addEventListener('click', () => {
+        if(st.locked[index]) return;
+        const pos = st.order[index].indexOf(rec);
+        if(pos >= 0) st.order[index].splice(pos,1);
+        rec.source.classList.remove('used');
+        chip.remove();
+      });
+
+      document.getElementById(`zone-${topicId}-${index}`).appendChild(chip);
+      return;
+    }
+
+    if(btn.classList.contains('order-reset')){
+      st.order[index].forEach(rec => rec.source.classList.remove('used'));
+      st.order[index] = [];
+      document.getElementById(`zone-${topicId}-${index}`).innerHTML = '';
+      return;
+    }
+
+    if(btn.classList.contains('order-check')){
+      const got = st.order[index].map(rec => rec.value);
+      const ok = JSON.stringify(got) === JSON.stringify(task.answer);
+      showFeedback(topicId,index,ok,task.exp);
+      finishTask(topicId,index,ok);
+      return;
+    }
+
+    if(btn.classList.contains('match')){
+      const m = st.match[index];
+      const side = btn.classList.contains('match-left') ? 'left' : 'right';
+
+      card.querySelectorAll(side === 'left' ? '.match-left' : '.match-right')
+        .forEach(x => x.classList.remove('sel'));
+
+      btn.classList.add('sel');
+      m[side] = btn;
+
+      if(m.left && m.right){
+        const ok = expectedMatch(task,m.left.dataset.value) === m.right.dataset.value;
+
+        if(ok){
+          m.left.classList.remove('sel');
+          m.right.classList.remove('sel');
+          m.left.classList.add('done');
+          m.right.classList.add('done');
+          m.left.disabled = true;
+          m.right.disabled = true;
+          m.matched += 1;
+        }else{
+          m.mistakes += 1;
+          const leftBtn = m.left;
+          const rightBtn = m.right;
+          leftBtn.classList.add('wrong');
+          rightBtn.classList.add('wrong');
+          setTimeout(() => {
+            leftBtn.classList.remove('wrong','sel');
+            rightBtn.classList.remove('wrong','sel');
+          },250);
+        }
+
+        m.left = null;
+        m.right = null;
+
+        if(m.matched === task.pairs.length){
+          const perfect = m.mistakes === 0;
+          showFeedback(
+            topicId,
+            index,
+            perfect,
+            perfect ? task.exp : `Все пары найдены. Ошибок: ${m.mistakes}. ${task.exp}`
+          );
+          finishTask(topicId,index,perfect);
+        }
+      }
+    }
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
